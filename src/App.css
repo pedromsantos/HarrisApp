@@ -1,0 +1,82 @@
+/* Common styles for left, right, and body sections */
+.left-side,
+.right-side,
+.body {
+  background-color: #ecf0f1;
+  padding: 10px;
+  font-family: 'Verdana', sans-serif;
+  font-size: 13px;
+}
+
+.left-side,
+.right-side {
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Box shadow on the right side */
+}
+
+.body {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for the body */
+}
+
+.left-side ul,
+.right-side ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 8px 0 0; /* Adjust margin for list items */
+}
+
+.left-side li,
+.right-side li {
+  margin-bottom: 4px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.left-side a,
+.right-side a {
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  border-radius: 4px;
+  padding: 2px 6px;
+  min-width: 30px;
+  transition: background-color 0.3s;
+}
+
+.left-side a:hover,
+.right-side a:hover {
+  background-color: #ddd;
+}
+
+/* Header, Body, Right Side, and Footer Sections */
+.header,
+.body,
+.right-side,
+.footer {
+  padding: 10px;
+}
+
+.header {
+  grid-area: header;
+  background-color: #3498db;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+}
+
+.body {
+  grid-area: body;
+  background-color: #ecf0f1;
+  font-family: 'Courier New', monospace;
+}
+
+.right-side {
+  grid-area: rightSide;
+}
+
+.footer {
+  grid-area: footer;
+  background-color: #3498db;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+  font-size: 10px;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); /* Box shadow on the left side */
+}
