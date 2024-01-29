@@ -1,0 +1,18 @@
+import Notation from './Notation';
+import Tab from './Tab';
+
+function Body() {
+  const abc =
+			"M: 4/4\n" +
+			"L: 1/8\n" +
+			"|CEG_B GFED _DC|";
+
+  return (
+    <div className="body">
+      <Notation abcNotation={abc}/>
+      <Tab />
+    </div>
+  );
+}
+
+export default Body;
