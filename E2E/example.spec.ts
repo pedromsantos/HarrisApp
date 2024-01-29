@@ -14,6 +14,12 @@ test('get started link', async ({ page }) => {
   await page.getByRole('link', { name: 'C Position', exact: true }).click();
   await page.getByRole('link', { name: 'Arpeggio Up', exact: true }).click();
 
-  // Expects page to have a heading with the name of Installation.
-  // await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+  const expectedTab = `e|---------|
+B|---------|
+G|-------3-|
+D|---2-5---|
+A|-3-------|
+E|---------|`;
+
+  await expect(page.getByText(expectedTab)).toBeVisible();
 });
