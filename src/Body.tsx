@@ -5,7 +5,7 @@ function Body() {
   const abc =
 			"M: 4/4\n" +
 			"L: 1/8\n" +
-			"|CEG_B GFED _DC|";
+			"|CEG_B AGFE D_DC|";
 
   return (
     <div className="body">
