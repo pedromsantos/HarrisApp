@@ -35,18 +35,33 @@
 .right-side ul {
   list-style-type: none;
   padding: 0;
-  margin: 8px 0 0; /* Adjust margin for list items */
+  margin: 8px 0 0;
+}
+
+.body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 40px;
+  display: flex;
+}
+
+.body li {
+  margin-right: 10px;
+  font-family: 'Verdana', sans-serif;
+  font-size: 14px;
 }
 
 .left-side li,
 .right-side li {
-  margin-bottom: 4px;
+  margin-bottom: x;
   display: flex;
   flex-wrap: wrap;
 }
 
 .left-side a,
-.right-side a {
+.right-side a,
+.body a {
   text-decoration: none;
   color: #333;
   display: flex;
@@ -57,7 +72,8 @@
 }
 
 .left-side a:hover,
-.right-side a:hover {
+.right-side a:hover,
+.body a:hover {
   background-color: #ddd;
 }
 
