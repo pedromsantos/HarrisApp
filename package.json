@@ -23,7 +23,7 @@
     "abcjs": "^6.1.9",
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
-    "@playwright/test": "^1.41.1",
+    "@playwright/test": "^1.41.2",
     "@stryker-mutator/core": "^8.0.0",
     "@stryker-mutator/jest-runner": "^8.0.0",
     "@stryker-mutator/typescript-checker": "^8.0.0",
