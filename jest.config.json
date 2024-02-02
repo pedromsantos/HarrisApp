@@ -1,5 +1,5 @@
 {
-  "collectCoverageFrom": ["src/**/*.ts", "!lib/**/*", "!src/__test__/**/*", "!src/index.ts"],
+  "collectCoverageFrom": ["src/**/*.ts", "src/**/*.tsx", "!src/__test__/**/*"],
   "coverageReporters": ["json", "lcov", "text", "html"],
   "coverageThreshold": {
     "global": {
@@ -10,5 +10,9 @@
     }
   },
   "preset": "ts-jest",
-  "testTimeout": 10000
+  "testTimeout": 10000,
+  "testEnvironment": "jsdom",
+  "moduleNameMapper": {
+    "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+  }
 }

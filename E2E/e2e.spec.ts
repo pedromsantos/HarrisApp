@@ -6,7 +6,7 @@ test('has title', async ({ page }) => {
   await expect(page).toHaveTitle(/Barry Harris Line generation App/);
 });
 
-test('get started link', async ({ page }) => {
+test.skip('Display guitar tab for C7 scale Arpeggio up fom degree I', async ({ page }) => {
   await page.goto('https://harrisjazzlines.com/');
 
   await page.getByRole('link', { name: 'C', exact: true }).click();

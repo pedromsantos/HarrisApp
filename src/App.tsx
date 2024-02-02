@@ -5,7 +5,7 @@ import Body from './Body';
 import RightSide from './RightSide';
 import Footer from './Footer';
 
-function App() {
+function HarrisApp() {
   return (
     <section className="layout">
       <Header />
@@ -17,4 +17,4 @@ function App() {
   );
 }
 
-export default App;
+export default HarrisApp;
