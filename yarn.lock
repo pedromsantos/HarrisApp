@@ -2954,10 +2954,10 @@ eslint-plugin-react-refresh@^0.4.5:
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-refresh/-/eslint-plugin-react-refresh-0.4.5.tgz#6b9b307bad3feba2244ef64a1a15485ac70a2d0f"
   integrity sha512-D53FYKJa+fDmZMtriODxvhwrO+IOqrxoEo21gMA0sjHdU6dPVH4OhyFip9ypl8HOF5RV5KdTo+rBQLvnY2cO8w==
 
-eslint-plugin-simple-import-sort@^11.0.0:
-  version "11.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-simple-import-sort/-/eslint-plugin-simple-import-sort-11.0.0.tgz#06693fd7a19cecc30cb042fb49fed38b3f1c21b0"
-  integrity sha512-3zxeF/0piwHA7/JlbpOmMJ1/1tc1dSRiir4DwpEnP747alKwZbj5xX+ZxroShMBU6LNDkpquo7FsXHCBc0HgCA==
+eslint-plugin-simple-import-sort@^12.0.0:
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-simple-import-sort/-/eslint-plugin-simple-import-sort-12.0.0.tgz#3cfa05d74509bd4dc329a956938823812194dbb6"
+  integrity sha512-8o0dVEdAkYap0Cn5kNeklaKcT1nUsa3LITWEuFk3nJifOoD+5JQGoyDUW2W/iPWwBsNBJpyJS9y4je/BgxLcyQ==
 
 eslint-plugin-sonarjs@^0.23.0:
   version "0.23.0"
