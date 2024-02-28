@@ -20,7 +20,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.6.1",
+    "@commitlint/cli": "^19.0.2",
     "@commitlint/config-conventional": "^19.0.0",
     "@playwright/test": "^1.41.2",
     "@stryker-mutator/core": "^8.0.0",
