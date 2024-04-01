@@ -11,8 +11,6 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
       - uses: actions/checkout@v4
-        with:
-          node-version: 18
       - name: Install dependencies
         run: npm install -g yarn && yarn
       - name: Install Playwright Browsers
