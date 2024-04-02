@@ -1,10 +1,8 @@
 function LeftSide() {
   return (
     <div className="left-side">
-      <div>
-        <b>Select Pitch</b>
-      </div>
       <ul>
+        <b>Select Root</b>
         <li>
           <a href="#">C</a>
         </li>
@@ -47,10 +45,8 @@ function LeftSide() {
           <a href="#">B</a>
         </li>
       </ul>
-      <div>
-        <b>Select Scale</b>
-      </div>
       <ul>
+        <b>Select Scale</b>
         <li>
           <a href="#">Major</a>
         </li>

@@ -21,43 +21,6 @@ function Tab() {
           <br />
         </pre>
       </div>
-      <div>
-        <ul>
-          <li>
-            <a href="#">Open Position</a>
-          </li>
-          <li>
-            <a href="#">C Position</a>
-          </li>
-          <li>
-            <a href="#">A Position</a>
-          </li>
-          <li>
-            <a href="#">G Position</a>
-          </li>
-          <li>
-            <a href="#">E Position</a>
-          </li>
-          <li>
-            <a href="#">D Position</a>
-          </li>
-          <li>
-            <a href="#">C8 Position</a>
-          </li>
-          <li>
-            <a href="#">A8 Position</a>
-          </li>
-          <li>
-            <a href="#">G8 Position</a>
-          </li>
-          <li>
-            <a href="#">E8 Position</a>
-          </li>
-          <li>
-            <a href="#">D8 Position</a>
-          </li>
-        </ul>
-      </div>
     </div>
   );
 }
