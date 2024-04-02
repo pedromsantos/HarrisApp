@@ -41,7 +41,7 @@ function HarrisApp() {
 
   const abc = () => {
     const timeSignature = new SimpleTimeSignature(4, Duration.Quarter);
-    const song = new Song(timeSignature, Key.FMajor);
+    const song = new Song(timeSignature, Key.CMajor);
 
     [...line()].map((pls) =>
       [...pls].map((p) => song.add(new Note(p, Duration.Eighth, Octave.C4)))
