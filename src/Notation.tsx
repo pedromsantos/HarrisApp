@@ -1,14 +1,14 @@
-import abcjs from "abcjs";
-import { useEffect } from "react";
+import abcjs from 'abcjs';
+import { useEffect } from 'react';
 
 export interface NotationProps {
-	abcNotation: string;
+  abc: string;
 }
 
-function Notation({ abcNotation }: NotationProps) {
+function Notation({ abc }: NotationProps) {
   useEffect(() => {
-		abcjs.renderAbc("paper", abcNotation);
-	}, []);
+    abcjs.renderAbc('paper', abc);
+  }, []);
 
   return (
     <div>

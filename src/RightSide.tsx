@@ -2,6 +2,30 @@ function RightSide() {
   return (
     <div className="right-side">
       <ul>
+        <b>Select Scale Degree</b>
+        <li>
+          <a href="#">I</a>
+        </li>
+        <li>
+          <a href="#">II</a>
+        </li>
+        <li>
+          <a href="#">III</a>
+        </li>
+        <li>
+          <a href="#">IV</a>
+        </li>
+        <li>
+          <a href="#">V</a>
+        </li>
+        <li>
+          <a href="#">VI</a>
+        </li>
+        <li>
+          <a href="#">VII</a>
+        </li>
+      </ul>
+      <ul>
         <b>Select Action</b>
         <li>
           <a href="#">Arpeggio Up</a>
