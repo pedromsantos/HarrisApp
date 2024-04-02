@@ -6,8 +6,6 @@ import RightSide from './RightSide';
 import Footer from './Footer';
 import {
   BarryHarrisLine,
-  ChordPattern,
-  ClosedChord,
   Duration,
   GuitarPitchLines,
   Key,
@@ -15,7 +13,6 @@ import {
   Octave,
   Pitch,
   Position,
-  Rest,
   Scale,
   ScaleDegree,
   ScalePattern,
@@ -31,26 +28,8 @@ function HarrisApp() {
   const [scalePattern] = useState<ScalePattern>(ScalePattern.Mixolydian);
   const [scale] = useState<Scale>(new Scale(scalePattern, rootPitch));
 
-  const abc = () => {
-    const timeSignature = new SimpleTimeSignature(4, Duration.Quarter);
-    const song = new Song(timeSignature, Key.CMajor);
-
-    song
-      .add(new Note(Pitch.C, Duration.Quarter, Octave.C4))
-      .add(new Note(Pitch.E, Duration.Quarter, Octave.C4))
-      .add(new Note(Pitch.G, Duration.Eighth, Octave.C4))
-      .add(new Rest(Duration.Eighth))
-      .add(new Note(Pitch.B, Duration.Eighth, Octave.C4))
-      .add(new Note(Pitch.C, Duration.Eighth, Octave.C5))
-      .add(new ClosedChord(Pitch.C, ChordPattern.Major, Duration.Whole, Octave.C4));
-
-    const tune = new abcTune(song.To, Duration.Eighth.To);
-
-    return tune.toString();
-  };
-
-  const tab = () => {
-    const line = new BarryHarrisLine(scale)
+  const line = () => {
+    return new BarryHarrisLine(scale)
       .arpeggioUpFrom(ScaleDegree.I)
       .resolveTo(Pitch.A)
       .scaleDownFromLastPitchTo(ScaleDegree.III)
@@ -58,8 +37,23 @@ function HarrisApp() {
       .resolveTo(Pitch.E)
       .pivotArpeggioUpFromLastPitch()
       .build();
+  };
 
-    const guitarLine = new GuitarPitchLines(line, Position.C);
+  const abc = () => {
+    const timeSignature = new SimpleTimeSignature(4, Duration.Quarter);
+    const song = new Song(timeSignature, Key.FMajor);
+
+    [...line()].map((pls) =>
+      [...pls].map((p) => song.add(new Note(p, Duration.Eighth, Octave.C4)))
+    );
+
+    const tune = new abcTune(song.To, Duration.Eighth.To);
+
+    return tune.toString();
+  };
+
+  const tab = () => {
+    const guitarLine = new GuitarPitchLines(line(), Position.C);
     return Tab.render(guitarLine.toTab());
   };
 
