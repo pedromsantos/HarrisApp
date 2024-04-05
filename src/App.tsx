@@ -24,9 +24,7 @@ import {
 import { useState } from 'react';
 
 function HarrisApp() {
-  const [rootPitch] = useState<Pitch>(Pitch.C);
-  const [scalePattern] = useState<ScalePattern>(ScalePattern.Mixolydian);
-  const [scale] = useState<Scale>(new Scale(scalePattern, rootPitch));
+  const [scale] = useState<Scale>(new Scale(ScalePattern.Mixolydian, Pitch.C));
 
   const line = () => {
     return new BarryHarrisLine(scale)
