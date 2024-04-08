@@ -26,7 +26,7 @@ import { useState } from 'react';
 function HarrisApp() {
   const [scale] = useState<Scale>(new Scale(ScalePattern.Mixolydian, Pitch.C));
 
-  const line = () => {
+  const barryLine = () => {
     return new BarryHarrisLine(scale)
       .arpeggioUpFrom(ScaleDegree.I)
       .resolveTo(Pitch.A)
@@ -41,8 +41,8 @@ function HarrisApp() {
     const timeSignature = new SimpleTimeSignature(4, Duration.Quarter);
     const song = new Song(timeSignature, Key.CMajor);
 
-    [...line()].forEach((sub_lines) =>
-      [...sub_lines].map((p) => song.add(new Note(p, Duration.Eighth, Octave.C4)))
+    [...barryLine()].forEach((sub_line) =>
+      [...sub_line].map((p) => song.add(new Note(p, Duration.Eighth, Octave.C4)))
     );
 
     const tune = new abcTune(song.To, Duration.Eighth.To);
@@ -51,7 +51,7 @@ function HarrisApp() {
   };
 
   const tab = () => {
-    const guitarLine = new GuitarPitchLines(line(), Position.C);
+    const guitarLine = new GuitarPitchLines(barryLine(), Position.C);
     return Tab.render(guitarLine.toTab());
   };
 
