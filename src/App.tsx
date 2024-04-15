@@ -9,7 +9,6 @@ import {
   Duration,
   GuitarPitchLines,
   Key,
-  Note,
   Octave,
   Pitch,
   Position,
@@ -42,7 +41,7 @@ function HarrisApp() {
     const song = new Song(timeSignature, Key.CMajor);
 
     [...barryLine()].forEach((pitchLine) =>
-      [...pitchLine].map((p) => song.add(new Note(p, Duration.Eighth, Octave.C4)))
+      [...pitchLine.melodicLine(Octave.C4, Duration.Eighth)].map((n) => song.add(n))
     );
 
     const tune = new abcTune(song.To, Duration.Eighth.To);
