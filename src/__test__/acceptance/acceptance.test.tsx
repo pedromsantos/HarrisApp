@@ -11,12 +11,12 @@ describe('Harris App Should', () => {
     screen.getByRole('link', { name: 'C Position' }).click();
     screen.getByRole('link', { name: 'Arpeggio Up' }).click();
 
-    const expectedTab = `e|---------|
-B|---------|
-G|-------3-|
-D|---2-5---|
-A|-3-------|
-E|---------|`;
+    const expectedTab = `e|-------------------------------|
+    B|---------------------3-5-------|
+    G|-------3-2---------3-------2-5-|
+    D|---2-5-----5-3-2-5-------3-----|
+    A|-3-----------------------------|
+    E|-------------------------------|`;
 
     expect(screen.getByText(expectedTab)).toHaveTextContent(expectedTab);
   });
