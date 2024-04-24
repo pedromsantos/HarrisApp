@@ -14,12 +14,12 @@ test.skip('Display guitar tab for C7 scale Arpeggio up fom degree I', async ({ p
   await page.getByRole('link', { name: 'C Position', exact: true }).click();
   await page.getByRole('link', { name: 'Arpeggio Up', exact: true }).click();
 
-  const expectedTab = `e|---------|
-B|---------|
-G|-------3-|
-D|---2-5---|
-A|-3-------|
-E|---------|`;
+  const expectedTab = `e|-------------------------------|
+B|---------------------3-5-------|
+G|-------3-2---------3-------2-5-|
+D|---2-5-----5-3-2-5-------3-----|
+A|-3-----------------------------|
+E|-------------------------------|`;
 
   await expect(page.getByText(expectedTab)).toBeVisible();
 });
