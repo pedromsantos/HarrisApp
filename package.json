@@ -54,7 +54,7 @@
     "prettier": "^3.3.3",
     "standard-version": "^9.5.0",
     "ts-coverage": "^0.1.5",
-    "ts-jest": "^29.2.3",
+    "ts-jest": "^29.2.4",
     "type-coverage": "^2.29.1",
     "typescript": "^5.5.4",
     "vite": "^5.3.5"
