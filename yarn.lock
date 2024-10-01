@@ -2680,10 +2680,10 @@ abab@^2.0.6:
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.6.tgz#41b80f2c871d19686216b82309231cfd3cb3d291"
   integrity sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==
 
-abcjs@^6.4.2:
-  version "6.4.2"
-  resolved "https://registry.yarnpkg.com/abcjs/-/abcjs-6.4.2.tgz#1adf9d40c1568d69b0d05644078c846c5c68d471"
-  integrity sha512-NuupFWAQ4kZTlFaC5ubunsr95mzIYXau5wafFjAj9bdD5GZhuTeXuXAYYIOrfFxFge/6YxYB96pU7e/rIRjlIw==
+abcjs@^6.4.3:
+  version "6.4.3"
+  resolved "https://registry.yarnpkg.com/abcjs/-/abcjs-6.4.3.tgz#7dbf4ff1e6eaf6b20f1b2dc4860f1c58eac44885"
+  integrity sha512-v13JdLTuTjWrShIXSWv92SL4/DeXPDl43nWimHBSSPkjDAFmXzlcepVrMsQufQFDxgD5IXvRuwTI00Ed35vooA==
 
 acorn-globals@^7.0.0:
   version "7.0.1"
