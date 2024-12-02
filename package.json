@@ -36,7 +36,7 @@
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.16.0",
     "@vitejs/plugin-react-swc": "^3.7.0",
-    "abcjs": "^6.4.3",
+    "abcjs": "^6.4.4",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.29.0",
