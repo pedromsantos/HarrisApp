@@ -23,7 +23,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.4.1",
     "@commitlint/config-conventional": "^19.4.1",
-    "@playwright/test": "^1.47.2",
+    "@playwright/test": "^1.49.0",
     "@stryker-mutator/core": "^8.0.0",
     "@stryker-mutator/jest-runner": "^8.0.0",
     "@stryker-mutator/typescript-checker": "^8.0.0",
