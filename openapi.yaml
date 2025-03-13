@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: Barry Harris Line Generator API
+  description: An API that generates musical lines based on Barry Harris' concepts
+  version: 1.0.0
+servers:
+  - url: http://barry-harris-line-generator.pedro-santos-personal.workers.dev
+    description: Production server
+paths:
+  /lines:
+    post:
+      summary: Generate musical lines
+      description: Generates musical lines based on given scales and patterns
+      operationId: generateLines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LineGeneratorRequest"
+      responses:
+        "200":
+          description: Successfully generated lines
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LineGeneratorResponse"
+        "400":
+          description: Invalid request body or scale format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Invalid HTTP method
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns OK if the service is healthy
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "OK"
+
+components:
+  schemas:
+    LineGeneratorRequest:
+      type: object
+      required:
+        - from_scale
+        - to_scale
+        - patterns
+      properties:
+        from_scale:
+          type: string
+          description: The starting scale in format 'type note', e.g., 'dominant G3'
+          example: "dominant G3"
+        to_scale:
+          type: string
+          description: The target scale in format 'type note', e.g., 'major C4'
+          example: "major C4"
+        patterns:
+          type: array
+          description: List of patterns to apply
+          items:
+            type: string
+            enum: ["chord_up", "scale_down"]
+          example: ["chord_up"]
+        position:
+          type: integer
+          description: Optional position parameter
+          minimum: 0
+          example: 0
+
+    LineGeneratorResponse:
+      type: object
+      required:
+        - lines
+        - tabs
+      properties:
+        lines:
+          type: array
+          description: Array of pitch lines
+          items:
+            type: array
+            items:
+              type: string
+              pattern: "^[A-G](?:#{1,2}|b{1,2})?[0-9]$"
+          example: [["G3", "B3", "D4", "F4"], ["E4", "B4", "E5", "B5"]]
+        tabs:
+          type: array
+          description: Array of guitar tab lines
+          items:
+            type: array
+            items:
+              type: string
+          example: [["0", "-", "2", "-"], ["1", "-", "3", "-"]]
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Invalid scale format"
