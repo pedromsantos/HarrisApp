@@ -518,14 +518,7 @@ const LineGenerator: React.FC = () => {
                   <div className="text-sm text-primary text-right">{result.to_scale}</div>
                 </div>
 
-                <div
-                  className="border rounded-md divide-y"
-                  style={{
-                    borderColor: 'var(--border)',
-                    '--tw-divide-opacity': '1',
-                    '--tw-divide-color': 'var(--border)',
-                  }}
-                >
+                <div className="border rounded-md divide-y divide-border">
                   {result.lines.map((line, index) => (
                     <div key={index} className="p-3">
                       {/* Pitch notation */}
