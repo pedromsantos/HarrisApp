@@ -2,56 +2,20 @@ import { useTheme } from './ThemeProvider';
 import { Button } from './ui/button';
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
-
-  // Show the next theme that will be selected, not the current theme
-  const getNextTheme = (): 'dark' | 'light' | 'system' => {
-    if (theme === 'dark') return 'light';
-    if (theme === 'light') return 'system';
-    return 'dark';
-  };
+  const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    console.log('Current theme before toggle:', theme, '(resolved:', resolvedTheme, ')');
-    // Cycle through themes: dark → light → system → dark
-    if (theme === 'dark') {
-      setTheme('light');
-    } else if (theme === 'light') {
-      setTheme('system');
-    } else {
-      setTheme('dark');
-    }
-    console.log(
-      'Theme changed to:',
-      theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark'
-    );
+    console.log('Current theme before toggle:', theme);
+    // Toggle between dark and light modes only
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    console.log('Setting theme to:', newTheme);
+    setTheme(newTheme);
   };
 
-  // Render the current theme's icon (not the next theme)
-  // This helps users identify what mode they're currently in
-  const getIconForCurrentTheme = () => {
-    // For system mode, show computer icon
-    if (theme === 'system') {
-      return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect width="18" height="12" x="3" y="4" rx="2" ry="2" />
-          <line x1="2" x2="22" y1="20" y2="20" />
-        </svg>
-      );
-    }
-
-    // For explicit dark/light mode, show the icon for the current mode
+  // Render the current theme's icon
+  const renderIcon = () => {
     if (theme === 'dark') {
+      // Moon icon for dark mode
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -68,6 +32,7 @@ export function ThemeToggle() {
         </svg>
       );
     } else {
+      // Sun icon for light mode
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -100,9 +65,9 @@ export function ThemeToggle() {
       size="icon"
       onClick={toggleTheme}
       className="rounded-full w-9 h-9 border-primary"
-      title={`Current theme: ${theme} (${resolvedTheme}). Click to change to ${getNextTheme()}.`}
+      title={`Current theme: ${theme}. Click to switch to ${theme === 'dark' ? 'light' : 'dark'} mode.`}
     >
-      {getIconForCurrentTheme()}
+      {renderIcon()}
     </Button>
   );
 }

@@ -13,8 +13,12 @@ const App: React.FC = () => {
       window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     );
 
+    // Add a performance class that enables faster transitions
+    document.documentElement.classList.add('performance-transitions');
+
     return () => {
-      // Cleanup - nothing needed here
+      // Cleanup
+      document.documentElement.classList.remove('performance-transitions');
     };
   }, []);
 
@@ -30,12 +34,10 @@ const AppContent: React.FC = () => {
   const isDarkMode = document.documentElement.classList.contains('dark');
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
+    <div className="min-h-screen bg-background text-foreground">
       <header className="bg-card shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-card-foreground">
-            Barry Harris Line Generator {isDarkMode ? '(Dark)' : '(Light)'}
-          </h1>
+          <h1 className="text-3xl font-bold text-card-foreground">Barry Harris Line Generator</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-card-foreground/70 hidden md:inline">Toggle Theme</span>
             <ThemeToggle />

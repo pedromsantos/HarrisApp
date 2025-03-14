@@ -157,7 +157,23 @@
 /* Add smooth transitions for theme changes */
 * {
   transition-property: color, background-color, border-color, box-shadow;
-  transition-duration: 200ms;
+  transition-duration: 100ms;
+}
+
+/* Performance optimizations for theme transitions */
+.performance-transitions * {
+  /* Use hardware acceleration for smoother transitions */
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: color, background-color;
+}
+
+/* Important theme elements get higher priority transitions */
+.dark body, .light body,
+.dark header, .light header,
+.dark .bg-card, .light .bg-card {
+  transition-duration: 80ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Debug styles to help see theme changes */

@@ -1,37 +1,29 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // Define the possible theme values
-export type Theme = 'dark' | 'light' | 'system';
+export type Theme = 'dark' | 'light';
 
 type ThemeProviderProps = {
   children: React.ReactNode;
-  defaultTheme?: Theme;
   storageKey?: string;
 };
 
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  resolvedTheme: 'dark' | 'light'; // Add this to track the actual applied theme
 };
 
 const initialState: ThemeProviderState = {
-  theme: 'system',
+  theme: 'light',
   setTheme: () => null,
-  resolvedTheme: 'light',
 };
 
 // Create context
 const ThemeContext = createContext<ThemeProviderState>(initialState);
 
-export function ThemeProvider({
-  children,
-  defaultTheme = 'system',
-  storageKey = 'ui-theme',
-  ...props
-}: ThemeProviderProps) {
+export function ThemeProvider({ children, storageKey = 'ui-theme', ...props }: ThemeProviderProps) {
   // Helper to get system theme preference
-  const getSystemTheme = (): 'dark' | 'light' => {
+  const getSystemTheme = (): Theme => {
     try {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         return 'dark';
@@ -48,44 +40,39 @@ export function ThemeProvider({
       const storedTheme = localStorage.getItem(storageKey);
       console.log('Stored theme from localStorage:', storedTheme);
 
-      if (storedTheme && ['dark', 'light', 'system'].includes(storedTheme)) {
+      if (storedTheme && ['dark', 'light'].includes(storedTheme)) {
         return storedTheme as Theme;
       }
     } catch (error) {
       console.error('Error reading theme from localStorage:', error);
     }
 
-    console.log(`Using default theme: ${defaultTheme}`);
-    return defaultTheme;
+    // Default to system preference
+    const systemTheme = getSystemTheme();
+    console.log(`Using system theme as default: ${systemTheme}`);
+    return systemTheme;
   });
-
-  // Track the actual resolved theme (dark or light)
-  const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>(
-    theme === 'system' ? getSystemTheme() : (theme as 'dark' | 'light')
-  );
 
   // Function to apply theme to document
   const applyTheme = (newTheme: Theme) => {
     try {
       console.log('Applying theme:', newTheme);
-      const resolved = newTheme === 'system' ? getSystemTheme() : (newTheme as 'dark' | 'light');
-      setResolvedTheme(resolved);
 
       const root = window.document.documentElement;
       // First remove both classes to ensure clean state
       root.classList.remove('light', 'dark');
       // Then add the appropriate class
-      root.classList.add(resolved);
-      root.setAttribute('data-theme', resolved);
+      root.classList.add(newTheme);
+      root.setAttribute('data-theme', newTheme);
 
       // Force Tailwind to recognize the theme change
-      if (resolved === 'dark') {
+      if (newTheme === 'dark') {
         root.style.colorScheme = 'dark';
       } else {
         root.style.colorScheme = 'light';
       }
 
-      console.log(`Theme applied: ${resolved} (from ${newTheme})`);
+      console.log(`Theme applied: ${newTheme}`);
     } catch (error) {
       console.error('Error applying theme:', error);
     }
@@ -94,7 +81,7 @@ export function ThemeProvider({
   // Controlled function to set theme with validation and logging
   const setTheme = (newTheme: Theme) => {
     console.log(`Setting theme from ${theme} to ${newTheme}`);
-    if (!['dark', 'light', 'system'].includes(newTheme)) {
+    if (!['dark', 'light'].includes(newTheme)) {
       console.error('Invalid theme:', newTheme);
       return;
     }
@@ -104,7 +91,11 @@ export function ThemeProvider({
   // Apply theme on mount and when theme changes
   useEffect(() => {
     console.log('Theme changed to:', theme);
-    applyTheme(theme);
+
+    // Immediate DOM update for better perceived performance
+    requestAnimationFrame(() => {
+      applyTheme(theme);
+    });
 
     try {
       localStorage.setItem(storageKey, theme);
@@ -114,21 +105,17 @@ export function ThemeProvider({
     }
   }, [theme, storageKey]);
 
-  // Listen for system theme changes if using 'system' theme
+  // Listen for system theme changes to log, but don't auto-change anymore since we're not using 'system' mode
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const handleChange = () => {
-      console.log('System theme preference changed, current theme:', theme);
-      if (theme === 'system') {
-        console.log('Applying system theme change');
-        applyTheme('system');
-      }
+      console.log('System theme preference changed, but not auto-updating theme.');
     };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
+  }, []);
 
   // Apply initial theme immediately on mount and force a reapplication
   useEffect(() => {
@@ -138,20 +125,18 @@ export function ThemeProvider({
     // Force immediate theme application on mount
     applyTheme(theme);
 
-    // Apply theme again after a small delay to ensure it sticks
-    const timer = setTimeout(() => {
-      console.log('Reapplying theme after delay');
-      applyTheme(theme);
-    }, 100);
+    // No need for the delayed application, it can slow things down
+    // Remove the setTimeout for faster initial load
 
-    return () => clearTimeout(timer);
+    return () => {
+      // No timer to clean up anymore
+    };
   }, []);
 
-  // Expose theme context with both the theme setting and resolved theme
+  // Expose theme context
   const value = {
     theme,
     setTheme,
-    resolvedTheme,
   };
 
   return (
