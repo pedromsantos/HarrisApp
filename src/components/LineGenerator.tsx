@@ -525,9 +525,9 @@ const LineGenerator: React.FC = () => {
                         <pre className="p-0 m-0 font-mono text-sm overflow-x-auto whitespace-pre">
                           {result.tabs && result.tabs[index]
                             ? Array.isArray(result.tabs[index])
-                              ? result.tabs[index].join('\n')
+                              ? result.tabs[index]?.join('\n') || ''
                               : typeof result.tabs[index] === 'string'
-                                ? String(result.tabs[index])
+                                ? String(result.tabs[index] || '')
                                 : 'Invalid tab format'
                             : 'No tab data available'}
                         </pre>

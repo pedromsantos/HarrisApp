@@ -31,8 +31,6 @@ const App: React.FC = () => {
 
 // Separating the content to ensure it re-renders when theme context changes
 const AppContent: React.FC = () => {
-  const isDarkMode = document.documentElement.classList.contains('dark');
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="bg-card shadow">
