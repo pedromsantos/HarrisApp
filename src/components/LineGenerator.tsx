@@ -529,15 +529,15 @@ const LineGenerator: React.FC = () => {
                   {result.lines.map((line, index) => (
                     <div key={index} className="p-3">
                       {/* Pitch notation */}
-                      <div className="bg-primary/10 p-2 rounded-t mb-1">
-                        <code className="text-primary-foreground text-sm block">
+                      <div className="p-2 rounded-t mb-1 bg-primary/10">
+                        <code className="text-sm block font-medium text-foreground">
                           {line.join(', ')}
                         </code>
                       </div>
 
                       {/* Tab notation */}
-                      <div className="bg-muted/30 p-2 rounded-b">
-                        <pre className="p-0 m-0 font-mono text-sm overflow-x-auto whitespace-pre">
+                      <div className="p-2 rounded-b bg-muted/30">
+                        <pre className="p-0 m-0 font-mono text-sm overflow-x-auto whitespace-pre text-foreground">
                           {result.tabs && result.tabs[index]
                             ? Array.isArray(result.tabs[index])
                               ? result.tabs[index]?.join('\n') || ''
