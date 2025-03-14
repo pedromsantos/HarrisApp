@@ -77,9 +77,21 @@ const LineGenerator: React.FC = () => {
       console.log('Response status:', response.status, response.statusText);
       const data = await response.json();
       console.log('Response data:', data);
+      console.log('Tab data:', data.tabs);
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to generate lines');
+      }
+
+      // Validate the response structure
+      if (!data.lines || !Array.isArray(data.lines)) {
+        throw new Error('Invalid response format: missing or invalid lines data');
+      }
+
+      // If tabs is missing but we have lines, create an empty tabs array
+      if (!data.tabs) {
+        console.warn('Tab data missing from API response, creating empty tabs array');
+        data.tabs = data.lines.map(() => []);
       }
 
       setResult(data);
@@ -196,118 +208,173 @@ const LineGenerator: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-background text-foreground py-6 px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl mx-auto">
         {/* Left Card - Inputs */}
-        <Card>
+        <Card className="h-fit">
           <CardHeader>
             <CardTitle>Line Generator</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* From Scale Section */}
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">From Scale</h3>
-              <div className="flex gap-4">
-                <Select
-                  value={getScaleType(formData.from_scale)}
-                  onValueChange={(value) =>
-                    handleScaleChange('from_scale', value, getScaleNote(formData.from_scale))
-                  }
-                  disabled={isLoading}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select scale type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SCALE_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select
-                  value={getScaleNote(formData.from_scale)}
-                  onValueChange={(value) =>
-                    handleScaleChange('from_scale', getScaleType(formData.from_scale), value)
-                  }
-                  disabled={isLoading}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select note" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {NOTES.map((note) =>
-                      OCTAVES.map((octave) => (
-                        <SelectItem key={`${note}${octave}`} value={`${note}${octave}`}>
-                          {note}
-                          {octave}
+          <CardContent className="space-y-3">
+            {/* From Scale and To Scale in a row to save vertical space */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* From Scale Section */}
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">From Scale</h3>
+                <div className="flex gap-2">
+                  <Select
+                    value={getScaleType(formData.from_scale)}
+                    onValueChange={(value) =>
+                      handleScaleChange('from_scale', value, getScaleNote(formData.from_scale))
+                    }
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Scale type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SCALE_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
                         </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={getScaleNote(formData.from_scale)}
+                    onValueChange={(value) =>
+                      handleScaleChange('from_scale', getScaleType(formData.from_scale), value)
+                    }
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Note" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {NOTES.map((note) =>
+                        OCTAVES.map((octave) => (
+                          <SelectItem key={`${note}${octave}`} value={`${note}${octave}`}>
+                            {note}
+                            {octave}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* To Scale Section */}
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">To Scale</h3>
+                <div className="flex gap-2">
+                  <Select
+                    value={getScaleType(formData.to_scale)}
+                    onValueChange={(value) =>
+                      handleScaleChange('to_scale', value, getScaleNote(formData.to_scale))
+                    }
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Scale type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SCALE_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={getScaleNote(formData.to_scale)}
+                    onValueChange={(value) =>
+                      handleScaleChange('to_scale', getScaleType(formData.to_scale), value)
+                    }
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Note" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {NOTES.map((note) =>
+                        OCTAVES.map((octave) => (
+                          <SelectItem key={`${note}${octave}`} value={`${note}${octave}`}>
+                            {note}
+                            {octave}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
-            {/* To Scale Section */}
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">To Scale</h3>
-              <div className="flex gap-4">
-                <Select
-                  value={getScaleType(formData.to_scale)}
-                  onValueChange={(value) =>
-                    handleScaleChange('to_scale', value, getScaleNote(formData.to_scale))
+            {/* Position Section - inline with Generate button to save space */}
+            <div className="grid grid-cols-3 gap-2 items-end">
+              <div className="col-span-1">
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Position (0-12)</h3>
+                <Input
+                  type="number"
+                  value={formData.position}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, position: parseInt(e.target.value) || 0 }))
                   }
+                  min="0"
+                  max="12"
                   disabled={isLoading}
+                />
+              </div>
+              <div className="col-span-2">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={formData.patterns.length === 0 || isLoading}
+                  className="w-full h-full"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select scale type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SCALE_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select
-                  value={getScaleNote(formData.to_scale)}
-                  onValueChange={(value) =>
-                    handleScaleChange('to_scale', getScaleType(formData.to_scale), value)
-                  }
-                  disabled={isLoading}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select note" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {NOTES.map((note) =>
-                      OCTAVES.map((octave) => (
-                        <SelectItem key={`${note}${octave}`} value={`${note}${octave}`}>
-                          {note}
-                          {octave}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+                  {isLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Generating...
+                    </>
+                  ) : (
+                    'Generate Lines'
+                  )}
+                </Button>
               </div>
             </div>
 
             {/* Patterns Section */}
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">Patterns</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Patterns</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Available Patterns */}
                 <div>
-                  <h4 className="text-xs text-muted-foreground mb-2">Available Patterns</h4>
-                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-[200px] overflow-y-auto">
+                  <h4 className="text-xs text-muted-foreground mb-1">Available Patterns</h4>
+                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-auto min-h-[350px]">
                     {availablePatterns.map((pattern) => (
                       <div
                         key={pattern}
-                        className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted cursor-pointer"
+                        className="flex items-center justify-between py-1.5 px-3 rounded-md hover:bg-muted cursor-pointer my-1"
                         onClick={() => addPattern(pattern)}
                       >
                         <span className="text-sm">{pattern.replace(/_/g, ' ')}</span>
@@ -332,12 +399,12 @@ const LineGenerator: React.FC = () => {
 
                 {/* Selected Patterns */}
                 <div>
-                  <h4 className="text-xs text-muted-foreground mb-2">Selected Patterns</h4>
-                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-[200px] overflow-y-auto">
+                  <h4 className="text-xs text-muted-foreground mb-1">Selected Patterns</h4>
+                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-auto min-h-[350px]">
                     {formData.patterns.map((pattern, index) => (
                       <div
                         key={`${pattern}-${index}`}
-                        className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted mb-2"
+                        className="flex items-center justify-between py-1.5 px-3 rounded-md hover:bg-muted my-1"
                       >
                         <span className="text-sm">{pattern.replace(/_/g, ' ')}</span>
                         <div className="flex space-x-2">
@@ -421,75 +488,15 @@ const LineGenerator: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            {/* Position Section */}
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">Position (0-12)</h3>
-              <Input
-                type="number"
-                value={formData.position}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, position: parseInt(e.target.value) || 0 }))
-                }
-                min="0"
-                max="12"
-                disabled={isLoading}
-              />
-            </div>
-
-            {/* Generate Button */}
-            <Button
-              onClick={handleSubmit}
-              disabled={formData.patterns.length === 0 || isLoading}
-              className="w-full"
-            >
-              {isLoading ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Generating...
-                </>
-              ) : (
-                'Generate Lines'
-              )}
-            </Button>
           </CardContent>
         </Card>
 
         {/* Right Card - Results */}
-        <Card>
+        <Card className="h-fit">
           <CardHeader>
             <CardTitle>Generated Lines</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="mb-6">
-              <Button
-                type="submit"
-                disabled={isLoading || formData.patterns.length === 0}
-                className="w-full"
-              >
-                {isLoading ? 'Generating...' : 'Generate Lines'}
-              </Button>
-            </form>
-
             {error && (
               <div className="bg-destructive/10 text-destructive p-4 rounded-md mb-4" role="alert">
                 <p>{error}</p>
@@ -497,34 +504,36 @@ const LineGenerator: React.FC = () => {
             )}
 
             {result && (
-              <div className="space-y-4">
-                <div className="text-sm">
-                  <span className="font-medium">From: </span>
-                  <span className="text-primary">{result.from_scale}</span>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-sm text-primary">{result.from_scale}</div>
+                  <div className="text-sm text-primary text-right">{result.to_scale}</div>
                 </div>
-                <div className="text-sm">
-                  <span className="font-medium">To: </span>
-                  <span className="text-primary">{result.to_scale}</span>
-                </div>
-                <div className="space-y-2">
-                  <div className="font-medium text-sm">Generated Lines:</div>
-                  <div className="border border-border rounded-md divide-y divide-border">
-                    {result.lines.map((line, index) => (
-                      <div key={index} className="p-3 bg-card">
-                        <div className="font-medium text-sm mb-1">Line {index + 1}</div>
-                        <div className="grid grid-cols-6 gap-2">
-                          {line.map((note, noteIndex) => (
-                            <span
-                              key={noteIndex}
-                              className="inline-block text-center py-1 px-2 rounded bg-primary/10 text-primary-foreground text-sm"
-                            >
-                              {note}
-                            </span>
-                          ))}
-                        </div>
+
+                <div className="border border-border rounded-md divide-y divide-border">
+                  {result.lines.map((line, index) => (
+                    <div key={index} className="p-3">
+                      {/* Pitch notation */}
+                      <div className="bg-primary/10 p-2 rounded-t mb-1">
+                        <code className="text-primary-foreground text-sm block">
+                          {line.join(', ')}
+                        </code>
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Tab notation */}
+                      <div className="bg-muted/30 p-2 rounded-b">
+                        <pre className="p-0 m-0 font-mono text-sm overflow-x-auto whitespace-pre">
+                          {result.tabs && result.tabs[index]
+                            ? Array.isArray(result.tabs[index])
+                              ? result.tabs[index].join('\n')
+                              : typeof result.tabs[index] === 'string'
+                                ? String(result.tabs[index])
+                                : 'Invalid tab format'
+                            : 'No tab data available'}
+                        </pre>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
