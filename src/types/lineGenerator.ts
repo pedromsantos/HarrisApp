@@ -21,6 +21,8 @@ export interface LineGeneratorRequest {
 export interface LineGeneratorResponse {
   lines: string[][];
   tabs: string[][];
+  from_scale: string;
+  to_scale: string;
 }
 
 export interface ErrorResponse {

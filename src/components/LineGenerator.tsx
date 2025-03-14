@@ -155,13 +155,20 @@ const LineGenerator: React.FC = () => {
 
   if (isServerHealthy === false) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8">
         <Card className="max-w-4xl mx-auto">
           <CardContent className="p-6">
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r" role="alert">
+            <div
+              className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 dark:border-red-600 p-4 rounded-r"
+              role="alert"
+            >
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <svg
+                    className="h-5 w-5 text-red-400 dark:text-red-500"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -170,8 +177,10 @@ const LineGenerator: React.FC = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-red-800">Server Unavailable</h3>
-                  <p className="mt-2 text-red-700">
+                  <h3 className="text-lg font-medium text-red-800 dark:text-red-200">
+                    Server Unavailable
+                  </h3>
+                  <p className="mt-2 text-red-700 dark:text-red-300">
                     The line generator service is currently unavailable. Please try again later.
                   </p>
                 </div>
@@ -187,7 +196,7 @@ const LineGenerator: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto">
         {/* Left Card - Inputs */}
         <Card>
@@ -197,7 +206,7 @@ const LineGenerator: React.FC = () => {
           <CardContent className="space-y-6">
             {/* From Scale Section */}
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-3">From Scale</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">From Scale</h3>
               <div className="flex gap-4">
                 <Select
                   value={getScaleType(formData.from_scale)}
@@ -243,7 +252,7 @@ const LineGenerator: React.FC = () => {
 
             {/* To Scale Section */}
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-3">To Scale</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">To Scale</h3>
               <div className="flex gap-4">
                 <Select
                   value={getScaleType(formData.to_scale)}
@@ -289,28 +298,33 @@ const LineGenerator: React.FC = () => {
 
             {/* Patterns Section */}
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-3">Patterns</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">Patterns</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Available Patterns */}
                 <div>
-                  <h4 className="text-xs text-gray-500 mb-2">Available Patterns</h4>
-                  <div className="bg-white rounded-lg border border-gray-200 p-3 h-[200px] overflow-y-auto">
+                  <h4 className="text-xs text-muted-foreground mb-2">Available Patterns</h4>
+                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-[200px] overflow-y-auto">
                     {availablePatterns.map((pattern) => (
                       <div
                         key={pattern}
-                        className="mb-2 p-2 bg-gray-50 rounded-lg border border-gray-100 flex justify-between items-center hover:border-gray-300 transition-colors"
+                        className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted cursor-pointer"
+                        onClick={() => addPattern(pattern)}
                       >
-                        <span className="text-gray-700 capitalize text-sm">
-                          {pattern.split('_').join(' ')}
-                        </span>
-                        <Button
-                          type="button"
-                          onClick={() => addPattern(pattern)}
-                          disabled={isLoading}
-                          size="sm"
+                        <span className="text-sm">{pattern.replace(/_/g, ' ')}</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-primary"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
                         >
-                          Add
-                        </Button>
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 4v16m8-8H4"
+                          />
+                        </svg>
                       </div>
                     ))}
                   </div>
@@ -318,50 +332,91 @@ const LineGenerator: React.FC = () => {
 
                 {/* Selected Patterns */}
                 <div>
-                  <h4 className="text-xs text-gray-500 mb-2">Selected Patterns</h4>
-                  <div className="bg-white rounded-lg border border-gray-200 p-3 h-[200px] overflow-y-auto">
+                  <h4 className="text-xs text-muted-foreground mb-2">Selected Patterns</h4>
+                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-[200px] overflow-y-auto">
                     {formData.patterns.map((pattern, index) => (
                       <div
-                        key={pattern}
-                        className="mb-2 p-2 bg-blue-50 rounded-lg border border-blue-100 flex justify-between items-center"
+                        key={`${pattern}-${index}`}
+                        className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted mb-2"
                       >
-                        <span className="text-gray-700 capitalize text-sm">
-                          {pattern.split('_').join(' ')}
-                        </span>
-                        <div className="flex gap-1">
-                          <Button
+                        <span className="text-sm">{pattern.replace(/_/g, ' ')}</span>
+                        <div className="flex space-x-2">
+                          <button
                             type="button"
                             onClick={() => movePatternUp(index)}
-                            disabled={index === 0 || isLoading}
-                            variant="secondary"
-                            size="icon"
-                            className="h-7 w-7"
+                            disabled={index === 0}
+                            className={`text-primary ${
+                              index === 0 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'
+                            }`}
                           >
-                            ↑
-                          </Button>
-                          <Button
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 15l7-7 7 7"
+                              />
+                            </svg>
+                          </button>
+                          <button
                             type="button"
                             onClick={() => movePatternDown(index)}
-                            disabled={index === formData.patterns.length - 1 || isLoading}
-                            variant="secondary"
-                            size="icon"
-                            className="h-7 w-7"
+                            disabled={index === formData.patterns.length - 1}
+                            className={`text-primary ${
+                              index === formData.patterns.length - 1
+                                ? 'opacity-30 cursor-not-allowed'
+                                : 'cursor-pointer'
+                            }`}
                           >
-                            ↓
-                          </Button>
-                          <Button
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                              />
+                            </svg>
+                          </button>
+                          <button
                             type="button"
                             onClick={() => removePattern(pattern)}
-                            variant="destructive"
-                            size="sm"
-                            disabled={isLoading}
-                            className="h-7"
+                            className="text-destructive cursor-pointer"
                           >
-                            ✕
-                          </Button>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
                         </div>
                       </div>
                     ))}
+                    {formData.patterns.length === 0 && (
+                      <div className="text-muted-foreground text-sm italic text-center py-8">
+                        No patterns selected
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -369,7 +424,7 @@ const LineGenerator: React.FC = () => {
 
             {/* Position Section */}
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-3">Position (0-12)</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">Position (0-12)</h3>
               <Input
                 type="number"
                 value={formData.position}
@@ -425,51 +480,59 @@ const LineGenerator: React.FC = () => {
             <CardTitle>Generated Lines</CardTitle>
           </CardHeader>
           <CardContent>
+            <form onSubmit={handleSubmit} className="mb-6">
+              <Button
+                type="submit"
+                disabled={isLoading || formData.patterns.length === 0}
+                className="w-full"
+              >
+                {isLoading ? 'Generating...' : 'Generate Lines'}
+              </Button>
+            </form>
+
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r mb-6">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-red-700">{error}</p>
+              <div className="bg-destructive/10 text-destructive p-4 rounded-md mb-4" role="alert">
+                <p>{error}</p>
+              </div>
+            )}
+
+            {result && (
+              <div className="space-y-4">
+                <div className="text-sm">
+                  <span className="font-medium">From: </span>
+                  <span className="text-primary">{result.from_scale}</span>
+                </div>
+                <div className="text-sm">
+                  <span className="font-medium">To: </span>
+                  <span className="text-primary">{result.to_scale}</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="font-medium text-sm">Generated Lines:</div>
+                  <div className="border border-border rounded-md divide-y divide-border">
+                    {result.lines.map((line, index) => (
+                      <div key={index} className="p-3 bg-card">
+                        <div className="font-medium text-sm mb-1">Line {index + 1}</div>
+                        <div className="grid grid-cols-6 gap-2">
+                          {line.map((note, noteIndex) => (
+                            <span
+                              key={noteIndex}
+                              className="inline-block text-center py-1 px-2 rounded bg-primary/10 text-primary-foreground text-sm"
+                            >
+                              {note}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
             )}
 
             {!result && !error && (
-              <div className="flex justify-center items-center h-[300px] text-gray-400">
-                Generate lines to see the results here
-              </div>
-            )}
-
-            {result && result.lines && result.tabs && (
-              <div className="space-y-4 overflow-y-auto max-h-[70vh]">
-                {result.tabs.map((tab, index) => {
-                  const line = result.lines[index];
-                  return line && line.length > 8 ? (
-                    <Card key={index} className="border-gray-200">
-                      <CardContent className="p-4">
-                        <pre
-                          className="font-mono text-sm leading-relaxed tracking-wider overflow-x-auto bg-gray-50 p-3 rounded"
-                          style={{
-                            fontFamily: "'Courier New', Courier, monospace",
-                            letterSpacing: '0.2em',
-                          }}
-                        >
-                          {tab.join('\n')}
-                        </pre>
-                      </CardContent>
-                    </Card>
-                  ) : null;
-                })}
+              <div className="text-center text-muted-foreground py-8">
+                Select your parameters and click "Generate Lines" to create lines based on Barry
+                Harris' method.
               </div>
             )}
           </CardContent>
