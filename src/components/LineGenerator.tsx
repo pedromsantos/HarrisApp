@@ -27,8 +27,6 @@ const PATTERNS: Pattern[] = [
   'third_down',
 ];
 
-type DroppableId = 'available' | 'selected';
-
 const LineGenerator: React.FC = () => {
   const [formData, setFormData] = useState<LineGeneratorRequest>({
     from_scale: 'dominant G3',
