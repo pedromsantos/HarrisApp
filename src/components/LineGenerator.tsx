@@ -213,7 +213,7 @@ const LineGenerator: React.FC = () => {
         {/* Left Card - Inputs */}
         <Card className="h-fit">
           <CardHeader>
-            <CardTitle>Line Generator</CardTitle>
+            <CardTitle>Line Generation input</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {/* From Scale and To Scale in a row to save vertical space */}
@@ -222,24 +222,6 @@ const LineGenerator: React.FC = () => {
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">From Scale</h3>
                 <div className="flex gap-2">
-                  <Select
-                    value={getScaleType(formData.from_scale)}
-                    onValueChange={(value) =>
-                      handleScaleChange('from_scale', value, getScaleNote(formData.from_scale))
-                    }
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Scale type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SCALE_TYPES.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                   <Select
                     value={getScaleNote(formData.from_scale)}
                     onValueChange={(value) =>
@@ -261,17 +243,10 @@ const LineGenerator: React.FC = () => {
                       )}
                     </SelectContent>
                   </Select>
-                </div>
-              </div>
-
-              {/* To Scale Section */}
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">To Scale</h3>
-                <div className="flex gap-2">
                   <Select
-                    value={getScaleType(formData.to_scale)}
+                    value={getScaleType(formData.from_scale)}
                     onValueChange={(value) =>
-                      handleScaleChange('to_scale', value, getScaleNote(formData.to_scale))
+                      handleScaleChange('from_scale', value, getScaleNote(formData.from_scale))
                     }
                     disabled={isLoading}
                   >
@@ -286,6 +261,13 @@ const LineGenerator: React.FC = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+
+              {/* To Scale Section */}
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">To Scale</h3>
+                <div className="flex gap-2">
                   <Select
                     value={getScaleNote(formData.to_scale)}
                     onValueChange={(value) =>
@@ -307,13 +289,33 @@ const LineGenerator: React.FC = () => {
                       )}
                     </SelectContent>
                   </Select>
+                  <Select
+                    value={getScaleType(formData.to_scale)}
+                    onValueChange={(value) =>
+                      handleScaleChange('to_scale', value, getScaleNote(formData.to_scale))
+                    }
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Scale type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SCALE_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
 
             {/* Position Section - standalone without Generate button */}
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">Position (0-12)</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                Guitar Position (0-12)
+              </h3>
               <Input
                 type="number"
                 value={formData.position}
@@ -333,7 +335,10 @@ const LineGenerator: React.FC = () => {
                 {/* Available Patterns */}
                 <div>
                   <h4 className="text-xs text-muted-foreground mb-1">Available Patterns</h4>
-                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-auto min-h-[350px]">
+                  <div
+                    className="bg-background dark:bg-card rounded-lg border p-3 h-auto min-h-[350px]"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
                     {availablePatterns.map((pattern) => (
                       <div
                         key={pattern}
@@ -363,7 +368,10 @@ const LineGenerator: React.FC = () => {
                 {/* Selected Patterns */}
                 <div>
                   <h4 className="text-xs text-muted-foreground mb-1">Selected Patterns</h4>
-                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-auto min-h-[350px]">
+                  <div
+                    className="bg-background dark:bg-card rounded-lg border p-3 h-auto min-h-[350px]"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
                     {formData.patterns.map((pattern, index) => (
                       <div
                         key={`${pattern}-${index}`}
@@ -510,7 +518,14 @@ const LineGenerator: React.FC = () => {
                   <div className="text-sm text-primary text-right">{result.to_scale}</div>
                 </div>
 
-                <div className="border border-border rounded-md divide-y divide-border">
+                <div
+                  className="border rounded-md divide-y"
+                  style={{
+                    borderColor: 'var(--border)',
+                    '--tw-divide-opacity': '1',
+                    '--tw-divide-color': 'var(--border)',
+                  }}
+                >
                   {result.lines.map((line, index) => (
                     <div key={index} className="p-3">
                       {/* Pitch notation */}
