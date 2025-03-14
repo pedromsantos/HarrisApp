@@ -335,10 +335,7 @@ const LineGenerator: React.FC = () => {
                 {/* Available Patterns */}
                 <div>
                   <h4 className="text-xs text-muted-foreground mb-1">Available Patterns</h4>
-                  <div
-                    className="bg-background dark:bg-card rounded-lg border p-3 h-auto min-h-[350px]"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
+                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-auto min-h-[350px]">
                     {availablePatterns.map((pattern) => (
                       <div
                         key={pattern}
@@ -368,10 +365,7 @@ const LineGenerator: React.FC = () => {
                 {/* Selected Patterns */}
                 <div>
                   <h4 className="text-xs text-muted-foreground mb-1">Selected Patterns</h4>
-                  <div
-                    className="bg-background dark:bg-card rounded-lg border p-3 h-auto min-h-[350px]"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
+                  <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-auto min-h-[350px]">
                     {formData.patterns.map((pattern, index) => (
                       <div
                         key={`${pattern}-${index}`}
