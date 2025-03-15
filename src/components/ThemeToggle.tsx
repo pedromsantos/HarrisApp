@@ -5,11 +5,7 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    console.log('Current theme before toggle:', theme);
-    // Toggle between dark and light modes only
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    console.log('Setting theme to:', newTheme);
-    setTheme(newTheme);
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   // Render the current theme's icon

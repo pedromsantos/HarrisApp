@@ -7,12 +7,6 @@ import { ThemeToggle } from './components/ThemeToggle';
 const App: React.FC = () => {
   // Apply initial theme classes to help prevent flickering
   useEffect(() => {
-    // For debugging - show the current mode in browser console
-    console.log(
-      'Initial OS theme:',
-      window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    );
-
     // Add a performance class that enables faster transitions
     document.documentElement.classList.add('performance-transitions');
 
