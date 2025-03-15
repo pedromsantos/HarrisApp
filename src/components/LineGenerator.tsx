@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import * as ABCJS from 'abcjs';
 import {
   LineGeneratorRequest,
   LineGeneratorResponse,
@@ -9,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { convertToABC } from '../lib/musicNotation';
 
 const API_BASE_URL = 'https://barry-harris-line-generator.pedro-santos-personal.workers.dev';
 
@@ -39,6 +41,7 @@ const LineGenerator: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isServerHealthy, setIsServerHealthy] = useState<boolean | null>(null);
+  const notationRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     checkServerHealth();
@@ -164,6 +167,25 @@ const LineGenerator: React.FC = () => {
     const parts = scale.split(' ');
     return (parts[1] ?? `${NOTES[0]}${OCTAVES[0]}`) as string;
   };
+
+  // Render ABC notation when results are available
+  useEffect(() => {
+    if (result && result.lines) {
+      result.lines.forEach((line, index) => {
+        if (notationRefs.current && index < notationRefs.current.length) {
+          const container = notationRefs.current[index];
+          if (container) {
+            const abcNotation = convertToABC(line);
+            ABCJS.renderAbc(container, abcNotation, {
+              responsive: 'resize',
+              add_classes: true,
+              staffwidth: 500,
+            });
+          }
+        }
+      });
+    }
+  }, [result]);
 
   if (isServerHealthy === false) {
     return (
@@ -522,12 +544,18 @@ const LineGenerator: React.FC = () => {
                         </code>
                       </div>
 
+                      {/* Music notation */}
+                      <div
+                        ref={(el) => (notationRefs.current[index] = el)}
+                        className="p-2 mb-1 bg-background rounded overflow-auto"
+                      ></div>
+
                       {/* Tab notation */}
                       <div className="p-2 rounded-b bg-muted/30">
                         <pre className="p-0 m-0 font-mono text-sm overflow-x-auto whitespace-pre text-foreground">
                           {result.tabs && result.tabs[index]
                             ? Array.isArray(result.tabs[index])
-                              ? result.tabs[index]?.join('\n') || ''
+                              ? (result.tabs[index] as string[]).join('\n') || ''
                               : typeof result.tabs[index] === 'string'
                                 ? String(result.tabs[index] || '')
                                 : 'Invalid tab format'
