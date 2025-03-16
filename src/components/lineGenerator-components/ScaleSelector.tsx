@@ -10,106 +10,124 @@ export interface ScaleSelectorProps {
   isLoading: boolean;
 }
 
+interface ScaleUtils {
+  getScaleType: (scale: string) => string;
+  getScaleNote: (scale: string) => string;
+}
+
+const useScaleUtils = (): ScaleUtils => ({
+  getScaleType: (scale: string): string => {
+    const parts = scale.split(' ');
+    return (parts[0] ?? SCALE_TYPES[0]) as string;
+  },
+  getScaleNote: (scale: string): string => {
+    const parts = scale.split(' ');
+    return (parts[1] ?? `${NOTES[0]}${OCTAVES[0]}`) as string;
+  },
+});
+
+interface NoteSelectProps {
+  value: string;
+  onChange: (value: string) => void;
+  isDisabled?: boolean;
+}
+
+const NoteSelect: React.FC<NoteSelectProps> = ({ value, onChange, isDisabled = false }) => (
+  <Select value={value} onValueChange={onChange} disabled={isDisabled}>
+    <SelectTrigger>
+      <SelectValue placeholder="Note" />
+    </SelectTrigger>
+    <SelectContent>
+      {NOTES.map((note) =>
+        OCTAVES.map((octave) => (
+          <SelectItem key={`${note}${octave}`} value={`${note}${octave}`}>
+            {note}
+            {octave}
+          </SelectItem>
+        ))
+      )}
+    </SelectContent>
+  </Select>
+);
+
+interface ScaleTypeSelectProps {
+  value: string;
+  onChange: (value: string) => void;
+  isDisabled?: boolean;
+}
+
+const ScaleTypeSelect: React.FC<ScaleTypeSelectProps> = ({
+  value,
+  onChange,
+  isDisabled = false,
+}) => (
+  <Select value={value} onValueChange={onChange} disabled={isDisabled}>
+    <SelectTrigger>
+      <SelectValue placeholder="Scale type" />
+    </SelectTrigger>
+    <SelectContent>
+      {SCALE_TYPES.map((type) => (
+        <SelectItem key={type} value={type}>
+          {type.charAt(0).toUpperCase() + type.slice(1)}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);
+
+interface ScaleConfigProps {
+  title: string;
+  scale: string;
+  onScaleChange: (type: string, note: string) => void;
+  isDisabled?: boolean;
+}
+
+const ScaleConfig: React.FC<ScaleConfigProps> = ({
+  title,
+  scale,
+  onScaleChange,
+  isDisabled = false,
+}) => {
+  const { getScaleType, getScaleNote } = useScaleUtils();
+
+  return (
+    <div>
+      <h3 className="text-sm font-medium text-muted-foreground mb-2">{title}</h3>
+      <div className="flex gap-2">
+        <NoteSelect
+          value={getScaleNote(scale)}
+          onChange={(value) => onScaleChange(getScaleType(scale), value)}
+          isDisabled={isDisabled}
+        />
+        <ScaleTypeSelect
+          value={getScaleType(scale)}
+          onChange={(value) => onScaleChange(value, getScaleNote(scale))}
+          isDisabled={isDisabled}
+        />
+      </div>
+    </div>
+  );
+};
+
 export const ScaleSelector: React.FC<ScaleSelectorProps> = ({
   fromScale,
   toScale,
   onFromScaleChange,
   onToScaleChange,
   isLoading,
-}) => {
-  const getScaleType = (scale: string): string => {
-    const parts = scale.split(' ');
-    return (parts[0] ?? SCALE_TYPES[0]) as string;
-  };
-
-  const getScaleNote = (scale: string): string => {
-    const parts = scale.split(' ');
-    return (parts[1] ?? `${NOTES[0]}${OCTAVES[0]}`) as string;
-  };
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <h3 className="text-sm font-medium text-muted-foreground mb-2">From Scale</h3>
-        <div className="flex gap-2">
-          <Select
-            value={getScaleNote(fromScale)}
-            onValueChange={(value) => onFromScaleChange(getScaleType(fromScale), value)}
-            disabled={isLoading}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Note" />
-            </SelectTrigger>
-            <SelectContent>
-              {NOTES.map((note) =>
-                OCTAVES.map((octave) => (
-                  <SelectItem key={`${note}${octave}`} value={`${note}${octave}`}>
-                    {note}
-                    {octave}
-                  </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
-          <Select
-            value={getScaleType(fromScale)}
-            onValueChange={(value) => onFromScaleChange(value, getScaleNote(fromScale))}
-            disabled={isLoading}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Scale type" />
-            </SelectTrigger>
-            <SelectContent>
-              {SCALE_TYPES.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium text-muted-foreground mb-2">To Scale</h3>
-        <div className="flex gap-2">
-          <Select
-            value={getScaleNote(toScale)}
-            onValueChange={(value) => onToScaleChange(getScaleType(toScale), value)}
-            disabled={isLoading}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Note" />
-            </SelectTrigger>
-            <SelectContent>
-              {NOTES.map((note) =>
-                OCTAVES.map((octave) => (
-                  <SelectItem key={`${note}${octave}`} value={`${note}${octave}`}>
-                    {note}
-                    {octave}
-                  </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
-          <Select
-            value={getScaleType(toScale)}
-            onValueChange={(value) => onToScaleChange(value, getScaleNote(toScale))}
-            disabled={isLoading}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Scale type" />
-            </SelectTrigger>
-            <SelectContent>
-              {SCALE_TYPES.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </div>
-  );
-};
+}) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <ScaleConfig
+      title="From Scale"
+      scale={fromScale}
+      onScaleChange={onFromScaleChange}
+      isDisabled={isLoading}
+    />
+    <ScaleConfig
+      title="To Scale"
+      scale={toScale}
+      onScaleChange={onToScaleChange}
+      isDisabled={isLoading}
+    />
+  </div>
+);
