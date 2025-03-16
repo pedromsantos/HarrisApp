@@ -1,15 +1,15 @@
-import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PatternSelector } from '../PatternSelector';
-import { PATTERNS } from '../constants';
+import { describe, expect, it, vi } from 'vitest';
+
 import { Pattern } from '../../../types/lineGenerator';
+import { PATTERNS } from '../constants';
+import { PatternSelector } from '../PatternSelector';
 
 describe('PatternSelector', () => {
   // Ensure we have at least 4 patterns for our tests
   const selectedPatterns = PATTERNS.slice(0, 2) as [Pattern, Pattern];
-  const availablePatterns = PATTERNS.slice(2) as Pattern[];
+  const availablePatterns = PATTERNS.slice(2);
 
   const mockProps = {
     selectedPatterns,

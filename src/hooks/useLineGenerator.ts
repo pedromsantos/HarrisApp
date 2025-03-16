@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+
 import { LineGeneratorRequest, LineGeneratorResponse } from '../types/lineGenerator';
 
 const API_BASE_URL = 'https://barry-harris-line-generator.pedro-santos-personal.workers.dev';

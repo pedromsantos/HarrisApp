@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+
 import { PositionSelector } from '../PositionSelector';
 
 describe('PositionSelector', () => {
@@ -22,8 +22,8 @@ describe('PositionSelector', () => {
 
   it('renders with initial position value', () => {
     render(<PositionSelector {...mockProps} />);
-    const input = screen.getByRole('spinbutton') as HTMLInputElement;
-    expect(input.value).toBe('5');
+    const input = screen.getByRole('spinbutton');
+    expect((input as HTMLInputElement).value).toBe('5');
   });
 
   it('calls onPositionChange when value changes', async () => {
@@ -55,7 +55,7 @@ describe('PositionSelector', () => {
 
   it('disables input when isLoading is true', () => {
     render(<PositionSelector {...mockProps} isLoading={true} />);
-    const input = screen.getByRole('spinbutton') as HTMLInputElement;
+    const input = screen.getByRole('spinbutton');
     expect(input).toBeDisabled();
   });
 
@@ -66,7 +66,7 @@ describe('PositionSelector', () => {
 
   it('has min and max attributes set correctly', () => {
     render(<PositionSelector {...mockProps} />);
-    const input = screen.getByRole('spinbutton') as HTMLInputElement;
+    const input = screen.getByRole('spinbutton');
     expect(input).toHaveAttribute('min', '0');
     expect(input).toHaveAttribute('max', '12');
   });
@@ -76,7 +76,7 @@ describe('PositionSelector', () => {
     // but the actual enforcement might be handled by the browser or by the onChange handler
     // We'll simplify this test to just check the attributes
     render(<PositionSelector {...mockProps} />);
-    const input = screen.getByRole('spinbutton') as HTMLInputElement;
+    const input = screen.getByRole('spinbutton');
 
     expect(input).toHaveAttribute('min', '0');
     expect(input).toHaveAttribute('max', '12');

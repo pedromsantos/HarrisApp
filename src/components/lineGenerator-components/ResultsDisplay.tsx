@@ -1,6 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+
 import { LineGeneratorResponse } from '../../types/lineGenerator';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 const EmptyState: React.FC = () => (
   <div className="text-center text-muted-foreground py-8">

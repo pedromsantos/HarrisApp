@@ -1,19 +1,18 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { LineGeneratorRequest, Pattern } from '../types/lineGenerator';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
+import React, { useCallback, useRef, useState } from 'react';
+
+import { useLineGenerator } from '../hooks/useLineGenerator';
 import { convertToABC } from '../lib/musicNotation';
+import { LineGeneratorRequest, Pattern } from '../types/lineGenerator';
+import { PATTERNS } from './lineGenerator-components/constants';
+import { PatternSelector } from './lineGenerator-components/PatternSelector';
+import { PositionSelector } from './lineGenerator-components/PositionSelector';
+import { ResultsDisplay } from './lineGenerator-components/ResultsDisplay';
+import { ScaleSelector } from './lineGenerator-components/ScaleSelector';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 const preloadABCJS = () => import('abcjs');
 let preloadPromise: Promise<typeof import('abcjs')> | null = null;
-
-import { PATTERNS } from './lineGenerator-components/constants';
-import { ScaleSelector } from './lineGenerator-components/ScaleSelector';
-import { PositionSelector } from './lineGenerator-components/PositionSelector';
-import { PatternSelector } from './lineGenerator-components/PatternSelector';
-import { ResultsDisplay } from './lineGenerator-components/ResultsDisplay';
-
-import { useLineGenerator } from '../hooks/useLineGenerator';
 
 const LineGenerator: React.FC = () => {
   const [formData, setFormData] = useState<LineGeneratorRequest>({

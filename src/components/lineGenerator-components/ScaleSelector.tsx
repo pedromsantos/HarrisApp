@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { NOTES, OCTAVES, SCALE_TYPES } from './constants';
 
@@ -22,7 +23,7 @@ const useScaleUtils = (): ScaleUtils => ({
   },
   getScaleNote: (scale: string): string => {
     const parts = scale.split(' ');
-    return (parts[1] ?? `${NOTES[0]}${OCTAVES[0]}`) as string;
+    return parts[1] ?? `${NOTES[0]}${OCTAVES[0]}`;
   },
 });
 

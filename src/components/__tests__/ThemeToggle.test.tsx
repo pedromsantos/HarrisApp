@@ -1,9 +1,9 @@
-import React from "react";
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ThemeToggle } from '../ThemeToggle';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { useTheme } from '../ThemeProvider';
+import { ThemeToggle } from '../ThemeToggle';
 
 vi.mock('../ThemeProvider', () => ({
   useTheme: vi.fn(),

@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { ResultsDisplay } from '../ResultsDisplay';
+import { describe, expect, it } from 'vitest';
+
 import { LineGeneratorResponse } from '../../../types/lineGenerator';
+import { ResultsDisplay } from '../ResultsDisplay';
 
 describe('ResultsDisplay', () => {
   const mockNotationRefs = { current: [] };

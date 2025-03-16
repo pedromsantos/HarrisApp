@@ -1,10 +1,10 @@
-import React from "react";
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { useLineGenerator } from '../../hooks/useLineGenerator';
 import LineGenerator from '../LineGenerator';
 import { PATTERNS } from '../lineGenerator-components/constants';
-import { useLineGenerator } from '../../hooks/useLineGenerator';
 
 // Mock scrollIntoView for Radix UI components
 Element.prototype.scrollIntoView = vi.fn();

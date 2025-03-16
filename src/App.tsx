@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
 import './App.css';
+
+import React, { useEffect } from 'react';
+
 import LineGenerator from './components/LineGenerator';
 import { ThemeProvider } from './components/ThemeProvider';
 import { ThemeToggle } from './components/ThemeToggle';

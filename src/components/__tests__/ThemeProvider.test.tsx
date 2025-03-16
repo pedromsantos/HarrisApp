@@ -1,7 +1,7 @@
-import React from 'react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { ThemeProvider, useTheme } from '../ThemeProvider';
 
 // Mock localStorage
@@ -36,12 +36,6 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.clearAllMocks();
 });
-
-// Create a component that will throw an error when used outside ThemeProvider
-const ErrorComponent = () => {
-  useTheme();
-  return <div>This should throw</div>;
-};
 
 const TestComponent = () => {
   const { theme, setTheme } = useTheme();

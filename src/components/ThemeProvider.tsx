@@ -36,8 +36,7 @@ export function ThemeProvider({ children, storageKey = 'ui-theme', ...props }: T
       return storedTheme as Theme;
     }
 
-    const systemTheme = getSystemTheme();
-    return systemTheme;
+    return getSystemTheme();
   });
 
   const applyTheme = (newTheme: Theme) => {

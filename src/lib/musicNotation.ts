@@ -11,9 +11,9 @@ export const convertToABC = (notes: string[]): string => {
       const abcNote = new AbcNote(note).toString();
 
       if ((index + 1) % 8 === 0) {
-        return abcNote + ' |';
+        return `${abcNote} |`;
       } else if ((index + 1) % 2 === 0) {
-        return abcNote + ' ';
+        return `${abcNote} `;
       }
 
       return abcNote;

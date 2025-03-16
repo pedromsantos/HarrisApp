@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+
 import { NOTES, OCTAVES, SCALE_TYPES } from '../constants';
 import { ScaleSelector } from '../ScaleSelector';
 

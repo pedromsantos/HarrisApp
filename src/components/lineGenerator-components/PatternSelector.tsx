@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Pattern } from '../../types/lineGenerator';
 
 export interface PatternSelectorProps {
