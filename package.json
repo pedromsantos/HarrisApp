@@ -1,19 +1,4 @@
 {
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
-    "rules": {
-      "subject-case": [
-        2,
-        "never",
-        [
-          "start-case",
-          "pascal-case"
-        ]
-      ]
-    }
-  },
   "dependencies": {
     "@radix-ui/react-select": "^2.1.6",
     "lucide-react": "^0.479.0",
@@ -61,11 +46,6 @@
     "vite": "^5.2.13",
     "vitest": "^3.0.8"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E  HUSKY_GIT_PARAMS"
-    }
-  },
   "lint-staged": {
     "**/*.ts": "prettier --write --ignore-unknown",
     "**/*.tsx": "prettier --write --ignore-unknown"
@@ -86,9 +66,6 @@
     "preview": "vite preview"
   },
   "type": "module",
-  "typeCoverage": {
-    "atLeast": 99
-  },
   "version": "0.0.1",
   "engines": {
     "node": ">=18.18.0"
