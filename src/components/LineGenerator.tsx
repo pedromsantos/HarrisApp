@@ -1,9 +1,11 @@
-import React, { useState, useRef } from 'react';
-import * as ABCJS from 'abcjs';
+import React, { useState, useRef, useCallback } from 'react';
 import { LineGeneratorRequest, Pattern } from '../types/lineGenerator';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { convertToABC } from '../lib/musicNotation';
+
+const preloadABCJS = () => import('abcjs');
+let preloadPromise: Promise<typeof import('abcjs')> | null = null;
 
 import { PATTERNS } from './lineGenerator-components/constants';
 import { ScaleSelector } from './lineGenerator-components/ScaleSelector';
@@ -22,15 +24,55 @@ const LineGenerator: React.FC = () => {
   });
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[]>(PATTERNS);
   const notationRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [isRenderingNotation, setIsRenderingNotation] = useState(false);
 
   const { result, error, isLoading, isServerHealthy, generateLines } = useLineGenerator();
 
+  const startPreload = useCallback(() => {
+    if (!preloadPromise) {
+      preloadPromise = preloadABCJS();
+    }
+  }, []);
+
+  const renderNotation = useCallback(async () => {
+    if (result?.lines && !isRenderingNotation) {
+      setIsRenderingNotation(true);
+      try {
+        // Use the preloaded module if available
+        const abcjs = await (preloadPromise || preloadABCJS());
+        result.lines.forEach((line, index) => {
+          if (notationRefs.current && index < notationRefs.current.length) {
+            const container = notationRefs.current[index];
+            if (container) {
+              const abcNotation = convertToABC(line);
+              abcjs.renderAbc(container, abcNotation, {
+                responsive: 'resize',
+                add_classes: true,
+                staffwidth: 500,
+              });
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Failed to load notation renderer:', error);
+      } finally {
+        setIsRenderingNotation(false);
+      }
+    }
+  }, [result, isRenderingNotation]);
+
+  React.useEffect(() => {
+    renderNotation();
+  }, [renderNotation]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    startPreload(); // Start preloading when form is submitted
     await generateLines(formData);
   };
 
   const handleScaleChange = (field: 'from_scale' | 'to_scale', type: string, note: string) => {
+    startPreload(); // Start preloading when user changes scales
     setFormData((prev) => ({
       ...prev,
       [field]: `${type} ${note}`,
@@ -38,6 +80,7 @@ const LineGenerator: React.FC = () => {
   };
 
   const addPattern = (pattern: Pattern) => {
+    startPreload(); // Start preloading when user adds patterns
     setFormData((prev) => ({
       ...prev,
       patterns: [...prev.patterns, pattern],
@@ -70,24 +113,6 @@ const LineGenerator: React.FC = () => {
     newPatterns[index + 1] = temp;
     setFormData((prev) => ({ ...prev, patterns: newPatterns }));
   };
-
-  React.useEffect(() => {
-    if (result && result.lines) {
-      result.lines.forEach((line, index) => {
-        if (notationRefs.current && index < notationRefs.current.length) {
-          const container = notationRefs.current[index];
-          if (container) {
-            const abcNotation = convertToABC(line);
-            ABCJS.renderAbc(container, abcNotation, {
-              responsive: 'resize',
-              add_classes: true,
-              staffwidth: 500,
-            });
-          }
-        }
-      });
-    }
-  }, [result]);
 
   return (
     <div className="min-h-screen bg-background text-foreground py-6 px-4 sm:px-6 lg:px-8">
