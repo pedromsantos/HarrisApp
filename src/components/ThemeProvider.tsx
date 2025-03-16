@@ -18,11 +18,9 @@ const initialState: ThemeProviderState = {
   setTheme: () => null,
 };
 
-// Create context
 const ThemeContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({ children, storageKey = 'ui-theme', ...props }: ThemeProviderProps) {
-  // Helper to get system theme preference
   const getSystemTheme = (): Theme => {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
@@ -32,19 +30,16 @@ export function ThemeProvider({ children, storageKey = 'ui-theme', ...props }: T
   };
 
   const [theme, setThemeState] = useState<Theme>(() => {
-    // Try to get the theme from localStorage first
     const storedTheme = localStorage.getItem(storageKey);
 
     if (storedTheme && ['dark', 'light'].includes(storedTheme)) {
       return storedTheme as Theme;
     }
 
-    // Default to system preference
     const systemTheme = getSystemTheme();
     return systemTheme;
   });
 
-  // Function to apply theme to document
   const applyTheme = (newTheme: Theme) => {
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
@@ -78,7 +73,6 @@ export function ThemeProvider({ children, storageKey = 'ui-theme', ...props }: T
     return () => {};
   }, []);
 
-  // Expose theme context
   const value = {
     theme,
     setTheme,

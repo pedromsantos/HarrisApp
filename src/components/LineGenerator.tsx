@@ -5,14 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { convertToABC } from '../lib/musicNotation';
 
-// Import components and constants
 import { PATTERNS } from './lineGenerator-components/constants';
 import { ScaleSelector } from './lineGenerator-components/ScaleSelector';
 import { PositionSelector } from './lineGenerator-components/PositionSelector';
 import { PatternSelector } from './lineGenerator-components/PatternSelector';
 import { ResultsDisplay } from './lineGenerator-components/ResultsDisplay';
 
-// Import custom hook
 import { useLineGenerator } from '../hooks/useLineGenerator';
 
 const LineGenerator: React.FC = () => {
@@ -25,10 +23,8 @@ const LineGenerator: React.FC = () => {
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[]>(PATTERNS);
   const notationRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Use our custom hook for all server-related logic
   const { result, error, isLoading, isServerHealthy, generateLines } = useLineGenerator();
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await generateLines(formData);
@@ -75,7 +71,6 @@ const LineGenerator: React.FC = () => {
     setFormData((prev) => ({ ...prev, patterns: newPatterns }));
   };
 
-  // Render ABC notation when results are available
   React.useEffect(() => {
     if (result && result.lines) {
       result.lines.forEach((line, index) => {
@@ -132,7 +127,6 @@ const LineGenerator: React.FC = () => {
               onMovePatternDown={movePatternDown}
             />
 
-            {/* Generate Button - Prominently displayed at the bottom */}
             <div className="mt-6">
               <Button
                 onClick={handleSubmit}
@@ -171,7 +165,6 @@ const LineGenerator: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Right Card - Results */}
         <ResultsDisplay result={result} error={error} notationRefs={notationRefs} />
       </div>
     </div>

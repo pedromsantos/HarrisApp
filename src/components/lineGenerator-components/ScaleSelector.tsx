@@ -29,7 +29,6 @@ export const ScaleSelector: React.FC<ScaleSelectorProps> = ({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {/* From Scale Section */}
       <div>
         <h3 className="text-sm font-medium text-muted-foreground mb-2">From Scale</h3>
         <div className="flex gap-2">
@@ -71,7 +70,6 @@ export const ScaleSelector: React.FC<ScaleSelectorProps> = ({
         </div>
       </div>
 
-      {/* To Scale Section */}
       <div>
         <h3 className="text-sm font-medium text-muted-foreground mb-2">To Scale</h3>
         <div className="flex gap-2">

@@ -8,10 +8,8 @@ export function ThemeToggle() {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  // Render the current theme's icon
   const renderIcon = () => {
     if (theme === 'dark') {
-      // Moon icon for dark mode
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +26,6 @@ export function ThemeToggle() {
         </svg>
       );
     } else {
-      // Sun icon for light mode
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"

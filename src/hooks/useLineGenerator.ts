@@ -22,7 +22,7 @@ export function useLineGenerator() {
           label: 'Retry',
           onClick: checkServerHealth,
         },
-        duration: Infinity, // Don't auto-dismiss critical errors
+        duration: Infinity,
       });
     }
   }, [isServerHealthy]);
@@ -43,46 +43,72 @@ export function useLineGenerator() {
     }
   }, [isServerHealthy]);
 
-  const generateLines = useCallback(async (formData: LineGeneratorRequest) => {
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/lines`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate lines');
-      }
-
-      if (!data.lines || !Array.isArray(data.lines)) {
-        throw new Error('Invalid response format: missing or invalid lines data');
-      }
-
-      if (!data.tabs) {
-        data.tabs = data.lines.map(() => []);
-      }
-
-      setResult(data);
-      toast.success('Lines Generated', {
-        description: 'Your musical lines have been successfully generated.',
-      });
-      return data;
-    } catch (err) {
-      handleError(err);
-      return null;
-    } finally {
-      setIsLoading(false);
+  const validateResponse = useCallback((data: any): data is LineGeneratorResponse => {
+    if (!data.lines || !Array.isArray(data.lines)) {
+      throw new Error('Invalid response format: missing or invalid lines data');
     }
+    return true;
   }, []);
+
+  const normalizeResponseData = useCallback(
+    (data: LineGeneratorResponse): LineGeneratorResponse => {
+      if (!data.tabs) {
+        return {
+          ...data,
+          tabs: data.lines.map(() => []),
+        };
+      }
+      return data;
+    },
+    []
+  );
+
+  const makeApiRequest = useCallback(async (formData: LineGeneratorRequest) => {
+    const response = await fetch(`${API_BASE_URL}/lines`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to generate lines');
+    }
+
+    return data;
+  }, []);
+
+  const generateLines = useCallback(
+    async (formData: LineGeneratorRequest) => {
+      setError(null);
+      setIsLoading(true);
+
+      try {
+        const data = await makeApiRequest(formData);
+
+        validateResponse(data);
+
+        const normalizedData = normalizeResponseData(data);
+
+        setResult(normalizedData);
+        toast.success('Lines Generated', {
+          description: 'Your musical lines have been successfully generated.',
+        });
+
+        return normalizedData;
+      } catch (err) {
+        handleError(err);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [makeApiRequest, validateResponse, normalizeResponseData]
+  );
 
   const handleError = useCallback((err: unknown) => {
     if (err instanceof Error) {
