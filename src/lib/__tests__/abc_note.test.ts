@@ -1,4 +1,4 @@
-import { AbcNote } from '../lib/abcNotation/abcNote';
+import { AbcNote } from '../abcNotation/abcNote';
 
 describe('abc Note should', () => {
   describe('using octaves', () => {
