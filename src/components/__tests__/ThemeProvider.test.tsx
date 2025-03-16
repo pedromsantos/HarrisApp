@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -139,18 +139,6 @@ describe('ThemeProvider', () => {
       </ThemeProvider>
     );
     expect(document.documentElement).toHaveClass('theme-ready');
-  });
-
-  it.skip('throws error when useTheme is used outside ThemeProvider', () => {
-    // Suppress React error logging for this test
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    // Use a function that directly calls useTheme to ensure the error is thrown
-    expect(() => {
-      render(<ErrorComponent />);
-    }).toThrow();
-
-    consoleError.mockRestore();
   });
 
   it('uses custom storage key when provided', () => {
