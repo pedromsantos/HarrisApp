@@ -5,13 +5,10 @@ import { ThemeProvider } from './components/ThemeProvider';
 import { ThemeToggle } from './components/ThemeToggle';
 
 const App: React.FC = () => {
-  // Apply initial theme classes to help prevent flickering
   useEffect(() => {
-    // Add a performance class that enables faster transitions
     document.documentElement.classList.add('performance-transitions');
 
     return () => {
-      // Cleanup
       document.documentElement.classList.remove('performance-transitions');
     };
   }, []);
@@ -23,7 +20,6 @@ const App: React.FC = () => {
   );
 };
 
-// Separating the content to ensure it re-renders when theme context changes
 const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
