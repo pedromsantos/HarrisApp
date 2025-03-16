@@ -10,53 +10,31 @@ export interface PatternSelectorProps {
   onMovePatternDown: (index: number) => void;
 }
 
-const AddIcon: React.FC = () => (
+interface IconProps extends React.SVGProps<SVGSVGElement> {
+  path: string;
+  className?: string;
+}
+
+const Icon: React.FC<IconProps> = ({ path, className = 'h-4 w-4', ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4 text-primary"
+    className={className}
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
+    {...props}
   >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={path} />
   </svg>
 );
 
-const UpArrowIcon: React.FC = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-  </svg>
-);
+const AddIcon: React.FC = () => <Icon path="M12 4v16m8-8H4" className="h-4 w-4 text-primary" />;
 
-const DownArrowIcon: React.FC = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-  </svg>
-);
+const UpArrowIcon: React.FC = () => <Icon path="M5 15l7-7 7 7" />;
 
-const RemoveIcon: React.FC = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-  </svg>
-);
+const DownArrowIcon: React.FC = () => <Icon path="M19 9l-7 7-7-7" />;
+
+const RemoveIcon: React.FC = () => <Icon path="M6 18L18 6M6 6l12 12" />;
 
 interface PatternItemProps {
   pattern: Pattern;
