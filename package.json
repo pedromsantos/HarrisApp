@@ -75,6 +75,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && vite build",
     "test:all": "vitest run --config vitest.config.ts --exclude \"E2E/**\" --exclude \"**/*.perf.test.{ts,tsx}\" --exclude \"**/*.visual.test.{ts,tsx}\"",
+    "test:coverage": "vitest run --coverage --config vitest.config.ts --exclude \"E2E/**\" --exclude \"**/*.perf.test.{ts,tsx}\" --exclude \"**/*.visual.test.{ts,tsx}\"",
+    "test:coverage:html": "vitest run --coverage --config vitest.config.ts --exclude \"E2E/**\" --exclude \"**/*.perf.test.{ts,tsx}\" --exclude \"**/*.visual.test.{ts,tsx}\" --reporter=html",
+    "test:coverage:open": "npm run test:coverage:html && npx vite preview --outDir coverage",
     "test:e2e": "playwright test --project=\"E2E Tests\" --config=playwright.config.ts",
     "test:visual": "playwright test --project=\"Visual Tests\" --config=playwright.config.ts",
     "test:perf": "playwright test --project=\"Performance Tests\" --config=playwright.config.ts",
