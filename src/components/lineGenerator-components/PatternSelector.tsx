@@ -45,11 +45,12 @@ interface PatternItemProps {
 
 const PatternItem: React.FC<PatternItemProps> = ({ pattern, onClick, icon, className = '' }) => (
   <div
+    data-testid={`pattern-item-${pattern}`}
     className={`flex items-center justify-between py-1.5 px-3 rounded-md hover:bg-muted cursor-pointer my-1 ${className}`}
     onClick={onClick}
   >
-    <span className="text-sm">{pattern.replace(/_/g, ' ')}</span>
-    {icon}
+    <span>{pattern.replace(/_/g, ' ')}</span>
+    {icon && <span className="ml-2">{icon}</span>}
   </div>
 );
 
@@ -101,7 +102,10 @@ interface PatternListProps {
 const PatternList: React.FC<PatternListProps> = ({ title, children }) => (
   <div>
     <h4 className="text-xs text-muted-foreground mb-1">{title}</h4>
-    <div className="bg-background dark:bg-card rounded-lg border border-border p-3 h-auto min-h-[350px]">
+    <div
+      data-testid={`${title.toLowerCase().replace(' ', '-')}-section`}
+      className="bg-background dark:bg-card rounded-lg border border-border p-3 h-auto min-h-[350px]"
+    >
       {children}
     </div>
   </div>

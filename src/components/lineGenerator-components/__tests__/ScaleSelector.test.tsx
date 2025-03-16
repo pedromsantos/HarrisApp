@@ -1,80 +1,162 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { ScaleSelector } from '../ScaleSelector';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { NOTES, OCTAVES, SCALE_TYPES } from '../constants';
+import { ScaleSelector } from '../ScaleSelector';
+import { describe, expect, it, beforeAll, vi } from 'vitest';
+
+beforeAll(() => {
+  Element.prototype.scrollIntoView = vi.fn();
+});
+
+const defaultProps = {
+  fromScale: 'dominant G3',
+  toScale: 'dominant C4',
+  onFromScaleChange: vi.fn(),
+  onToScaleChange: vi.fn(),
+  isLoading: false,
+};
+
+const setup = () => {
+  const user = userEvent.setup();
+  return { user };
+};
+
+const getScaleSection = (heading: string) => {
+  return screen.getByTestId(`${heading.toLowerCase().replace(' ', '-')}-section`);
+};
+
+const selectOption = async (
+  user: ReturnType<typeof userEvent.setup>,
+  trigger: HTMLElement,
+  value: string
+) => {
+  await user.click(trigger);
+  const listbox = screen.getByRole('listbox');
+  await user.click(within(listbox).getByRole('option', { name: value }));
+};
 
 describe('ScaleSelector', () => {
-  const mockProps = {
-    fromScale: 'major C4',
-    toScale: 'dominant G4',
-    onFromScaleChange: vi.fn(),
-    onToScaleChange: vi.fn(),
-    isLoading: false,
-  };
-
-  it('renders with initial scale values', () => {
-    render(<ScaleSelector {...mockProps} />);
-
-    expect(screen.getByText('From Scale')).toBeInTheDocument();
-    expect(screen.getAllByText('C4')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('Major')[0]).toBeInTheDocument();
-
-    expect(screen.getByText('To Scale')).toBeInTheDocument();
-    expect(screen.getAllByText('G4')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('Dominant')[0]).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('calls onFromScaleChange when from scale note changes', () => {
-    render(<ScaleSelector {...mockProps} />);
-    const fromNoteSelect = screen.getAllByRole('combobox')[0];
-    fromNoteSelect && fireEvent.change(fromNoteSelect, { target: { value: 'D4' } });
-    expect(mockProps.onFromScaleChange).toHaveBeenCalledWith('major', 'D4');
+  it('renders initial scale values', () => {
+    render(<ScaleSelector {...defaultProps} />);
+
+    const fromSection = getScaleSection('from scale');
+    const toSection = getScaleSection('to scale');
+
+    // Check note values
+    expect(within(fromSection).getByRole('combobox', { name: 'Select note' })).toHaveTextContent(
+      'G3'
+    );
+    expect(within(fromSection).getByRole('combobox', { name: 'Select scale' })).toHaveTextContent(
+      'Dominant'
+    );
+    expect(within(toSection).getByRole('combobox', { name: 'Select note' })).toHaveTextContent(
+      'C4'
+    );
+    expect(within(toSection).getByRole('combobox', { name: 'Select scale' })).toHaveTextContent(
+      'Dominant'
+    );
   });
 
-  it('calls onToScaleChange when to scale type changes', () => {
-    render(<ScaleSelector {...mockProps} />);
-    const toTypeSelect = screen.getAllByRole('combobox')[3];
-    toTypeSelect && fireEvent.change(toTypeSelect, { target: { value: 'major' } });
-    expect(mockProps.onToScaleChange).toHaveBeenCalledWith('major', 'G4');
+  it('allows changing from scale values', async () => {
+    const { user } = setup();
+    render(<ScaleSelector {...defaultProps} />);
+    const fromScaleSection = getScaleSection('from scale');
+
+    const noteSelect = within(fromScaleSection).getByRole('combobox', { name: 'Select note' });
+    const typeSelect = within(fromScaleSection).getByRole('combobox', { name: 'Select scale' });
+
+    await selectOption(user, noteSelect, 'C4');
+    expect(defaultProps.onFromScaleChange).toHaveBeenCalledWith('dominant', 'C4');
+
+    await selectOption(user, typeSelect, 'Major');
+    expect(defaultProps.onFromScaleChange).toHaveBeenCalledWith('major', 'G3');
+  });
+
+  it('allows changing to scale values', async () => {
+    const { user } = setup();
+    render(<ScaleSelector {...defaultProps} />);
+    const toScaleSection = getScaleSection('to scale');
+
+    const noteSelect = within(toScaleSection).getByRole('combobox', { name: 'Select note' });
+    const typeSelect = within(toScaleSection).getByRole('combobox', { name: 'Select scale' });
+
+    await selectOption(user, noteSelect, 'G4');
+    expect(defaultProps.onToScaleChange).toHaveBeenCalledWith('dominant', 'G4');
+
+    await selectOption(user, typeSelect, 'Major');
+    expect(defaultProps.onToScaleChange).toHaveBeenCalledWith('major', 'C4');
+  });
+
+  it('renders all available notes and scale types', async () => {
+    const { user } = setup();
+    render(<ScaleSelector {...defaultProps} />);
+    const fromScaleSection = getScaleSection('from scale');
+
+    // Get the note select by aria-label
+    const noteSelect = within(fromScaleSection).getByRole('combobox', { name: 'Select note' });
+
+    // Open the note select dropdown
+    await user.click(noteSelect);
+    const listbox = screen.getByRole('listbox');
+
+    // Check for sample notes
+    for (const note of NOTES) {
+      for (const octave of OCTAVES) {
+        const optionText = `${note}${octave}`;
+        expect(within(listbox).getByRole('option', { name: optionText })).toBeInTheDocument();
+      }
+    }
+
+    // Close the note dropdown by pressing Escape
+    await user.keyboard('{Escape}');
+
+    // Get the scale type select by aria-label
+    const scaleSelect = within(fromScaleSection).getByRole('combobox', { name: 'Select scale' });
+
+    // Open the scale type dropdown
+    await user.click(scaleSelect);
+
+    // Check for scale types
+    for (const type of SCALE_TYPES) {
+      const displayText = type.charAt(0).toUpperCase() + type.slice(1);
+      expect(screen.getByRole('option', { name: displayText })).toBeInTheDocument();
+    }
   });
 
   it('disables all selects when isLoading is true', () => {
-    render(<ScaleSelector {...mockProps} isLoading={true} />);
-    const selects = screen.getAllByRole('combobox');
-    selects.forEach((select) => {
-      expect(select).toBeDisabled();
-    });
-  });
+    render(<ScaleSelector {...defaultProps} isLoading={true} />);
 
-  it('renders all available notes and octaves', () => {
-    render(<ScaleSelector {...mockProps} />);
-    const noteSelect = screen.getAllByRole('combobox')[0];
-    noteSelect && fireEvent.click(noteSelect);
+    const fromSection = getScaleSection('from scale');
+    const toSection = getScaleSection('to scale');
 
-    NOTES.forEach((note) => {
-      OCTAVES.forEach((octave) => {
-        expect(screen.getByText(`${note}${octave}`)).toBeInTheDocument();
+    // Check that all selects are disabled
+    [fromSection, toSection].forEach((section) => {
+      const selects = within(section).getAllByRole('combobox');
+      selects.forEach((select) => {
+        expect(select).toBeDisabled();
       });
     });
   });
 
-  it('renders all available scale types', () => {
-    render(<ScaleSelector {...mockProps} />);
-    const typeSelect = screen.getAllByRole('combobox')[1];
-    typeSelect && fireEvent.click(typeSelect);
+  it('maintains accessibility attributes', () => {
+    render(<ScaleSelector {...defaultProps} />);
 
-    SCALE_TYPES.forEach((type) => {
-      expect(screen.getByText(type.charAt(0).toUpperCase() + type.slice(1))).toBeInTheDocument();
+    const fromSection = getScaleSection('from scale');
+    const toSection = getScaleSection('to scale');
+
+    [fromSection, toSection].forEach((section) => {
+      expect(within(section).getByRole('combobox', { name: 'Select note' })).toHaveAttribute(
+        'aria-label',
+        'Select note'
+      );
+      expect(within(section).getByRole('combobox', { name: 'Select scale' })).toHaveAttribute(
+        'aria-label',
+        'Select scale'
+      );
     });
-  });
-
-  it('maintains separate state for from and to scales', () => {
-    render(<ScaleSelector {...mockProps} />);
-
-    const fromNoteSelect = screen.getAllByRole('combobox')[0];
-    fromNoteSelect && fireEvent.change(fromNoteSelect, { target: { value: 'D4' } });
-
-    expect(screen.getAllByText('G4')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('Dominant')[0]).toBeInTheDocument();
   });
 });

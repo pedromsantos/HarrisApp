@@ -34,7 +34,7 @@ interface NoteSelectProps {
 
 const NoteSelect: React.FC<NoteSelectProps> = ({ value, onChange, isDisabled = false }) => (
   <Select value={value} onValueChange={onChange} disabled={isDisabled}>
-    <SelectTrigger>
+    <SelectTrigger aria-label="Select note">
       <SelectValue placeholder="Note" />
     </SelectTrigger>
     <SelectContent>
@@ -62,7 +62,7 @@ const ScaleTypeSelect: React.FC<ScaleTypeSelectProps> = ({
   isDisabled = false,
 }) => (
   <Select value={value} onValueChange={onChange} disabled={isDisabled}>
-    <SelectTrigger>
+    <SelectTrigger aria-label="Select scale">
       <SelectValue placeholder="Scale type" />
     </SelectTrigger>
     <SelectContent>
@@ -91,7 +91,7 @@ const ScaleConfig: React.FC<ScaleConfigProps> = ({
   const { getScaleType, getScaleNote } = useScaleUtils();
 
   return (
-    <div>
+    <div data-testid={`${title.toLowerCase().replace(' ', '-')}-section`}>
       <h3 className="text-sm font-medium text-muted-foreground mb-2">{title}</h3>
       <div className="flex gap-2">
         <NoteSelect

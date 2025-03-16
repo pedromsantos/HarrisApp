@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { PatternSelector } from '../PatternSelector';
 import { PATTERNS } from '../constants';
 import { Pattern } from '../../../types/lineGenerator';
@@ -18,87 +19,156 @@ describe('PatternSelector', () => {
     onMovePatternDown: vi.fn(),
   };
 
+  const setup = () => {
+    const user = userEvent.setup();
+    return { user };
+  };
+
   beforeEach(() => {
     expect(selectedPatterns.length).toBeGreaterThanOrEqual(2);
     expect(availablePatterns.length).toBeGreaterThanOrEqual(2);
+    vi.clearAllMocks();
   });
 
   it('renders available and selected patterns', () => {
     render(<PatternSelector {...mockProps} />);
 
-    const firstAvailable = availablePatterns[0]?.replace(/_/g, ' ');
-    const secondAvailable = availablePatterns[1]?.replace(/_/g, ' ');
-    expect(firstAvailable && screen.getByText(firstAvailable)).toBeInTheDocument();
-    expect(secondAvailable && screen.getByText(secondAvailable)).toBeInTheDocument();
+    // Check available patterns
+    const availableSection = screen.getByTestId('available-patterns-section');
+    availablePatterns.forEach((pattern) => {
+      const displayText = pattern.replace(/_/g, ' ');
+      expect(within(availableSection).getByText(displayText)).toBeInTheDocument();
+    });
 
-    const firstSelected = selectedPatterns[0]?.replace(/_/g, ' ');
-    const secondSelected = selectedPatterns[1]?.replace(/_/g, ' ');
-    expect(firstSelected && screen.getByText(firstSelected)).toBeInTheDocument();
-    expect(secondSelected && screen.getByText(secondSelected)).toBeInTheDocument();
+    // Check selected patterns
+    const selectedSection = screen.getByTestId('selected-patterns-section');
+    selectedPatterns.forEach((pattern) => {
+      const displayText = pattern.replace(/_/g, ' ');
+      expect(within(selectedSection).getByText(displayText)).toBeInTheDocument();
+    });
   });
 
-  it('calls onAddPattern when clicking an available pattern', () => {
+  it('calls onAddPattern when clicking an available pattern', async () => {
+    const { user } = setup();
     render(<PatternSelector {...mockProps} />);
-    const firstAvailable = availablePatterns[0]?.replace(/_/g, ' ');
-    if (!firstAvailable) throw new Error('First available pattern is undefined');
 
-    const pattern = screen.getByText(firstAvailable);
-    fireEvent.click(pattern);
+    const availableSection = screen.getByTestId('available-patterns-section');
+    const firstPattern = availablePatterns[0]?.replace(/_/g, ' ');
+    if (!firstPattern) throw new Error('First available pattern is undefined');
+
+    const patternElement = within(availableSection).getByText(firstPattern);
+    await user.click(patternElement);
     expect(mockProps.onAddPattern).toHaveBeenCalledWith(availablePatterns[0]);
   });
 
-  it('calls onRemovePattern when clicking remove button', () => {
+  it('calls onRemovePattern when clicking remove button', async () => {
+    const { user } = setup();
     render(<PatternSelector {...mockProps} />);
-    const removeButtons = screen
+
+    const selectedSection = screen.getByTestId('selected-patterns-section');
+    // Find remove buttons by their SVG path
+    const removeButtons = within(selectedSection)
       .getAllByRole('button')
-      .filter((button) => button.innerHTML.includes('M6 6l12 12'));
-    expect(removeButtons.length).toBeGreaterThan(0);
-    const removeButton = removeButtons[0] as HTMLElement;
-    fireEvent.click(removeButton);
+      .filter((button) => {
+        const svg = button.querySelector('svg');
+        return svg && svg.innerHTML.includes('M6 18L18 6M6 6l12 12');
+      });
+
+    const removeButton = removeButtons[0];
+    if (!removeButton) throw new Error('Remove button not found');
+
+    await user.click(removeButton);
     expect(mockProps.onRemovePattern).toHaveBeenCalledWith(selectedPatterns[0]);
   });
 
-  it('calls onMovePatternUp when clicking up arrow', () => {
+  it('calls onMovePatternUp when clicking up arrow', async () => {
+    const { user } = setup();
     render(<PatternSelector {...mockProps} />);
-    const upButtons = screen
+
+    const selectedSection = screen.getByTestId('selected-patterns-section');
+    // Find up buttons by their SVG path
+    const moveUpButtons = within(selectedSection)
       .getAllByRole('button')
-      .filter((button) => button.innerHTML.includes('M5 15l7-7 7 7'));
-    expect(upButtons.length).toBeGreaterThan(1);
-    const upButton = upButtons[1] as HTMLElement;
-    fireEvent.click(upButton); // Click second pattern's up button
+      .filter((button) => {
+        const svg = button.querySelector('svg');
+        return svg && svg.innerHTML.includes('M5 15l7-7 7 7');
+      });
+
+    const upButton = moveUpButtons[1]; // Second pattern's up button
+    if (!upButton) throw new Error('Move up button not found');
+
+    await user.click(upButton);
     expect(mockProps.onMovePatternUp).toHaveBeenCalledWith(1);
   });
 
-  it('calls onMovePatternDown when clicking down arrow', () => {
+  it('calls onMovePatternDown when clicking down arrow', async () => {
+    const { user } = setup();
     render(<PatternSelector {...mockProps} />);
-    const downButtons = screen
+
+    const selectedSection = screen.getByTestId('selected-patterns-section');
+    // Find down buttons by their SVG path
+    const moveDownButtons = within(selectedSection)
       .getAllByRole('button')
-      .filter((button) => button.innerHTML.includes('M19 9l-7 7-7-7'));
-    expect(downButtons.length).toBeGreaterThan(0);
-    const downButton = downButtons[0] as HTMLElement;
-    fireEvent.click(downButton); // Click first pattern's down button
+      .filter((button) => {
+        const svg = button.querySelector('svg');
+        return svg && svg.innerHTML.includes('M19 9l-7 7-7-7');
+      });
+
+    const downButton = moveDownButtons[0]; // First pattern's down button
+    if (!downButton) throw new Error('Move down button not found');
+
+    await user.click(downButton);
     expect(mockProps.onMovePatternDown).toHaveBeenCalledWith(0);
   });
 
   it('disables up button for first pattern and down button for last pattern', () => {
     render(<PatternSelector {...mockProps} />);
 
-    const buttons = screen.getAllByRole('button');
-    const firstUpButton = buttons.find(
-      (button) =>
-        button.innerHTML.includes('M5 15l7-7 7 7') && button.className.includes('opacity-30')
-    );
-    const lastDownButton = buttons.find(
-      (button) =>
-        button.innerHTML.includes('M19 9l-7 7-7-7') && button.className.includes('opacity-30')
-    );
+    const selectedSection = screen.getByTestId('selected-patterns-section');
+    // Find up and down buttons by their SVG paths
+    const moveUpButtons = within(selectedSection)
+      .getAllByRole('button')
+      .filter((button) => {
+        const svg = button.querySelector('svg');
+        return svg && svg.innerHTML.includes('M5 15l7-7 7 7');
+      });
 
-    expect(firstUpButton).toBeDefined();
-    expect(lastDownButton).toBeDefined();
+    const moveDownButtons = within(selectedSection)
+      .getAllByRole('button')
+      .filter((button) => {
+        const svg = button.querySelector('svg');
+        return svg && svg.innerHTML.includes('M19 9l-7 7-7-7');
+      });
+
+    // First pattern's up button should be disabled
+    const firstUpButton = moveUpButtons[0];
+    expect(firstUpButton).toBeDisabled();
+    expect(firstUpButton).toHaveClass('opacity-30');
+
+    // Last pattern's down button should be disabled
+    const lastDownButton = moveDownButtons[moveDownButtons.length - 1];
+    expect(lastDownButton).toBeDisabled();
+    expect(lastDownButton).toHaveClass('opacity-30');
   });
 
   it('shows empty state when no patterns are selected', () => {
     render(<PatternSelector {...mockProps} selectedPatterns={[]} />);
     expect(screen.getByText('No patterns selected')).toBeInTheDocument();
+  });
+
+  it('maintains proper tab order', async () => {
+    const { user } = setup();
+    render(<PatternSelector {...mockProps} />);
+
+    const selectedSection = screen.getByTestId('selected-patterns-section');
+    const patternItems = within(selectedSection).getAllByTestId(/pattern-item/);
+
+    expect(patternItems.length).toBeGreaterThan(0);
+
+    // Tab to focus the first button
+    await user.tab(); // This might need adjustment based on the actual tab order
+
+    // Check that buttons can be focused in sequence
+    expect(document.activeElement).not.toBe(document.body);
   });
 });

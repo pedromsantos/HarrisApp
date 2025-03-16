@@ -38,7 +38,6 @@ const LineGenerator: React.FC = () => {
     if (result?.lines && !isRenderingNotation) {
       setIsRenderingNotation(true);
       try {
-        // Use the preloaded module if available
         const abcjs = await (preloadPromise || preloadABCJS());
         result.lines.forEach((line, index) => {
           if (notationRefs.current && index < notationRefs.current.length) {
@@ -67,20 +66,20 @@ const LineGenerator: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    startPreload(); // Start preloading when form is submitted
+    startPreload();
     await generateLines(formData);
   };
 
   const handleScaleChange = (field: 'from_scale' | 'to_scale', type: string, note: string) => {
-    startPreload(); // Start preloading when user changes scales
+    startPreload();
     setFormData((prev) => ({
       ...prev,
-      [field]: `${type} ${note}`,
+      [field]: `${type.toLowerCase()} ${note}`,
     }));
   };
 
   const addPattern = (pattern: Pattern) => {
-    startPreload(); // Start preloading when user adds patterns
+    startPreload();
     setFormData((prev) => ({
       ...prev,
       patterns: [...prev.patterns, pattern],

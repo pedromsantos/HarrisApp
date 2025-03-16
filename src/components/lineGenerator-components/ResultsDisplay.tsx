@@ -41,30 +41,33 @@ interface LineNotationProps {
   index: number;
 }
 
-const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef, index }) => (
-  <div key={index} className="p-3">
-    {/* Pitch notation */}
-    <div className="p-2 rounded-t mb-1 bg-primary/10">
-      <code className="text-sm block font-medium text-foreground">{line.join(', ')}</code>
-    </div>
+const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef, index }) => {
+  const renderTabData = () => {
+    if (!tabData) return 'No tab data available';
+    if (Array.isArray(tabData)) return tabData.join('\n');
+    if (typeof tabData === 'string') return tabData;
+    return 'Invalid tab format';
+  };
 
-    {/* Music notation */}
-    <div ref={notationRef} className="p-2 mb-1 bg-background rounded overflow-auto"></div>
+  return (
+    <div key={index} className="p-3">
+      {/* Pitch notation */}
+      <div className="p-2 rounded-t mb-1 bg-primary/10">
+        <code className="text-sm block font-medium text-foreground">{line.join(', ')}</code>
+      </div>
 
-    {/* Tab notation */}
-    <div className="p-2 rounded-b bg-muted/30">
-      <pre className="p-0 m-0 font-mono text-sm overflow-x-auto whitespace-pre text-foreground">
-        {tabData
-          ? Array.isArray(tabData)
-            ? tabData.join('\n') || ''
-            : typeof tabData === 'string'
-              ? String(tabData || '')
-              : 'Invalid tab format'
-          : 'No tab data available'}
-      </pre>
+      {/* Music notation */}
+      <div ref={notationRef} className="p-2 mb-1 bg-background rounded overflow-auto"></div>
+
+      {/* Tab notation */}
+      <div className="p-2 rounded-b bg-muted/30">
+        <pre className="p-0 m-0 font-mono text-sm overflow-x-auto whitespace-pre text-foreground">
+          {renderTabData()}
+        </pre>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Main ResultsDisplay Component
 export interface ResultsDisplayProps {
