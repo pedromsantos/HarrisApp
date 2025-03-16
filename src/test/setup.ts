@@ -1,6 +1,17 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import { afterEach, vi, expect } from 'vitest';
+import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
+
+// Extend Vitest's expect with jest-dom matchers
+declare global {
+  namespace Vi {
+    interface Assertion<T = any>
+      extends TestingLibraryMatchers<typeof expect.stringContaining, T> {}
+    interface AsymmetricMatchersContaining
+      extends TestingLibraryMatchers<typeof expect.stringContaining, unknown> {}
+  }
+}
 
 // Mock pointer capture API
 Element.prototype.setPointerCapture = vi.fn();

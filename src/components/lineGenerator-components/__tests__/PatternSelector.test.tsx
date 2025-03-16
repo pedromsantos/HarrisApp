@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PatternSelector } from '../PatternSelector';
@@ -142,12 +143,12 @@ describe('PatternSelector', () => {
 
     // First pattern's up button should be disabled
     const firstUpButton = moveUpButtons[0];
-    expect(firstUpButton).toBeDisabled();
+    expect(firstUpButton).toHaveAttribute('disabled');
     expect(firstUpButton).toHaveClass('opacity-30');
 
     // Last pattern's down button should be disabled
     const lastDownButton = moveDownButtons[moveDownButtons.length - 1];
-    expect(lastDownButton).toBeDisabled();
+    expect(lastDownButton).toHaveAttribute('disabled');
     expect(lastDownButton).toHaveClass('opacity-30');
   });
 
