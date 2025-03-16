@@ -39,8 +39,19 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
-    "strictPropertyInitialization": true
+    "strictPropertyInitialization": true,
+    "types": ["vitest/globals", "node"]
   },
   "include": ["src"],
+  "exclude": [
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/test/**",
+    "src/test/**",
+    "E2E/**"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

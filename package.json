@@ -82,8 +82,8 @@
   "name": "harrisapp",
   "private": true,
   "scripts": {
-    "build": "tsc && vite build",
-    "test:all": "vitest run --exclude \"E2E/**\" --exclude \"**/*.perf.test.{ts,tsx}\" --exclude \"**/*.visual.test.{ts,tsx}\"",
+    "build": "tsc -p tsconfig.json && vite build",
+    "test:all": "vitest run --config vitest.config.ts --exclude \"E2E/**\" --exclude \"**/*.perf.test.{ts,tsx}\" --exclude \"**/*.visual.test.{ts,tsx}\"",
     "test:e2e": "playwright test --project=\"E2E Tests\" --config=playwright.config.ts",
     "test:visual": "playwright test --project=\"Visual Tests\" --config=playwright.config.ts",
     "test:perf": "playwright test --project=\"Performance Tests\" --config=playwright.config.ts",
