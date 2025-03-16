@@ -26,9 +26,6 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Setup Playwright
-        run: npx playwright install --with-deps
-
       - name: Run Component Tests
         run: npm run test:all
 
