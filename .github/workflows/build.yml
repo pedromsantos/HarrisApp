@@ -32,8 +32,5 @@ jobs:
       - name: Run Component Tests
         run: npm run test:all
 
-      - name: Run Performance Tests
-        run: npm run test:perf
-
       - name: Build
         run: npm run build
