@@ -1,5 +1,6 @@
+import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import * as Toggle from '@radix-ui/react-toggle';
 import { useTheme } from './ThemeProvider';
-import { Button } from './ui/button';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -8,59 +9,14 @@ export function ThemeToggle() {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  const renderIcon = () => {
-    if (theme === 'dark') {
-      return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-        </svg>
-      );
-    } else {
-      return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2" />
-          <path d="M12 20v2" />
-          <path d="m4.93 4.93 1.41 1.41" />
-          <path d="m17.66 17.66 1.41 1.41" />
-          <path d="M2 12h2" />
-          <path d="M20 12h2" />
-          <path d="m6.34 17.66-1.41 1.41" />
-          <path d="m19.07 4.93-1.41 1.41" />
-        </svg>
-      );
-    }
-  };
-
   return (
-    <Button
-      variant="outline"
-      size="icon"
-      onClick={toggleTheme}
-      className="rounded-full w-9 h-9 border-primary"
-      title={`Current theme: ${theme}. Click to switch to ${theme === 'dark' ? 'light' : 'dark'} mode.`}
+    <Toggle.Root
+      pressed={theme === 'dark'}
+      onPressedChange={() => toggleTheme()}
+      aria-label={`Current theme: ${theme}. Click to switch to ${theme === 'dark' ? 'light' : 'dark'} mode.`}
+      className="rounded-full w-9 h-9 border border-primary inline-flex items-center justify-center bg-background hover:bg-accent"
     >
-      {renderIcon()}
-    </Button>
+      {theme === 'dark' ? <MoonIcon className="h-5 w-5" /> : <SunIcon className="h-5 w-5" />}
+    </Toggle.Root>
   );
 }
