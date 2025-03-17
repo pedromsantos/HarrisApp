@@ -6,7 +6,6 @@ import { useLineGenerator } from '../../hooks/useLineGenerator';
 import LineGenerator from '../LineGenerator';
 import { PATTERNS } from '../lineGenerator-components/constants';
 
-// Mock scrollIntoView for Radix UI components
 Element.prototype.scrollIntoView = vi.fn();
 
 vi.mock('../../hooks/useLineGenerator', () => ({
