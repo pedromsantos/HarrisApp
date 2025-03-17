@@ -47,7 +47,6 @@ describe('ScaleSelector', () => {
     const fromSection = getScaleSection('from scale');
     const toSection = getScaleSection('to scale');
 
-    // Check note values
     expect(within(fromSection).getByRole('combobox', { name: 'Select note' })).toHaveTextContent(
       'G3'
     );
@@ -97,14 +96,11 @@ describe('ScaleSelector', () => {
     render(<ScaleSelector {...defaultProps} />);
     const fromScaleSection = getScaleSection('from scale');
 
-    // Get the note select by aria-label
     const noteSelect = within(fromScaleSection).getByRole('combobox', { name: 'Select note' });
 
-    // Open the note select dropdown
     await user.click(noteSelect);
     const listbox = screen.getByRole('listbox');
 
-    // Check for sample notes
     for (const note of NOTES) {
       for (const octave of OCTAVES) {
         const optionText = `${note}${octave}`;
@@ -112,16 +108,12 @@ describe('ScaleSelector', () => {
       }
     }
 
-    // Close the note dropdown by pressing Escape
     await user.keyboard('{Escape}');
 
-    // Get the scale type select by aria-label
     const scaleSelect = within(fromScaleSection).getByRole('combobox', { name: 'Select scale' });
 
-    // Open the scale type dropdown
     await user.click(scaleSelect);
 
-    // Check for scale types
     for (const type of SCALE_TYPES) {
       const displayText = type.charAt(0).toUpperCase() + type.slice(1);
       expect(screen.getByRole('option', { name: displayText })).toBeInTheDocument();
@@ -134,7 +126,6 @@ describe('ScaleSelector', () => {
     const fromSection = getScaleSection('from scale');
     const toSection = getScaleSection('to scale');
 
-    // Check that all selects are disabled
     [fromSection, toSection].forEach((section) => {
       const selects = within(section).getAllByRole('combobox');
       selects.forEach((select) => {

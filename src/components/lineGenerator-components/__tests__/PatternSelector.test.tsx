@@ -7,7 +7,6 @@ import { PATTERNS } from '../constants';
 import { PatternSelector } from '../PatternSelector';
 
 describe('PatternSelector', () => {
-  // Ensure we have at least 4 patterns for our tests
   const selectedPatterns = PATTERNS.slice(0, 2) as [Pattern, Pattern];
   const availablePatterns = PATTERNS.slice(2);
 
@@ -34,14 +33,12 @@ describe('PatternSelector', () => {
   it('renders available and selected patterns', () => {
     render(<PatternSelector {...mockProps} />);
 
-    // Check available patterns
     const availableSection = screen.getByTestId('available-patterns-section');
     availablePatterns.forEach((pattern) => {
       const displayText = pattern.replace(/_/g, ' ');
       expect(within(availableSection).getByText(displayText)).toBeInTheDocument();
     });
 
-    // Check selected patterns
     const selectedSection = screen.getByTestId('selected-patterns-section');
     selectedPatterns.forEach((pattern) => {
       const displayText = pattern.replace(/_/g, ' ');
@@ -49,7 +46,7 @@ describe('PatternSelector', () => {
     });
   });
 
-  it('calls onAddPattern when clicking an available pattern', async () => {
+  it('adds pattern when clicking an available pattern', async () => {
     const { user } = setup();
     render(<PatternSelector {...mockProps} />);
 
@@ -59,15 +56,16 @@ describe('PatternSelector', () => {
 
     const patternElement = within(availableSection).getByText(firstPattern);
     await user.click(patternElement);
+
     expect(mockProps.onAddPattern).toHaveBeenCalledWith(availablePatterns[0]);
   });
 
-  it('calls onRemovePattern when clicking remove button', async () => {
+  it('removes pattern when clicking remove button', async () => {
     const { user } = setup();
     render(<PatternSelector {...mockProps} />);
 
     const selectedSection = screen.getByTestId('selected-patterns-section');
-    // Find remove buttons by their SVG path
+
     const removeButtons = within(selectedSection)
       .getAllByRole('button')
       .filter((button) => {
@@ -82,12 +80,12 @@ describe('PatternSelector', () => {
     expect(mockProps.onRemovePattern).toHaveBeenCalledWith(selectedPatterns[0]);
   });
 
-  it('calls onMovePatternUp when clicking up arrow', async () => {
+  it('mover pattern up when clicking up arrow', async () => {
     const { user } = setup();
     render(<PatternSelector {...mockProps} />);
 
     const selectedSection = screen.getByTestId('selected-patterns-section');
-    // Find up buttons by their SVG path
+
     const moveUpButtons = within(selectedSection)
       .getAllByRole('button')
       .filter((button) => {
@@ -102,12 +100,12 @@ describe('PatternSelector', () => {
     expect(mockProps.onMovePatternUp).toHaveBeenCalledWith(1);
   });
 
-  it('calls onMovePatternDown when clicking down arrow', async () => {
+  it('moves pattern down when clicking down arrow', async () => {
     const { user } = setup();
     render(<PatternSelector {...mockProps} />);
 
     const selectedSection = screen.getByTestId('selected-patterns-section');
-    // Find down buttons by their SVG path
+
     const moveDownButtons = within(selectedSection)
       .getAllByRole('button')
       .filter((button) => {
@@ -126,7 +124,7 @@ describe('PatternSelector', () => {
     render(<PatternSelector {...mockProps} />);
 
     const selectedSection = screen.getByTestId('selected-patterns-section');
-    // Find up and down buttons by their SVG paths
+
     const moveUpButtons = within(selectedSection)
       .getAllByRole('button')
       .filter((button) => {
@@ -141,12 +139,10 @@ describe('PatternSelector', () => {
         return svg && svg.innerHTML.includes('M19 9l-7 7-7-7');
       });
 
-    // First pattern's up button should be disabled
     const firstUpButton = moveUpButtons[0];
     expect(firstUpButton).toHaveAttribute('disabled');
     expect(firstUpButton).toHaveClass('opacity-30');
 
-    // Last pattern's down button should be disabled
     const lastDownButton = moveDownButtons[moveDownButtons.length - 1];
     expect(lastDownButton).toHaveAttribute('disabled');
     expect(lastDownButton).toHaveClass('opacity-30');
@@ -166,10 +162,8 @@ describe('PatternSelector', () => {
 
     expect(patternItems.length).toBeGreaterThan(0);
 
-    // Tab to focus the first button
-    await user.tab(); // This might need adjustment based on the actual tab order
+    await user.tab();
 
-    // Check that buttons can be focused in sequence
     expect(document.activeElement).not.toBe(document.body);
   });
 });

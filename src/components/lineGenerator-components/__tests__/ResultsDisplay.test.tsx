@@ -55,7 +55,6 @@ describe('ResultsDisplay', () => {
       expect(tabContent).toBeInTheDocument();
       expect(tabContent.textContent).toBe('e|---\nB|---\nG|---');
 
-      // Check that the parent has the correct class for pre element
       const preElement = tabContent.closest('pre');
       expect(preElement).toHaveClass('whitespace-pre');
     });
@@ -73,7 +72,6 @@ describe('ResultsDisplay', () => {
       const tabContent = screen.getByText('e|---3---5---7---|');
       expect(tabContent).toBeInTheDocument();
 
-      // Check that the parent has the correct class for pre element
       const preElement = tabContent.closest('pre');
       expect(preElement).toHaveClass('whitespace-pre');
     });
@@ -116,7 +114,6 @@ describe('ResultsDisplay', () => {
       const pitchNotation = screen.getByText('C4, E4, G4');
       expect(pitchNotation).toHaveClass('text-sm', 'font-medium', 'text-foreground');
 
-      // Check that the container has the correct class
       const container = pitchNotation.closest('div');
       expect(container).toHaveClass('bg-primary/10');
     });

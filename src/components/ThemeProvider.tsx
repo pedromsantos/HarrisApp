@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-// Define the possible theme values
 export type Theme = 'dark' | 'light';
 
 type ThemeProviderProps = {

@@ -57,10 +57,8 @@ const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef,
         <code className="text-sm block font-medium text-foreground">{line.join(', ')}</code>
       </div>
 
-      {/* Music notation */}
       <div ref={notationRef} className="p-2 mb-1 bg-background rounded overflow-auto"></div>
 
-      {/* Tab notation */}
       <div className="p-2 rounded-b bg-muted/30">
         <pre className="p-0 m-0 font-mono text-sm overflow-x-auto whitespace-pre text-foreground">
           {renderTabData()}
@@ -70,7 +68,6 @@ const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef,
   );
 };
 
-// Main ResultsDisplay Component
 export interface ResultsDisplayProps {
   result: LineGeneratorResponse | null;
   error: string | null;
