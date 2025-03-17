@@ -37,8 +37,8 @@ describe('ThemeToggle', () => {
     // Verify sun icon is present
     const svg = button.querySelector('svg');
     expect(svg).toBeInTheDocument();
-    // Radix UI SunIcon has a different structure, so we just check it exists
-    expect(svg).toHaveAttribute('viewBox', '0 0 15 15');
+    // Check the viewBox matches our SVG icon
+    expect(svg).toHaveAttribute('viewBox', '0 0 24 24');
   });
 
   it('renders with moon icon when theme is dark', () => {
@@ -58,8 +58,8 @@ describe('ThemeToggle', () => {
     // Verify moon icon is present
     const svg = button.querySelector('svg');
     expect(svg).toBeInTheDocument();
-    // Radix UI MoonIcon has a different structure, so we just check it exists
-    expect(svg).toHaveAttribute('viewBox', '0 0 15 15');
+    // Check the viewBox matches our SVG icon
+    expect(svg).toHaveAttribute('viewBox', '0 0 24 24');
   });
 
   it('toggles theme when clicked', async () => {
