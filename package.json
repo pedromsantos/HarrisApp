@@ -40,7 +40,7 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sonarjs": "^3.0.2",
     "eslint-plugin-vitest": "^0.5.4",
-    "husky": "^9.0.11",
+    "husky": "^9.1.7",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.3",
     "postcss-import": "^16.1.0",
