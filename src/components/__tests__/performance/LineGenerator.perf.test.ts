@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+const PATTERN_ITEM_SELECTOR = '[data-testid^="pattern-item-"]';
+
 test.describe('LineGenerator Performance', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:5173/');
@@ -32,7 +34,7 @@ test.describe('LineGenerator Performance', () => {
     const patternSelectionTime = await page.evaluate(async () => {
       const start = performance.now();
       // Use a more reliable selector
-      const element = document.querySelector('[data-testid^="pattern-item-"]');
+      const element = document.querySelector(PATTERN_ITEM_SELECTOR);
       if (element instanceof HTMLElement) {
         element.click();
       }
@@ -69,7 +71,7 @@ test.describe('LineGenerator Performance', () => {
 
   test('notation rendering performance', async ({ page }) => {
     // Add pattern and generate
-    await page.locator('[data-testid^="pattern-item-"]').first().click();
+    await page.locator(PATTERN_ITEM_SELECTOR).first().click();
     await page.waitForTimeout(500);
 
     // Use page.locator instead of page.evaluate for clicking the button
@@ -104,7 +106,7 @@ test.describe('LineGenerator Performance', () => {
       Array(3)
         .fill(null)
         .map(async () => {
-          await page.locator('[data-testid^="pattern-item-"]').first().click();
+          await page.locator(PATTERN_ITEM_SELECTOR).first().click();
           await page.locator('button', { hasText: 'Generate Lines' }).click();
           await page.waitForTimeout(1000);
         })
@@ -117,5 +119,25 @@ test.describe('LineGenerator Performance', () => {
     const memoryIncrease = finalMemory - initialMemory;
 
     expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024); // 50MB threshold
+  });
+
+  test('long list performance', async ({ page }) => {
+    // Test performance with pattern list scrolling
+    const scrollPerformance = await page.evaluate(() => {
+      const start = performance.now();
+      // Find a pattern list container
+      const container = document.querySelector('[data-testid="available-patterns-section"]');
+      if (container instanceof HTMLElement) {
+        container.scrollTop = container.scrollHeight;
+        // Simple synchronous delay
+        const end = performance.now() + 16; // ~1 frame
+        while (performance.now() < end) {
+          // Busy wait
+        }
+      }
+      return performance.now() - start;
+    });
+
+    expect(scrollPerformance).toBeLessThan(200); // 200ms threshold for scroll performance
   });
 });

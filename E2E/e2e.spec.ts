@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 const PRODUCTION_URL = 'https://harrisjazzlines.com/';
 
@@ -30,18 +30,18 @@ test.describe('Harris Jazz Lines App E2E Tests', () => {
   });
 
   test('can select a pattern', async ({ page }) => {
-    const patternItem = await page.locator('[data-testid^="pattern-item-"]').first();
+    const patternItem = page.locator('[data-testid^="pattern-item-"]').first();
     await patternItem.waitFor({ state: 'visible' });
     await patternItem.click();
 
-    const selectedPatternsSection = await page.locator('[data-testid="selected-patterns-section"]');
+    const selectedPatternsSection = page.locator('[data-testid="selected-patterns-section"]');
     await expect(selectedPatternsSection.locator('[data-testid^="pattern-item-"]')).toHaveCount(1);
 
     await expect(page.locator('button:has-text("Generate Lines")')).toBeEnabled();
   });
 
   test('can generate lines', async ({ page }) => {
-    const patternItem = await page.locator('[data-testid^="pattern-item-"]').first();
+    const patternItem = page.locator('[data-testid^="pattern-item-"]').first();
     await patternItem.waitFor({ state: 'visible' });
     await patternItem.click();
 
@@ -109,17 +109,16 @@ test.describe('Harris Jazz Lines App E2E Tests', () => {
   });
 
   test('can change position', async ({ page }) => {
-    const positionInput = await page.locator('input[type="number"]');
+    const positionInput = page.locator('input[type="number"]');
     await positionInput.waitFor({ state: 'visible' });
-
     await positionInput.clear();
     await positionInput.fill('7');
-
     await expect(positionInput).toHaveValue('7');
   });
 
   test('can reorder patterns', async ({ page }) => {
     const patternItems = await page.locator('[data-testid^="pattern-item-"]').all();
+    expect(patternItems.length).toBeGreaterThan(1);
 
     await patternItems[0].waitFor({ state: 'visible' });
     await patternItems[0].click();
@@ -127,7 +126,7 @@ test.describe('Harris Jazz Lines App E2E Tests', () => {
     await patternItems[1].waitFor({ state: 'visible' });
     await patternItems[1].click();
 
-    const selectedPatternsSection = await page.locator('[data-testid="selected-patterns-section"]');
+    const selectedPatternsSection = page.locator('[data-testid="selected-patterns-section"]');
     await selectedPatternsSection.waitFor({ state: 'visible' });
 
     await expect(selectedPatternsSection.locator('[data-testid^="pattern-item-"]')).toHaveCount(2);
@@ -161,11 +160,11 @@ test.describe('Harris Jazz Lines App E2E Tests', () => {
   });
 
   test('can remove patterns', async ({ page }) => {
-    const patternItem = await page.locator('[data-testid^="pattern-item-"]').first();
+    const patternItem = page.locator('[data-testid^="pattern-item-"]').first();
     await patternItem.waitFor({ state: 'visible' });
     await patternItem.click();
 
-    const selectedPatternsSection = await page.locator('[data-testid="selected-patterns-section"]');
+    const selectedPatternsSection = page.locator('[data-testid="selected-patterns-section"]');
     await selectedPatternsSection.waitFor({ state: 'visible' });
 
     await expect(selectedPatternsSection.locator('[data-testid^="pattern-item-"]')).toHaveCount(1);
@@ -181,13 +180,11 @@ test.describe('Harris Jazz Lines App E2E Tests', () => {
 
   test('works on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-
-    // Wait for the page to adjust to the new viewport size
     await page.waitForLoadState('networkidle');
 
     await expect(page.locator('h1')).toContainText('Barry Harris Line Generator');
 
-    const patternItem = await page.locator('[data-testid^="pattern-item-"]').first();
+    const patternItem = page.locator('[data-testid^="pattern-item-"]').first();
     await patternItem.waitFor({ state: 'visible' });
     await patternItem.click();
 
