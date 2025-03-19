@@ -18,7 +18,7 @@ const mockLocalStorage = {
 const mockMatchMedia = vi.fn();
 
 // Mock requestAnimationFrame
-const mockRequestAnimationFrame = vi.fn((callback) => {
+const mockRequestAnimationFrame = vi.fn((callback: () => void) => {
   callback();
   return 0;
 });
@@ -39,6 +39,7 @@ afterEach(() => {
 
 const TestComponent = () => {
   const { theme, setTheme } = useTheme();
+
   return (
     <div data-testid="theme-test">
       <span>{theme}</span>
