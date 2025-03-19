@@ -5,15 +5,36 @@ import { LineGeneratorRequest, LineGeneratorResponse } from '../types/lineGenera
 
 const API_BASE_URL = 'https://barry-harris-line-generator.pedro-santos-personal.workers.dev';
 
-export function useLineGenerator() {
+type UseLineGeneratorReturn = {
+  result: LineGeneratorResponse | null;
+  error: string | null;
+  isLoading: boolean;
+  isServerHealthy: boolean | null;
+  checkServerHealth: () => Promise<void>;
+  generateLines: (formData: LineGeneratorRequest) => Promise<LineGeneratorResponse | null>;
+};
+
+export function useLineGenerator(): UseLineGeneratorReturn {
   const [result, setResult] = useState<LineGeneratorResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isServerHealthy, setIsServerHealthy] = useState<boolean | null>(null);
 
+  const checkServerHealth = useCallback(async () => {
+    const response = await fetch(`${API_BASE_URL}/health`);
+    const newStatus = response.ok;
+    setIsServerHealthy(newStatus);
+
+    if (newStatus && isServerHealthy === false) {
+      toast.success('Server Available', {
+        description: 'The line generator service is now available.',
+      });
+    }
+  }, [isServerHealthy]);
+
   useEffect(() => {
-    checkServerHealth();
-  }, []);
+    void checkServerHealth();
+  }, [checkServerHealth]);
 
   useEffect(() => {
     if (isServerHealthy === false) {
@@ -21,31 +42,20 @@ export function useLineGenerator() {
         description: 'The line generator service is currently unavailable. Please try again later.',
         action: {
           label: 'Retry',
-          onClick: checkServerHealth,
+          onClick: () => void checkServerHealth(),
         },
         duration: Infinity,
       });
     }
-  }, [isServerHealthy]);
+  }, [isServerHealthy, checkServerHealth]);
 
-  const checkServerHealth = useCallback(async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/health`);
-      const newStatus = response.ok;
-      setIsServerHealthy(newStatus);
-
-      if (newStatus && isServerHealthy === false) {
-        toast.success('Server Available', {
-          description: 'The line generator service is now available.',
-        });
-      }
-    } catch (err) {
-      setIsServerHealthy(false);
+  const validateResponse = useCallback((data: unknown): data is LineGeneratorResponse => {
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('Invalid response format: not an object');
     }
-  }, [isServerHealthy]);
-
-  const validateResponse = useCallback((data: any): data is LineGeneratorResponse => {
-    if (!data.lines || !Array.isArray(data.lines)) {
+    const response = data as { lines?: unknown };
+    const hasLines = response.lines !== undefined && Array.isArray(response.lines);
+    if (!hasLines) {
       throw new Error('Invalid response format: missing or invalid lines data');
     }
     return true;
@@ -53,7 +63,7 @@ export function useLineGenerator() {
 
   const normalizeResponseData = useCallback(
     (data: LineGeneratorResponse): LineGeneratorResponse => {
-      if (!data.tabs) {
+      if (data.tabs === undefined) {
         return {
           ...data,
           tabs: data.lines.map(() => []),
@@ -74,13 +84,40 @@ export function useLineGenerator() {
       body: JSON.stringify(formData),
     });
 
-    const data = await response.json();
+    const data = (await response.json()) as unknown;
 
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to generate lines');
+      const errorData = data as { error?: string };
+      throw new Error(errorData.error ?? 'Failed to generate lines');
     }
 
-    return data;
+    return data as LineGeneratorResponse;
+  }, []);
+
+  const handleError = useCallback((err: unknown) => {
+    if (err instanceof Error) {
+      if (err.message.includes('Failed to fetch')) {
+        const errorMessage =
+          'Unable to connect to the server. Please check your internet connection and try again. ' +
+          'If the problem persists, the service might be temporarily unavailable.';
+
+        setError(errorMessage);
+        toast.error('Connection Error', {
+          description: errorMessage,
+        });
+      } else {
+        setError(err.message);
+        toast.error('Error', {
+          description: err.message,
+        });
+      }
+    } else {
+      const errorMessage = 'An unexpected error occurred. Please try again later.';
+      setError(errorMessage);
+      toast.error('Unexpected Error', {
+        description: errorMessage,
+      });
+    }
   }, []);
 
   const generateLines = useCallback(
@@ -108,34 +145,8 @@ export function useLineGenerator() {
         setIsLoading(false);
       }
     },
-    [makeApiRequest, validateResponse, normalizeResponseData]
+    [makeApiRequest, validateResponse, normalizeResponseData, handleError]
   );
-
-  const handleError = useCallback((err: unknown) => {
-    if (err instanceof Error) {
-      if (err.message.includes('Failed to fetch')) {
-        const errorMessage =
-          'Unable to connect to the server. Please check your internet connection and try again. ' +
-          'If the problem persists, the service might be temporarily unavailable.';
-
-        setError(errorMessage);
-        toast.error('Connection Error', {
-          description: errorMessage,
-        });
-      } else {
-        setError(err.message);
-        toast.error('Error', {
-          description: err.message,
-        });
-      }
-    } else {
-      const errorMessage = 'An unexpected error occurred. Please try again later.';
-      setError(errorMessage);
-      toast.error('Unexpected Error', {
-        description: errorMessage,
-      });
-    }
-  }, []);
 
   return {
     result,
