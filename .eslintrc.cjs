@@ -89,7 +89,7 @@ module.exports = {
     'import/no-cycle': 'error',
     'import/no-self-import': 'error',
     'import/no-useless-path-segments': 'error',
-    'import/no-relative-parent-imports': 'error',
+    'import/no-relative-parent-imports': 'off',
     'import/no-mutable-exports': 'error',
     'import/no-unused-modules': 'error',
     'simple-import-sort/exports': 'error',
