@@ -42,8 +42,14 @@ test.describe('LineGenerator Visual Tests', () => {
 
   test('dark theme matches snapshot', async ({ page }) => {
     // Switch to dark theme
-    await page.locator('button[title*="theme"]').click();
-    await page.waitForTimeout(1000);
+    const themeButton = page.locator('button[title*="theme"]');
+    await themeButton.click();
+
+    // Wait for the dark theme class to be applied
+    await page.waitForSelector('html.dark');
+
+    // Wait for theme transitions to complete
+    await page.waitForTimeout(100);
 
     await expect(page).toHaveScreenshot('line-generator-dark.png', {
       threshold: 0.2, // Allow 20% pixel difference
