@@ -6,22 +6,6 @@ import LineGenerator from './components/LineGenerator';
 import { ThemeProvider } from './components/ThemeProvider';
 import { ThemeToggle } from './components/ThemeToggle';
 
-const App: React.FC = () => {
-  useEffect(() => {
-    document.documentElement.classList.add('performance-transitions');
-
-    return () => {
-      document.documentElement.classList.remove('performance-transitions');
-    };
-  }, []);
-
-  return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
-  );
-};
-
 const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -42,6 +26,22 @@ const AppContent: React.FC = () => {
         </div>
       </main>
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  useEffect(() => {
+    document.documentElement.classList.add('performance-transitions');
+
+    return () => {
+      document.documentElement.classList.remove('performance-transitions');
+    };
+  }, []);
+
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 };
 

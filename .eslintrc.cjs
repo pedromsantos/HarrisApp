@@ -17,7 +17,15 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  ignorePatterns: [
+    'dist',
+    '.eslintrc.cjs',
+    'vitest.config.ts',
+    'vite.config.ts',
+    'E2E/e2e.spec.ts',
+    'playwright.config.ts',
+    'src/test/setup.ts',
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
