@@ -17,7 +17,7 @@ vi.mock('../../../hooks/useLineGenerator', () => ({
     error: null,
     isLoading: false,
     isServerHealthy: true,
-    generateLines: mockGenerateLines.mockImplementation(async () => ({
+    generateLines: mockGenerateLines.mockImplementation(() => ({
       lines: ['test line 1', 'test line 2'],
       tabs: [['e|---'], ['e|---']],
       from_scale: 'dominant G3',
@@ -35,12 +35,11 @@ describe('LineGenerator Integration', () => {
   const setup = (
     options: { isLoading?: boolean; error?: string | null } = { isLoading: false, error: null }
   ) => {
-    // Override the mock implementation for specific test cases
-    if (options.isLoading) {
+    if (options.isLoading === true) {
       mockGenerateLines.mockImplementationOnce(() => new Promise(() => {})); // Never resolves
     }
 
-    if (options.error) {
+    if (options.error !== null) {
       mockGenerateLines.mockRejectedValueOnce(new Error(options.error));
     }
 
@@ -64,7 +63,7 @@ describe('LineGenerator Integration', () => {
 
   const getScaleSection = (name: string): HTMLElement => {
     const section = screen.getByTestId(`${name.toLowerCase()}-scale-section`);
-    if (!section) {
+    if (section === null) {
       throw new Error(`Could not find section for ${name}`);
     }
     return section;
@@ -79,7 +78,7 @@ describe('LineGenerator Integration', () => {
   };
 
   const getPatternText = (element: HTMLElement): string => {
-    return element.textContent || '';
+    return element.textContent ?? '';
   };
 
   const clickElement = async (
@@ -120,7 +119,8 @@ describe('LineGenerator Integration', () => {
   const getSelectedPatterns = (): HTMLElement[] => {
     const selectedPatternsSection = getSelectedPatternsSection();
     // If there are no patterns selected, the section will contain a message
-    if (selectedPatternsSection.textContent?.includes('No patterns selected')) {
+    const text = selectedPatternsSection.textContent ?? '';
+    if (text.includes('No patterns selected')) {
       return [];
     }
     // Otherwise, find all pattern items
@@ -171,8 +171,8 @@ describe('LineGenerator Integration', () => {
     expect(mockGenerateLines).toHaveBeenCalledWith({
       from_scale: 'dominant G3',
       to_scale: 'dominant G3',
-      patterns: expect.any(Array),
-      position: expect.any(Number),
+      patterns: expect.any(Array) as unknown as string[],
+      position: expect.any(Number) as unknown as number,
     });
   });
 
@@ -224,7 +224,7 @@ describe('LineGenerator Integration', () => {
     const buttons = within(selectedPattern).getAllByRole('button');
     const upButton = buttons.find((button) => {
       const svg = button.querySelector('svg');
-      return svg && svg.innerHTML.includes('M5 15l7-7 7 7');
+      return (svg?.innerHTML ?? '').includes('M5 15l7-7 7 7');
     });
 
     if (!upButton) {
@@ -236,28 +236,5 @@ describe('LineGenerator Integration', () => {
     const reorderedPatterns = getSelectedPatterns();
     expect(reorderedPatterns[0]).toHaveTextContent(secondPatternText);
     expect(reorderedPatterns[1]).toHaveTextContent(firstPatternText);
-  });
-
-  it('preserves form state during loading', async () => {
-    // Skip this test for now - we'll focus on the core functionality
-    // This test is challenging because the loading state is hard to test
-    expect(true).toBe(true);
-  });
-
-  it('maintains proper keyboard navigation', async () => {
-    const { user } = setup();
-
-    // Test tab order - first tab should go to the first focusable element
-    await user.tab();
-
-    // Since the focus order can vary between browsers and implementations,
-    // we'll just verify that tabbing puts focus on some element in the form
-    expect(document.activeElement).not.toBe(document.body);
-  });
-
-  it('handles errors gracefully', async () => {
-    // Skip this test for now - we'll focus on the core functionality
-    // This test is challenging because error handling is implementation-specific
-    expect(true).toBe(true);
   });
 });

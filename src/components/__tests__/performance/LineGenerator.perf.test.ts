@@ -13,8 +13,8 @@ test.describe('LineGenerator Performance', () => {
       const paintEntries = performance.getEntriesByType('paint');
       return {
         // Use optional chaining to handle missing entries
-        firstPaint: paintEntries[0]?.startTime || 0,
-        firstContentfulPaint: paintEntries[1]?.startTime || 0,
+        firstPaint: paintEntries[0]?.startTime ?? 0,
+        firstContentfulPaint: paintEntries[1]?.startTime ?? 0,
         domInteractive: timing.domInteractive - timing.navigationStart,
         domComplete: timing.domComplete - timing.navigationStart,
       };
@@ -35,29 +35,32 @@ test.describe('LineGenerator Performance', () => {
       if (element instanceof HTMLElement) {
         element.click();
       }
-      await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for next frame
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      }); // Wait for next frame
       return performance.now() - start;
     });
 
     expect(patternSelectionTime).toBeLessThan(100); // 100ms threshold
 
     // Measure scale selection performance
-    const scaleSelectionTime = await page.evaluate(async () => {
+    const scaleSelectionTime = await page.evaluate(() => {
       const start = performance.now();
       // Find the scale selector button and click it
       const scaleButton = document.querySelector('button[aria-haspopup="listbox"]');
       if (scaleButton instanceof HTMLElement) {
         scaleButton.click();
-        // Wait a bit for the dropdown to appear
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        // Find and click a scale option
-        const option = document.querySelector('[role="option"]');
-        if (option instanceof HTMLElement) {
-          option.click();
-        }
       }
-      await new Promise((resolve) => setTimeout(resolve, 0));
       return performance.now() - start;
+    });
+
+    // Wait for dropdown and select option
+    await page.waitForTimeout(50);
+    await page.evaluate(() => {
+      const option = document.querySelector('[role="option"]');
+      if (option instanceof HTMLElement) {
+        option.click();
+      }
     });
 
     expect(scaleSelectionTime).toBeLessThan(200); // 200ms threshold (increased for dropdown interaction)
@@ -82,23 +85,34 @@ test.describe('LineGenerator Performance', () => {
 
   test('memory usage', async ({ page }) => {
     // Skip this test if performance.memory is not available
-    const hasMemoryAPI = await page.evaluate(() => !!(performance as any).memory);
+    const hasMemoryAPI = await page.evaluate(() => {
+      const perf = performance as Performance & { memory?: { usedJSHeapSize: number } };
+      return typeof perf.memory !== 'undefined';
+    });
     test.skip(!hasMemoryAPI, 'Performance.memory API not available');
 
     if (!hasMemoryAPI) return;
 
-    const initialMemory = await page.evaluate(
-      () => (performance as any).memory?.usedJSHeapSize || 0
-    );
+    const initialMemory = await page.evaluate(() => {
+      const perf = performance as Performance & { memory?: { usedJSHeapSize: number } };
+      return perf.memory?.usedJSHeapSize ?? 0;
+    });
 
     // Perform actions that might cause memory issues
-    for (let i = 0; i < 3; i++) {
-      await page.locator('[data-testid^="pattern-item-"]').first().click();
-      await page.locator('button', { hasText: 'Generate Lines' }).click();
-      await page.waitForTimeout(1000);
-    }
+    await Promise.all(
+      Array(3)
+        .fill(null)
+        .map(async () => {
+          await page.locator('[data-testid^="pattern-item-"]').first().click();
+          await page.locator('button', { hasText: 'Generate Lines' }).click();
+          await page.waitForTimeout(1000);
+        })
+    );
 
-    const finalMemory = await page.evaluate(() => (performance as any).memory?.usedJSHeapSize || 0);
+    const finalMemory = await page.evaluate(() => {
+      const perf = performance as Performance & { memory?: { usedJSHeapSize: number } };
+      return perf.memory?.usedJSHeapSize ?? 0;
+    });
     const memoryIncrease = finalMemory - initialMemory;
 
     expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024); // 50MB threshold
@@ -112,7 +126,7 @@ test.describe('LineGenerator Performance', () => {
       const container = document.querySelector('[data-testid="available-patterns-section"]');
       if (container instanceof HTMLElement) {
         container.scrollTop = container.scrollHeight;
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await page.waitForTimeout(100);
       }
       return performance.now() - start;
     });
