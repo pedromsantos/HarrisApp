@@ -1,4 +1,5 @@
-import React, { useCallback, useRef, useState } from 'react';
+/* eslint-disable react/jsx-no-bind */
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useLineGenerator } from '../hooks/useLineGenerator';
 import { convertToABC } from '../lib/musicNotation';
@@ -36,31 +37,28 @@ const LineGenerator: React.FC = () => {
   const renderNotation = useCallback(async () => {
     if (result?.lines && !isRenderingNotation) {
       setIsRenderingNotation(true);
-      try {
-        const abcjs = await (preloadPromise || preloadABCJS());
-        result.lines.forEach((line, index) => {
-          if (notationRefs.current && index < notationRefs.current.length) {
-            const container = notationRefs.current[index];
-            if (container) {
-              const abcNotation = convertToABC(line);
-              abcjs.renderAbc(container, abcNotation, {
-                responsive: 'resize',
-                add_classes: true,
-                staffwidth: 500,
-              });
-            }
+
+      const abcjs = await (preloadPromise ?? preloadABCJS());
+      result.lines.forEach((line, index) => {
+        if (index < notationRefs.current.length) {
+          const container = notationRefs.current[index];
+          if (container) {
+            const abcNotation = convertToABC(line);
+            abcjs.renderAbc(container, abcNotation, {
+              responsive: 'resize',
+              add_classes: true,
+              staffwidth: 500,
+            });
           }
-        });
-      } catch (error) {
-        console.error('Failed to load notation renderer:', error);
-      } finally {
-        setIsRenderingNotation(false);
-      }
+        }
+      });
+
+      setIsRenderingNotation(false);
     }
   }, [result, isRenderingNotation]);
 
-  React.useEffect(() => {
-    renderNotation();
+  useEffect(() => {
+    void renderNotation();
   }, [renderNotation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,7 +132,7 @@ const LineGenerator: React.FC = () => {
             />
 
             <PositionSelector
-              position={formData.position || 0}
+              position={formData.position ?? 0}
               onPositionChange={(position: number) =>
                 setFormData((prev) => ({ ...prev, position }))
               }
@@ -152,7 +150,7 @@ const LineGenerator: React.FC = () => {
 
             <div className="mt-6">
               <Button
-                onClick={handleSubmit}
+                onClick={(e) => void handleSubmit(e)}
                 disabled={formData.patterns.length === 0 || isLoading || isServerHealthy === false}
                 className="w-full py-6 text-lg font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
               >
