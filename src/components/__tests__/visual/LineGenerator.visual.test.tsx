@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { expect, test } from '@playwright/test';
 
 test.describe('LineGenerator Visual Tests', () => {

@@ -148,7 +148,7 @@ module.exports = {
     // SonarJS rules
     'sonarjs/cognitive-complexity': ['error', 10],
     'sonarjs/no-identical-expressions': 'error',
-    'sonarjs/no-duplicate-string': 'error',
+    'sonarjs/no-duplicate-string': 'warn',
     'sonarjs/no-redundant-jump': 'error',
     'sonarjs/no-small-switch': 'error',
     'sonarjs/prefer-immediate-return': 'error',

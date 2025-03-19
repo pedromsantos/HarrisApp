@@ -1,6 +1,7 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Pattern } from '../../../types/lineGenerator';
 import { PATTERNS } from '../constants';

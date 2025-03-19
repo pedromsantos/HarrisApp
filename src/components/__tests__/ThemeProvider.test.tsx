@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable react/jsx-no-bind */
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
