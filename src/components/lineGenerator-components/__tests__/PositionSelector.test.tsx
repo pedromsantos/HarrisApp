@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PositionSelector } from '../PositionSelector';
 
@@ -66,8 +66,12 @@ describe('PositionSelector', () => {
   });
 
   it('enforces min and max values', async () => {
+    const { user } = setup();
     render(<PositionSelector {...mockProps} />);
     const input = screen.getByRole('spinbutton');
+
+    await user.clear(input);
+    await user.type(input, '13');
 
     expect(input).toHaveAttribute('min', '0');
     expect(input).toHaveAttribute('max', '12');
