@@ -1,3 +1,5 @@
+import { describe, expect, test } from 'vitest';
+
 import { AbcNote } from '../abcNotation/abcNote';
 
 describe('abc Note should', () => {

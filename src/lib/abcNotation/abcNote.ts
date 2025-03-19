@@ -7,11 +7,11 @@ export class AbcPitch {
     this.naturalName = pitch.slice(0, -1).replace(/[#b]/g, '') ?? '';
   }
 
-  toString() {
+  toString(): string {
     return this.toAccidental();
   }
 
-  private toAccidental() {
+  private toAccidental(): string {
     if (this.accidental === 1) {
       return `^${this.naturalName}`;
     }
@@ -20,6 +20,12 @@ export class AbcPitch {
     }
 
     return this.naturalName;
+  }
+}
+
+class AbcEightNote {
+  toString(): string {
+    return '';
   }
 }
 
@@ -34,11 +40,11 @@ export class AbcNote {
     this.duration = new AbcEightNote();
   }
 
-  toString() {
+  toString(): string {
     return this.pitch.toString() + this.toOctave() + new AbcEightNote().toString();
   }
 
-  private toOctave() {
+  private toOctave(): string {
     if (this.octave === 0) {
       return ',,,,';
     }
@@ -75,12 +81,6 @@ export class AbcNote {
       return "'''''";
     }
 
-    return '';
-  }
-}
-
-class AbcEightNote {
-  toString() {
     return '';
   }
 }
