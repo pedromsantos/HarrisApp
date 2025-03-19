@@ -16,7 +16,7 @@ test.describe('LineGenerator Visual Tests', () => {
 
   test('form with selected patterns matches snapshot', async ({ page }) => {
     // Find a pattern item and click it
-    const patternItem = await page.locator('[data-testid^="pattern-item-"]').first();
+    const patternItem = page.locator('[data-testid^="pattern-item-"]').first();
     await patternItem.click();
 
     await expect(page).toHaveScreenshot('line-generator-with-pattern.png', {
@@ -29,7 +29,7 @@ test.describe('LineGenerator Visual Tests', () => {
     await page.waitForTimeout(2000);
 
     // Find a pattern item and click it
-    const patternItem = await page.locator('[data-testid^="pattern-item-"]').first();
+    const patternItem = page.locator('[data-testid^="pattern-item-"]').first();
     await patternItem.click();
 
     // Click generate button
@@ -68,7 +68,7 @@ test.describe('LineGenerator Visual Tests', () => {
     await page.route('**/api/generate', (route) => route.abort());
 
     // Find a pattern item and click it
-    const patternItem = await page.locator('[data-testid^="pattern-item-"]').first();
+    const patternItem = page.locator('[data-testid^="pattern-item-"]').first();
     await patternItem.click();
 
     // Click generate button

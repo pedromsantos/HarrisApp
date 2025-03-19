@@ -6,7 +6,11 @@ import { useLineGenerator } from '../../hooks/useLineGenerator';
 import LineGenerator from '../LineGenerator';
 import { PATTERNS } from '../lineGenerator-components/constants';
 
+const PATTERNS_AS_STRINGS = PATTERNS as readonly string[];
+
 Element.prototype.scrollIntoView = vi.fn();
+
+const mockUseLineGenerator = vi.mocked(useLineGenerator);
 
 vi.mock('../../hooks/useLineGenerator', () => ({
   useLineGenerator: vi.fn(),
@@ -26,11 +30,12 @@ describe('LineGenerator', () => {
     isLoading: false,
     isServerHealthy: true,
     generateLines: mockGenerateLines,
+    checkServerHealth: vi.fn(),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useLineGenerator as any).mockReturnValue(defaultHookReturn);
+    mockUseLineGenerator.mockReturnValue(defaultHookReturn);
   });
 
   const selectFromNote = async (note: string) => {
@@ -110,7 +115,9 @@ describe('LineGenerator', () => {
     await selectFromNote('C4');
     await selectToScaleType('Major');
     await selectToNote('G4');
-    await addPattern(PATTERNS[0]?.replace(/_/g, ' ') || '');
+    if (PATTERNS[0]) {
+      await addPattern(PATTERNS[0].replace(/_/g, ' '));
+    }
 
     const generateButton = screen.getByRole('button', { name: /generate/i });
     expect(generateButton).toBeEnabled();
@@ -129,7 +136,9 @@ describe('LineGenerator', () => {
     await selectFromNote('C4');
     await selectToScaleType('Major');
     await selectToNote('G4');
-    await addPattern(PATTERNS[0]?.replace(/_/g, ' ') || '');
+    if (PATTERNS[0]) {
+      await addPattern(PATTERNS[0].replace(/_/g, ' '));
+    }
 
     const generateButton = screen.getByRole('button', { name: /generate/i });
     await userEvent.click(generateButton);
@@ -138,13 +147,13 @@ describe('LineGenerator', () => {
       expect.objectContaining({
         from_scale: 'major C4',
         to_scale: 'major G4',
-        patterns: expect.arrayContaining([PATTERNS[0]]),
+        patterns: expect.arrayContaining([PATTERNS_AS_STRINGS[0]]) as unknown as string[],
       })
     );
   });
 
   it('shows loading state when generating lines', () => {
-    (useLineGenerator as any).mockReturnValue({
+    mockUseLineGenerator.mockReturnValue({
       ...defaultHookReturn,
       isLoading: true,
     });
@@ -155,7 +164,7 @@ describe('LineGenerator', () => {
 
   it('shows error message when generation fails', () => {
     const errorMessage = 'Failed to generate lines';
-    (useLineGenerator as any).mockReturnValue({
+    mockUseLineGenerator.mockReturnValue({
       ...defaultHookReturn,
       error: errorMessage,
     });
@@ -189,7 +198,7 @@ describe('LineGenerator', () => {
   });
 
   it('disables form inputs during loading', () => {
-    (useLineGenerator as any).mockReturnValue({
+    mockUseLineGenerator.mockReturnValue({
       ...defaultHookReturn,
       isLoading: true,
     });
@@ -212,7 +221,7 @@ describe('LineGenerator', () => {
   });
 
   it('disables generate button when server is unhealthy', () => {
-    (useLineGenerator as any).mockReturnValue({
+    mockUseLineGenerator.mockReturnValue({
       ...defaultHookReturn,
       isServerHealthy: false,
     });
