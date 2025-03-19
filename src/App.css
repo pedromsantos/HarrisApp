@@ -9,7 +9,7 @@
   display: grid;
   grid-template-areas:
     "notation"
-    "tab";;
+    "tab";
 }
 
 .body ul {
