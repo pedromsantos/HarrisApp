@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { NOTES, OCTAVES, SCALE_TYPES } from '../constants';
 import { ScaleSelector } from '../ScaleSelector';
