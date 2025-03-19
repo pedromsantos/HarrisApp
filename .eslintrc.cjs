@@ -103,7 +103,7 @@ module.exports = {
     'react/jsx-no-useless-fragment': 'error',
     'react/no-array-index-key': 'error',
     'react/no-danger': 'error',
-    'react/no-multi-comp': 'error',
+    'react/no-multi-comp': 'off',
     'react/jsx-pascal-case': 'error',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',

@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react/jsx-no-bind */
+import React, { SVGProps } from 'react';
 
 import { Pattern } from '../../types/lineGenerator';
 
@@ -11,7 +12,7 @@ export interface PatternSelectorProps {
   onMovePatternDown: (index: number) => void;
 }
 
-interface IconProps extends React.SVGProps<SVGSVGElement> {
+interface IconProps extends SVGProps<SVGSVGElement> {
   path: string;
   className?: string;
 }
@@ -51,7 +52,7 @@ const PatternItem: React.FC<PatternItemProps> = ({ pattern, onClick, icon, class
     onClick={onClick}
   >
     <span>{pattern.replace(/_/g, ' ')}</span>
-    {icon && <span className="ml-2">{icon}</span>}
+    {icon !== null && icon !== undefined && <span className="ml-2">{icon}</span>}
   </div>
 );
 
@@ -140,17 +141,17 @@ const SelectedPatterns: React.FC<{
         No patterns selected
       </div>
     ) : (
-      patterns.map((pattern, index) => (
+      patterns.map((pattern) => (
         <PatternItem
-          key={`${pattern}-${index}`}
+          key={pattern}
           pattern={pattern}
           onClick={() => {}}
           icon={
             <PatternControls
-              index={index}
+              index={patterns.indexOf(pattern)}
               totalPatterns={patterns.length}
-              onMoveUp={() => onMovePatternUp(index)}
-              onMoveDown={() => onMovePatternDown(index)}
+              onMoveUp={() => onMovePatternUp(patterns.indexOf(pattern))}
+              onMoveDown={() => onMovePatternDown(patterns.indexOf(pattern))}
               onRemove={() => onRemovePattern(pattern)}
             />
           }

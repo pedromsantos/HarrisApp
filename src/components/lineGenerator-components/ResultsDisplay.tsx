@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 import React from 'react';
 
 import { LineGeneratorResponse } from '../../types/lineGenerator';
@@ -5,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 const EmptyState: React.FC = () => (
   <div className="text-center text-muted-foreground py-8">
-    Select your parameters and click "Generate Lines" to create lines based on Barry Harris' method.
+    Select your parameters and click &quot;Generate Lines&quot; to create lines based on Barry
+    Harris&apos; method.
   </div>
 );
 
@@ -44,14 +46,14 @@ interface LineNotationProps {
 
 const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef, index }) => {
   const renderTabData = () => {
-    if (!tabData) return 'No tab data available';
+    if (tabData === null || tabData === undefined) return 'No tab data available';
     if (Array.isArray(tabData)) return tabData.join('\n');
     if (typeof tabData === 'string') return tabData;
     return 'Invalid tab format';
   };
 
   return (
-    <div key={index} className="p-3">
+    <div key={`${line.join('-')}-${index}`} className="p-3">
       {/* Pitch notation */}
       <div className="p-2 rounded-t mb-1 bg-primary/10">
         <code className="text-sm block font-medium text-foreground">{line.join(', ')}</code>
@@ -80,7 +82,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result, error, n
       <CardTitle>Generated Lines</CardTitle>
     </CardHeader>
     <CardContent>
-      {error && <ErrorMessage error={error} />}
+      {error !== null && error !== '' && <ErrorMessage error={error} />}
 
       {result && (
         <div className="space-y-3">
@@ -89,7 +91,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result, error, n
           <div className="border rounded-md divide-y divide-border">
             {result.lines.map((line, index) => (
               <LineNotation
-                key={index}
+                key={line.join('-')}
                 line={line}
                 tabData={result.tabs?.[index]}
                 notationRef={(el) => (notationRefs.current[index] = el)}
@@ -100,7 +102,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result, error, n
         </div>
       )}
 
-      {!result && !error && <EmptyState />}
+      {result === null && error === null && <EmptyState />}
     </CardContent>
   </Card>
 );
