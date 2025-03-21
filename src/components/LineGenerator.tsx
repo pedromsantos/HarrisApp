@@ -152,7 +152,7 @@ const LineGenerator: React.FC = () => {
               <Button
                 onClick={(e) => void handleSubmit(e)}
                 disabled={formData.patterns.length === 0 || isLoading || isServerHealthy === false}
-                className="w-full py-6 text-lg font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
+                className="w-full py-6 text-lg font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow"
               >
                 {isLoading ? (
                   <>
