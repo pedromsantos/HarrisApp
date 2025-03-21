@@ -36,12 +36,6 @@ export function ThemeProvider({
     root.classList.remove('light', 'dark');
     root.classList.add(newTheme);
     root.setAttribute('data-theme', newTheme);
-
-    if (newTheme === 'dark') {
-      root.style.colorScheme = 'dark';
-    } else {
-      root.style.colorScheme = 'light';
-    }
   };
 
   const setTheme = (newTheme: Theme) => {
