@@ -1,4 +1,3 @@
-/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

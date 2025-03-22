@@ -69,6 +69,7 @@ export default tseslint.config(
         typescript: {
           project: './tsconfig.json',
           alwaysTryTypes: true,
+          alwaysStrict: true,
         },
       },
     },
@@ -128,7 +129,7 @@ export default tseslint.config(
       'import/no-cycle': 'error',
       'import/no-self-import': 'error',
       'import/no-useless-path-segments': 'error',
-      'import/no-relative-parent-imports': 'warn', // Downgraded to warn as this is causing many errors
+      'import/no-relative-parent-imports': 'off',
       'import/no-mutable-exports': 'error',
       'import/no-unused-modules': 'error',
       'simple-import-sort/exports': 'error',

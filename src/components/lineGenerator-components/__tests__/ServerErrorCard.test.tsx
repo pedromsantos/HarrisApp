@@ -1,4 +1,3 @@
-/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable react/jsx-no-bind */
 
 import { fireEvent, render, screen } from '@testing-library/react';
