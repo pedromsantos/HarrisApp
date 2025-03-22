@@ -39,7 +39,7 @@ const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef,
   };
 
   return (
-    <div key={`${line.join('-')}-${index}`} className="p-3">
+    <div key={`${line.join('-')}-${String(index)}`} className="p-3">
       {/* Pitch notation */}
       <div className="p-2 rounded-t mb-1 bg-primary/10">
         <code className="text-sm block font-medium text-foreground">{line.join(', ')}</code>
@@ -47,7 +47,7 @@ const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef,
 
       <div
         ref={notationRef}
-        data-testid={`notation-container-${index}`}
+        data-testid={`notation-container-${String(index)}`}
         className="p-2 mb-1 bg-background rounded overflow-auto"
       ></div>
 
@@ -63,7 +63,7 @@ const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef,
 export interface ResultsDisplayProps {
   result: LineGeneratorResponse | null;
   error: string | null;
-  notationRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
+  notationRefs: React.RefObject<(HTMLDivElement | null)[]>;
 }
 
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result, error, notationRefs }) => (

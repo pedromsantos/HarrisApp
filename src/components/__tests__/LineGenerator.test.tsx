@@ -119,7 +119,13 @@ describe('LineGenerator', () => {
       const localMockGenerateLines = vi.fn();
 
       render(
-        <Button onClick={() => localMockGenerateLines()} disabled={false}>
+        <Button
+          onClick={() => {
+            localMockGenerateLines();
+            return undefined;
+          }}
+          disabled={false}
+        >
           Generate
         </Button>
       );

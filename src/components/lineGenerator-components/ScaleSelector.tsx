@@ -31,7 +31,7 @@ const useScaleUtils = (): ScaleUtils => ({
   },
   getScaleNote: (scale: string): string => {
     const parts = scale.split(' ');
-    return parts[1] ?? `${NOTES[0]}${OCTAVES[0]}`;
+    return parts[1] ?? `${String(NOTES[0])}${String(OCTAVES[0])}`;
   },
 });
 

@@ -77,7 +77,7 @@ describe('ResultsDisplay', () => {
       };
 
       render(<ResultsDisplay result={mockResult} error={null} notationRefs={mockNotationRefs} />);
-      expect(screen.getByText('No tab data available')).toBeInTheDocument();
+      expect(screen.getByText('Invalid tab format')).toBeInTheDocument();
     });
 
     it('handles invalid tab format gracefully', () => {

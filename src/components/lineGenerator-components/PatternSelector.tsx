@@ -78,7 +78,7 @@ const PatternControls: React.FC<PatternControlsProps> = ({
       onClick={onMoveUp}
       disabled={index === 0}
       className={`text-primary ${index === 0 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
-      data-testid={`move-up-button-${index}`}
+      data-testid={`move-up-button-${String(index)}`}
       aria-label="Move pattern up"
     >
       <UpArrowIcon />
@@ -90,7 +90,7 @@ const PatternControls: React.FC<PatternControlsProps> = ({
       className={`text-primary ${
         index === totalPatterns - 1 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'
       }`}
-      data-testid={`move-down-button-${index}`}
+      data-testid={`move-down-button-${String(index)}`}
       aria-label="Move pattern down"
     >
       <DownArrowIcon />
