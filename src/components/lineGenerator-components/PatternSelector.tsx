@@ -47,7 +47,7 @@ interface PatternItemProps {
 
 const PatternItem: React.FC<PatternItemProps> = ({ pattern, onClick, icon, className = '' }) => (
   <div
-    data-testid={`pattern-item-${pattern}`}
+    data-testid={`pattern-item-${pattern.toLowerCase().replace(/\s+/g, '_')}`}
     className={`flex items-center justify-between py-1.5 px-3 rounded-md hover:bg-muted cursor-pointer my-1 ${className}`}
     onClick={onClick}
   >
@@ -77,6 +77,8 @@ const PatternControls: React.FC<PatternControlsProps> = ({
       onClick={onMoveUp}
       disabled={index === 0}
       className={`text-primary ${index === 0 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
+      data-testid={`move-up-button-${index}`}
+      aria-label="Move pattern up"
     >
       <UpArrowIcon />
     </button>
@@ -87,10 +89,18 @@ const PatternControls: React.FC<PatternControlsProps> = ({
       className={`text-primary ${
         index === totalPatterns - 1 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'
       }`}
+      data-testid={`move-down-button-${index}`}
+      aria-label="Move pattern down"
     >
       <DownArrowIcon />
     </button>
-    <button type="button" onClick={onRemove} className="text-destructive cursor-pointer">
+    <button
+      type="button"
+      onClick={onRemove}
+      className="text-destructive cursor-pointer"
+      data-testid="pattern-remove-button"
+      aria-label="Remove pattern"
+    >
       <RemoveIcon />
     </button>
   </div>

@@ -21,7 +21,7 @@ export const PositionSelector: React.FC<PositionSelectorProps> = ({
   );
 
   return (
-    <div>
+    <div data-testid="position-selector">
       <h3 className="text-sm font-medium text-muted-foreground mb-2">Guitar Position (0-12)</h3>
       <Input
         type="number"
@@ -30,6 +30,8 @@ export const PositionSelector: React.FC<PositionSelectorProps> = ({
         min="0"
         max="12"
         disabled={isLoading}
+        data-testid="position-input"
+        aria-label="Guitar Position"
       />
     </div>
   );

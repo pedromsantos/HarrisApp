@@ -45,7 +45,11 @@ const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef,
         <code className="text-sm block font-medium text-foreground">{line.join(', ')}</code>
       </div>
 
-      <div ref={notationRef} className="p-2 mb-1 bg-background rounded overflow-auto"></div>
+      <div
+        ref={notationRef}
+        data-testid={`notation-container-${index}`}
+        className="p-2 mb-1 bg-background rounded overflow-auto"
+      ></div>
 
       <div className="p-2 rounded-b bg-muted/30">
         <pre className="p-0 m-0 font-mono text-sm overflow-x-auto whitespace-pre text-foreground">
