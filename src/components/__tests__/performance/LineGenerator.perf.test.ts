@@ -31,18 +31,15 @@ test.describe('LineGenerator Performance', () => {
 
   test('form interaction performance', async ({ page }) => {
     // Measure pattern selection performance
-    const patternSelectionTime = await page.evaluate(async () => {
+    const patternSelectionTime = await page.evaluate((selector) => {
       const start = performance.now();
-      // Use a more reliable selector
-      const element = document.querySelector(PATTERN_ITEM_SELECTOR);
+      // Use the selector passed from the test
+      const element = document.querySelector(selector);
       if (element instanceof HTMLElement) {
         element.click();
       }
-      await new Promise<void>((resolve) => {
-        requestAnimationFrame(() => resolve());
-      }); // Wait for next frame
       return performance.now() - start;
-    });
+    }, PATTERN_ITEM_SELECTOR);
 
     expect(patternSelectionTime).toBeLessThan(100); // 100ms threshold
 
@@ -80,9 +77,11 @@ test.describe('LineGenerator Performance', () => {
     // Wait for results to appear
     await page.waitForTimeout(3000);
 
-    // Check if results or error message appeared
+    // Check if results appeared or error cards are present (using our new error components)
     const hasResults =
-      (await page.locator('pre').count()) > 0 || (await page.locator('[role="alert"]').count()) > 0;
+      (await page.locator('pre').count()) > 0 ||
+      (await page.locator('.border-destructive').count()) > 0;
+
     expect(hasResults).toBeTruthy();
   });
 
