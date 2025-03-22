@@ -3,8 +3,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { LineGeneratorRequest, LineGeneratorResponse } from '../types/lineGenerator';
 
 const API_BASE_URL = 'https://barry-harris-line-generator.pedro-santos-personal.workers.dev';
-// const API_BASE_URL =
-//   'https://barrygennsyhv9juow-container-barry-line-gen.functions.fnc.nl-ams.scw.cloud';
 
 const HEALTH_CHECK_INTERVAL = 30 * 1000;
 
