@@ -1,10 +1,11 @@
+/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { NOTES, OCTAVES, SCALE_TYPES } from '../constants';
-import { ScaleSelector } from '../ScaleSelector';
+import { NOTES, OCTAVES, SCALE_TYPES } from '@/components/lineGenerator-components/constants';
+import { ScaleSelector } from '@/components/lineGenerator-components/ScaleSelector';
 
 beforeAll(() => {
   Element.prototype.scrollIntoView = vi.fn();

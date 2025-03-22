@@ -14,7 +14,7 @@ export function ThemeToggle(): React.ReactElement {
   return (
     <Toggle.Root
       pressed={theme === 'dark'}
-      onPressedChange={() => toggleTheme()}
+      onPressedChange={() => { toggleTheme(); }}
       aria-label={`Current theme: ${theme}. Click to switch to ${theme === 'dark' ? 'light' : 'dark'} mode.`}
       title={`Current theme: ${theme}. Click to switch to ${theme === 'dark' ? 'light' : 'dark'} mode.`}
       className="rounded-full w-9 h-9 border border-primary inline-flex items-center justify-center bg-background hover:bg-accent/20 transition-colors"

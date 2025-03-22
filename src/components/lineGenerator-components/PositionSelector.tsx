@@ -1,3 +1,4 @@
+/* eslint-disable import/no-relative-parent-imports */
 import React, { useCallback } from 'react';
 
 import { Input } from '@/components/ui/input';

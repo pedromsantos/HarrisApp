@@ -18,8 +18,8 @@ test.describe('LineGenerator Performance', () => {
       return {
         firstPaint: paintEntries[0]?.startTime ?? 0,
         firstContentfulPaint: paintEntries[1]?.startTime ?? 0,
-        domInteractive: navigation?.domInteractive ?? 0,
-        domComplete: navigation?.domComplete ?? 0,
+        domInteractive: navigation.domInteractive,
+        domComplete: navigation.domComplete,
       };
     });
 

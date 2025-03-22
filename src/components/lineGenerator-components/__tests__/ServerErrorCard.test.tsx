@@ -1,9 +1,10 @@
+/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable react/jsx-no-bind */
-/* eslint-disable react/jsx-no-leaked-render */
+
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ServerErrorCard } from '../ServerErrorCard';
+import { ServerErrorCard } from '@/components/lineGenerator-components/ServerErrorCard';
 
 describe('ServerErrorCard', () => {
   function noop() {}

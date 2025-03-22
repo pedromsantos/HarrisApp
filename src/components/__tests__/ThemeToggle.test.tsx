@@ -1,10 +1,11 @@
+/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useTheme } from '../../hooks/useTheme';
-import { ThemeToggle } from '../ThemeToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTheme } from '@/hooks/useTheme';
 
 vi.mock('../../hooks/useTheme', () => ({
   useTheme: vi.fn(),

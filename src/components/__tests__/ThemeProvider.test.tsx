@@ -1,11 +1,12 @@
+/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable react/jsx-no-bind */
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useTheme } from '../../hooks/useTheme';
-import { ThemeProvider } from '../ThemeProvider';
+import { ThemeProvider } from '@/components/ThemeProvider';
+import { useTheme } from '@/hooks/useTheme';
 
 // Mock localStorage
 const mockLocalStorage = {
@@ -46,10 +47,20 @@ const TestComponent = () => {
   return (
     <div data-testid="theme-test">
       <span>{theme}</span>
-      <button onClick={() => setTheme('dark')} data-testid="set-dark">
+      <button
+        onClick={() => {
+          setTheme('dark');
+        }}
+        data-testid="set-dark"
+      >
         Set Dark
       </button>
-      <button onClick={() => setTheme('light')} data-testid="set-light">
+      <button
+        onClick={() => {
+          setTheme('light');
+        }}
+        data-testid="set-light"
+      >
         Set Light
       </button>
     </div>

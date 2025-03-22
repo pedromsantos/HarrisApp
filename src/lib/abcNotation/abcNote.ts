@@ -4,7 +4,7 @@ export class AbcPitch {
 
   constructor(readonly pitch: string) {
     this.accidental = pitch.includes('#') ? 1 : pitch.includes('b') ? -1 : 0;
-    this.naturalName = pitch.slice(0, -1).replace(/[#b]/g, '') ?? '';
+    this.naturalName = pitch.slice(0, -1).replace(/[#b]/g, '');
   }
 
   toString(): string {
@@ -35,7 +35,7 @@ export class AbcNote {
   duration: AbcEightNote;
 
   constructor(note: string) {
-    this.octave = parseInt(note.slice(-1) ?? '4');
+    this.octave = parseInt(note.slice(-1));
     this.pitch = new AbcPitch(note);
     this.duration = new AbcEightNote();
   }

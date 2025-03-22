@@ -1,3 +1,4 @@
+/* eslint-disable import/no-relative-parent-imports */
 import React from 'react';
 
 import { Button } from '@/components/ui/button';

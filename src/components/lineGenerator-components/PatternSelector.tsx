@@ -1,3 +1,4 @@
+/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable react/jsx-no-bind */
 import React, { SVGProps } from 'react';
 
@@ -132,7 +133,9 @@ const AvailablePatterns: React.FC<{
       <PatternItem
         key={pattern}
         pattern={pattern}
-        onClick={() => onAddPattern(pattern)}
+        onClick={() => {
+          onAddPattern(pattern);
+        }}
         icon={<AddIcon />}
       />
     ))}
@@ -160,9 +163,15 @@ const SelectedPatterns: React.FC<{
             <PatternControls
               index={patterns.indexOf(pattern)}
               totalPatterns={patterns.length}
-              onMoveUp={() => onMovePatternUp(patterns.indexOf(pattern))}
-              onMoveDown={() => onMovePatternDown(patterns.indexOf(pattern))}
-              onRemove={() => onRemovePattern(pattern)}
+              onMoveUp={() => {
+                onMovePatternUp(patterns.indexOf(pattern));
+              }}
+              onMoveDown={() => {
+                onMovePatternDown(patterns.indexOf(pattern));
+              }}
+              onRemove={() => {
+                onRemovePattern(pattern);
+              }}
             />
           }
         />

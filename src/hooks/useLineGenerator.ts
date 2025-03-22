@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { LineGeneratorRequest, LineGeneratorResponse } from '../types/lineGenerator';
+import { LineGeneratorRequest, LineGeneratorResponse } from '@/types/lineGenerator';
 
 const API_BASE_URL = 'https://barry-harris-line-generator.pedro-santos-personal.workers.dev';
 
@@ -59,12 +59,6 @@ export function useLineGenerator(): UseLineGeneratorReturn {
 
   const normalizeResponseData = useCallback(
     (data: LineGeneratorResponse): LineGeneratorResponse => {
-      if (data.tabs === undefined) {
-        return {
-          ...data,
-          tabs: data.lines.map(() => []),
-        };
-      }
       return data;
     },
     []

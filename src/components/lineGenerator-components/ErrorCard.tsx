@@ -1,3 +1,4 @@
+/* eslint-disable import/no-relative-parent-imports */
 import React from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

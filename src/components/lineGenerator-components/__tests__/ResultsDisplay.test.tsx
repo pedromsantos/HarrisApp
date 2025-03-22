@@ -1,9 +1,10 @@
+/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { LineGeneratorResponse } from '../../../types/lineGenerator';
-import { ResultsDisplay } from '../ResultsDisplay';
+import { ResultsDisplay } from '@/components/lineGenerator-components/ResultsDisplay';
+import { LineGeneratorResponse } from '@/types/lineGenerator';
 
 describe('ResultsDisplay', () => {
   const mockNotationRefs = { current: [] };
@@ -68,11 +69,12 @@ describe('ResultsDisplay', () => {
     });
 
     it('handles missing tab data gracefully', () => {
-      const mockResult = {
+      const mockResult: LineGeneratorResponse = {
         from_scale: 'C major',
         to_scale: 'G dominant',
         lines: [['C4', 'E4', 'G4']],
-      } as LineGeneratorResponse;
+        tabs: [],
+      };
 
       render(<ResultsDisplay result={mockResult} error={null} notationRefs={mockNotationRefs} />);
       expect(screen.getByText('No tab data available')).toBeInTheDocument();

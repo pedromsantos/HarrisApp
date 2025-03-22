@@ -1,3 +1,4 @@
+/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable react/jsx-no-bind */
 import React from 'react';
 
@@ -32,7 +33,6 @@ interface LineNotationProps {
 
 const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef, index }) => {
   const renderTabData = () => {
-    if (tabData === null || tabData === undefined) return 'No tab data available';
     if (Array.isArray(tabData)) return tabData.join('\n');
     if (typeof tabData === 'string') return tabData;
     return 'Invalid tab format';
@@ -81,7 +81,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result, error, n
               <LineNotation
                 key={line.join('-')}
                 line={line}
-                tabData={result.tabs?.[index]}
+                tabData={result.tabs[index]}
                 notationRef={(el) => (notationRefs.current[index] = el)}
                 index={index}
               />

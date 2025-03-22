@@ -63,11 +63,7 @@ describe('LineGenerator Integration', () => {
   };
 
   const getScaleSection = (name: string): HTMLElement => {
-    const section = screen.getByTestId(`${name.toLowerCase()}-scale-section`);
-    if (section === null) {
-      throw new Error(`Could not find section for ${name}`);
-    }
-    return section;
+    return screen.getByTestId(`${name.toLowerCase()}-scale-section`);
   };
 
   const getSelectsFromSection = (section: HTMLElement): [HTMLElement, HTMLElement] => {

@@ -1,11 +1,12 @@
+/* eslint-disable import/no-relative-parent-imports */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Pattern } from '../../../types/lineGenerator';
-import { PATTERNS } from '../constants';
-import { PatternSelector } from '../PatternSelector';
+import { PATTERNS } from '@/components/lineGenerator-components/constants';
+import { PatternSelector } from '@/components/lineGenerator-components/PatternSelector';
+import { Pattern } from '@/types/lineGenerator';
 
 describe('PatternSelector', () => {
   const selectedPatterns = PATTERNS.slice(0, 2) as [Pattern, Pattern];
@@ -72,7 +73,7 @@ describe('PatternSelector', () => {
       .getAllByRole('button')
       .filter((button) => {
         const svg = button.querySelector('svg');
-        return Boolean(svg?.innerHTML?.includes('M6 18L18 6M6 6l12 12'));
+        return Boolean(svg?.innerHTML.includes('M6 18L18 6M6 6l12 12'));
       });
 
     const removeButton = removeButtons[0];
@@ -92,7 +93,7 @@ describe('PatternSelector', () => {
       .getAllByRole('button')
       .filter((button) => {
         const svg = button.querySelector('svg');
-        return Boolean(svg?.innerHTML?.includes('M5 15l7-7 7 7'));
+        return Boolean(svg?.innerHTML.includes('M5 15l7-7 7 7'));
       });
 
     const upButton = moveUpButtons[1]; // Second pattern's up button
@@ -112,7 +113,7 @@ describe('PatternSelector', () => {
       .getAllByRole('button')
       .filter((button) => {
         const svg = button.querySelector('svg');
-        return Boolean(svg?.innerHTML?.includes('M19 9l-7 7-7-7'));
+        return Boolean(svg?.innerHTML.includes('M19 9l-7 7-7-7'));
       });
 
     const downButton = moveDownButtons[0]; // First pattern's down button
@@ -131,14 +132,14 @@ describe('PatternSelector', () => {
       .getAllByRole('button')
       .filter((button) => {
         const svg = button.querySelector('svg');
-        return Boolean(svg?.innerHTML?.includes('M5 15l7-7 7 7'));
+        return Boolean(svg?.innerHTML.includes('M5 15l7-7 7 7'));
       });
 
     const moveDownButtons = within(selectedSection)
       .getAllByRole('button')
       .filter((button) => {
         const svg = button.querySelector('svg');
-        return Boolean(svg?.innerHTML?.includes('M19 9l-7 7-7-7'));
+        return Boolean(svg?.innerHTML.includes('M19 9l-7 7-7-7'));
       });
 
     const firstUpButton = moveUpButtons[0];

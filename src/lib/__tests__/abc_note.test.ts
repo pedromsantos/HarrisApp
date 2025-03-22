@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { AbcNote } from '../abcNotation/abcNote';
+import { AbcNote } from '@/lib/abcNotation/abcNote';
 
 describe('abc Note should', () => {
   describe('using octaves', () => {

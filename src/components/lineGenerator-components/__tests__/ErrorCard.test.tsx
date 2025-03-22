@@ -1,7 +1,8 @@
+/* eslint-disable import/no-relative-parent-imports */
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { ErrorCard } from '../ErrorCard';
+import { ErrorCard } from '@/components/lineGenerator-components/ErrorCard';
 
 describe('ErrorCard', () => {
   it('renders nothing when error is null', () => {

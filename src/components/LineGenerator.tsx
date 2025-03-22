@@ -135,10 +135,10 @@ const LineGenerator: React.FC = () => {
                 fromScale={formData.from_scale}
                 toScale={formData.to_scale}
                 onFromScaleChange={(type: string, note: string) =>
-                  handleScaleChange('from_scale', type, note)
+                  { handleScaleChange('from_scale', type, note); }
                 }
                 onToScaleChange={(type: string, note: string) =>
-                  handleScaleChange('to_scale', type, note)
+                  { handleScaleChange('to_scale', type, note); }
                 }
                 isLoading={isLoading}
               />
@@ -146,7 +146,7 @@ const LineGenerator: React.FC = () => {
               <PositionSelector
                 position={formData.position ?? 0}
                 onPositionChange={(position: number) =>
-                  setFormData((prev) => ({ ...prev, position }))
+                  { setFormData((prev) => ({ ...prev, position })); }
                 }
                 isLoading={isLoading}
               />

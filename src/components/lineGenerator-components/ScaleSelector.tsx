@@ -105,12 +105,16 @@ const ScaleConfig: React.FC<ScaleConfigProps> = ({
       <div className="flex gap-2">
         <NoteSelect
           value={getScaleNote(scale)}
-          onChange={(value) => onScaleChange(getScaleType(scale), value)}
+          onChange={(value) => {
+            onScaleChange(getScaleType(scale), value);
+          }}
           isDisabled={isDisabled}
         />
         <ScaleTypeSelect
           value={getScaleType(scale)}
-          onChange={(value) => onScaleChange(value, getScaleNote(scale))}
+          onChange={(value) => {
+            onScaleChange(value, getScaleNote(scale));
+          }}
           isDisabled={isDisabled}
         />
       </div>
