@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-bind */
 import React, { SVGProps } from 'react';
 
-import { Pattern } from '../../types/lineGenerator';
+import { Pattern } from '@/types/lineGenerator';
 
 export interface PatternSelectorProps {
   selectedPatterns: Pattern[];

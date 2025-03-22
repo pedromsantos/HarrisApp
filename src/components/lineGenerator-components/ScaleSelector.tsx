@@ -1,7 +1,14 @@
 /* eslint-disable react/jsx-no-bind */
 import React from 'react';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
 import { NOTES, OCTAVES, SCALE_TYPES } from './constants';
 
 export interface ScaleSelectorProps {

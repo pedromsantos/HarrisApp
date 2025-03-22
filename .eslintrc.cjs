@@ -48,7 +48,10 @@ module.exports = {
       version: 'detect',
     },
     'import/resolver': {
-      typescript: {},
+      typescript: {
+        project: './tsconfig.json',
+        alwaysTryTypes: true,
+      },
     },
   },
   rules: {
@@ -97,7 +100,7 @@ module.exports = {
     'import/no-cycle': 'error',
     'import/no-self-import': 'error',
     'import/no-useless-path-segments': 'error',
-    'import/no-relative-parent-imports': 'off',
+    'import/no-relative-parent-imports': 'error',
     'import/no-mutable-exports': 'error',
     'import/no-unused-modules': 'error',
     'simple-import-sort/exports': 'error',

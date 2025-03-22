@@ -1,4 +1,4 @@
-import { Pattern, ScaleType } from '../../types/lineGenerator';
+import { Pattern, ScaleType } from '@/types/lineGenerator';
 
 export const NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 export const OCTAVES = ['3', '4', '5'];

@@ -1,8 +1,8 @@
 /* eslint-disable react/jsx-no-bind */
 import React from 'react';
 
-import { LineGeneratorResponse } from '../../types/lineGenerator';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LineGeneratorResponse } from '@/types/lineGenerator';
 
 const EmptyState: React.FC = () => (
   <div className="text-center text-muted-foreground py-8">

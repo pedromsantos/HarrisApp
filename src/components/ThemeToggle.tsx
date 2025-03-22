@@ -2,7 +2,7 @@
 import * as Toggle from '@radix-ui/react-toggle';
 import React from 'react';
 
-import { useTheme } from '../hooks/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 export function ThemeToggle(): React.ReactElement {
   const { theme, setTheme } = useTheme();

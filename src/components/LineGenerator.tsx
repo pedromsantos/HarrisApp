@@ -1,9 +1,10 @@
 /* eslint-disable react/jsx-no-bind */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useLineGenerator } from '../hooks/useLineGenerator';
-import { convertToABC } from '../lib/musicNotation';
-import { LineGeneratorRequest, Pattern } from '../types/lineGenerator';
+import { useLineGenerator } from '@/hooks/useLineGenerator';
+import { convertToABC } from '@/lib/musicNotation';
+import { LineGeneratorRequest, Pattern } from '@/types/lineGenerator';
+
 import { PATTERNS } from './lineGenerator-components/constants';
 import { ErrorCard } from './lineGenerator-components/ErrorCard';
 import { PatternSelector } from './lineGenerator-components/PatternSelector';
