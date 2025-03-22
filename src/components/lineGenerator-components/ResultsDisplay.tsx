@@ -11,20 +11,6 @@ const EmptyState: React.FC = () => (
   </div>
 );
 
-interface ErrorMessageProps {
-  error: string;
-}
-
-const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
-  if (!error) return null;
-
-  return (
-    <div className="bg-destructive/10 text-destructive p-4 rounded-md mb-4" role="alert">
-      <p>{error}</p>
-    </div>
-  );
-};
-
 interface ScaleInfoProps {
   fromScale: string;
   toScale: string;
@@ -82,8 +68,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result, error, n
       <CardTitle>Generated Lines</CardTitle>
     </CardHeader>
     <CardContent>
-      {error !== null && error !== '' && <ErrorMessage error={error} />}
-
       {result && (
         <div className="space-y-3">
           <ScaleInfo fromScale={result.from_scale} toScale={result.to_scale} />

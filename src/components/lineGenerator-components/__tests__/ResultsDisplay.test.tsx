@@ -15,16 +15,6 @@ describe('ResultsDisplay', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders error message when error is present', () => {
-    const error = 'Test error message';
-    render(<ResultsDisplay result={null} error={error} notationRefs={mockNotationRefs} />);
-
-    const alert = screen.getByRole('alert');
-    expect(alert).toBeInTheDocument();
-    expect(alert).toHaveTextContent(error);
-    expect(alert).toHaveClass('bg-destructive/10', 'text-destructive');
-  });
-
   it('renders scale information correctly', () => {
     const mockResult: LineGeneratorResponse = {
       from_scale: 'C major',

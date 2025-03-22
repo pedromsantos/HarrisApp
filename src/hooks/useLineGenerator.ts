@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
 
 import { LineGeneratorRequest, LineGeneratorResponse } from '../types/lineGenerator';
 
 const API_BASE_URL = 'https://barry-harris-line-generator.pedro-santos-personal.workers.dev';
+// const API_BASE_URL =
+//   'https://barrygennsyhv9juow-container-barry-line-gen.functions.fnc.nl-ams.scw.cloud';
+
+const HEALTH_CHECK_INTERVAL = 30 * 1000;
 
 type UseLineGeneratorReturn = {
   result: LineGeneratorResponse | null;
@@ -21,33 +24,28 @@ export function useLineGenerator(): UseLineGeneratorReturn {
   const [isServerHealthy, setIsServerHealthy] = useState<boolean | null>(null);
 
   const checkServerHealth = useCallback(async () => {
-    const response = await fetch(`${API_BASE_URL}/health`);
-    const newStatus = response.ok;
-    setIsServerHealthy(newStatus);
-
-    if (newStatus && isServerHealthy === false) {
-      toast.success('Server Available', {
-        description: 'The line generator service is now available.',
-      });
+    try {
+      const response = await fetch(`${API_BASE_URL}/health`);
+      const newStatus = response.ok;
+      setIsServerHealthy(newStatus);
+    } catch {
+      setIsServerHealthy(false);
     }
-  }, [isServerHealthy]);
+  }, []);
 
   useEffect(() => {
     void checkServerHealth();
   }, [checkServerHealth]);
 
   useEffect(() => {
-    if (isServerHealthy === false) {
-      toast.error('Server Unavailable', {
-        description: 'The line generator service is currently unavailable. Please try again later.',
-        action: {
-          label: 'Retry',
-          onClick: () => void checkServerHealth(),
-        },
-        duration: Infinity,
-      });
-    }
-  }, [isServerHealthy, checkServerHealth]);
+    const intervalId = setInterval(() => {
+      void checkServerHealth();
+    }, HEALTH_CHECK_INTERVAL);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [checkServerHealth]);
 
   const validateResponse = useCallback((data: unknown): data is LineGeneratorResponse => {
     if (typeof data !== 'object' || data === null) {
@@ -102,21 +100,12 @@ export function useLineGenerator(): UseLineGeneratorReturn {
           'If the problem persists, the service might be temporarily unavailable.';
 
         setError(errorMessage);
-        toast.error('Connection Error', {
-          description: errorMessage,
-        });
       } else {
         setError(err.message);
-        toast.error('Error', {
-          description: err.message,
-        });
       }
     } else {
       const errorMessage = 'An unexpected error occurred. Please try again later.';
       setError(errorMessage);
-      toast.error('Unexpected Error', {
-        description: errorMessage,
-      });
     }
   }, []);
 
@@ -133,10 +122,6 @@ export function useLineGenerator(): UseLineGeneratorReturn {
         const normalizedData = normalizeResponseData(data);
 
         setResult(normalizedData);
-        toast.success('Lines Generated', {
-          description: 'Your musical lines have been successfully generated.',
-        });
-
         return normalizedData;
       } catch (err) {
         handleError(err);
