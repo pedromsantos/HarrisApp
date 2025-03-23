@@ -1,15 +1,15 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { ResultsDisplay } from '@/components/lineGenerator-components/ResultsDisplay';
 import { LineGeneratorResponse } from '@/types/lineGenerator';
 
 describe('ResultsDisplay', () => {
-  const mockNotationRefs = { current: [] };
+  const mockOnNotationRef = vi.fn();
 
   it('renders empty state when no result and no error', () => {
-    render(<ResultsDisplay result={null} error={null} notationRefs={mockNotationRefs} />);
+    render(<ResultsDisplay result={null} error={null} onNotationRef={mockOnNotationRef} />);
     expect(
       screen.getByText(/Select your parameters and click "Generate Lines"/)
     ).toBeInTheDocument();
@@ -23,7 +23,7 @@ describe('ResultsDisplay', () => {
       tabs: [['e|---']],
     };
 
-    render(<ResultsDisplay result={mockResult} error={null} notationRefs={mockNotationRefs} />);
+    render(<ResultsDisplay result={mockResult} error={null} onNotationRef={mockOnNotationRef} />);
 
     const scaleInfo = screen.getByText('C major').parentElement;
     expect(scaleInfo).toHaveClass('grid', 'grid-cols-2', 'gap-2');
@@ -40,7 +40,7 @@ describe('ResultsDisplay', () => {
         tabs: [['e|---', 'B|---', 'G|---']],
       };
 
-      render(<ResultsDisplay result={mockResult} error={null} notationRefs={mockNotationRefs} />);
+      render(<ResultsDisplay result={mockResult} error={null} onNotationRef={mockOnNotationRef} />);
 
       const tabContent = screen.getByText(/e\|---/);
       expect(tabContent).toBeInTheDocument();
@@ -58,7 +58,7 @@ describe('ResultsDisplay', () => {
         tabs: [['e|---3---5---7---|']],
       };
 
-      render(<ResultsDisplay result={mockResult} error={null} notationRefs={mockNotationRefs} />);
+      render(<ResultsDisplay result={mockResult} error={null} onNotationRef={mockOnNotationRef} />);
 
       const tabContent = screen.getByText('e|---3---5---7---|');
       expect(tabContent).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe('ResultsDisplay', () => {
         tabs: [],
       };
 
-      render(<ResultsDisplay result={mockResult} error={null} notationRefs={mockNotationRefs} />);
+      render(<ResultsDisplay result={mockResult} error={null} onNotationRef={mockOnNotationRef} />);
       expect(screen.getByText('Invalid tab format')).toBeInTheDocument();
     });
 
@@ -87,7 +87,7 @@ describe('ResultsDisplay', () => {
         tabs: [{ invalid: 'format' }],
       } as unknown as LineGeneratorResponse;
 
-      render(<ResultsDisplay result={mockResult} error={null} notationRefs={mockNotationRefs} />);
+      render(<ResultsDisplay result={mockResult} error={null} onNotationRef={mockOnNotationRef} />);
       expect(screen.getByText('Invalid tab format')).toBeInTheDocument();
     });
   });
@@ -101,7 +101,7 @@ describe('ResultsDisplay', () => {
         tabs: [['e|---']],
       };
 
-      render(<ResultsDisplay result={mockResult} error={null} notationRefs={mockNotationRefs} />);
+      render(<ResultsDisplay result={mockResult} error={null} onNotationRef={mockOnNotationRef} />);
 
       const pitchNotation = screen.getByText('C4, E4, G4');
       expect(pitchNotation).toHaveClass('text-sm', 'font-medium', 'text-foreground');
@@ -121,7 +121,7 @@ describe('ResultsDisplay', () => {
         tabs: [['e|---'], ['e|---']],
       };
 
-      render(<ResultsDisplay result={mockResult} error={null} notationRefs={mockNotationRefs} />);
+      render(<ResultsDisplay result={mockResult} error={null} onNotationRef={mockOnNotationRef} />);
 
       expect(screen.getByText('C4, E4, G4')).toBeInTheDocument();
       expect(screen.getByText('G4, B4, D5')).toBeInTheDocument();

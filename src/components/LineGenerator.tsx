@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-bind */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { useLineGenerator } from '@/hooks/useLineGenerator';
 import { convertToABC } from '@/lib/musicNotation';
@@ -16,7 +16,6 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 const preloadABCJS = () => import('abcjs');
-let preloadPromise: Promise<typeof import('abcjs')> | null = null;
 
 const LineGenerator: React.FC = () => {
   const [formData, setFormData] = useState<LineGeneratorRequest>({
@@ -27,52 +26,65 @@ const LineGenerator: React.FC = () => {
   });
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[]>(PATTERNS);
   const notationRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [isRenderingNotation, setIsRenderingNotation] = useState(false);
+  const [isLoading, setLocalIsLoading] = useState(false);
+  const abcjsRef = useRef<typeof import('abcjs') | null>(null);
 
-  const { result, error, isLoading, isServerHealthy, generateLines, checkServerHealth } =
-    useLineGenerator();
-
-  const startPreload = useCallback(() => {
-    if (!preloadPromise) {
-      preloadPromise = preloadABCJS();
-    }
-  }, []);
-
-  const renderNotation = useCallback(async () => {
-    if (result?.lines && !isRenderingNotation) {
-      setIsRenderingNotation(true);
-
-      const abcjs = await (preloadPromise ?? preloadABCJS());
-      result.lines.forEach((line, index) => {
-        if (index < notationRefs.current.length) {
-          const container = notationRefs.current[index];
-          if (container) {
-            const abcNotation = convertToABC(line);
-            abcjs.renderAbc(container, abcNotation, {
-              responsive: 'resize',
-              add_classes: true,
-              staffwidth: 500,
-            });
-          }
-        }
-      });
-
-      setIsRenderingNotation(false);
-    }
-  }, [result, isRenderingNotation]);
+  const {
+    result,
+    error,
+    isLoading: apiLoading,
+    isServerHealthy,
+    generateLines,
+    checkServerHealth,
+  } = useLineGenerator();
 
   useEffect(() => {
-    void renderNotation();
-  }, [renderNotation]);
+    const loadAbcjs = async () => {
+      try {
+        const abcjs = await preloadABCJS();
+        abcjsRef.current = abcjs;
+      } catch {
+        // Silently handle abcjs loading errors
+      }
+    };
+
+    void loadAbcjs();
+  }, []);
+
+  const handleNotationRef = (el: HTMLDivElement | null, index: number, line: string[]) => {
+    notationRefs.current[index] = el;
+
+    if (el && abcjsRef.current) {
+      try {
+        const abcNotation = convertToABC(line);
+        abcjsRef.current.renderAbc(el, abcNotation, {
+          responsive: 'resize',
+          add_classes: true,
+          staffwidth: 500,
+        });
+      } catch {
+        // Silently handle rendering errors
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    startPreload();
-    await generateLines(formData);
+
+    if (isLoading || apiLoading) return;
+
+    notationRefs.current = [];
+
+    setLocalIsLoading(true);
+
+    try {
+      await generateLines(formData);
+    } finally {
+      setLocalIsLoading(false);
+    }
   };
 
   const handleScaleChange = (field: 'from_scale' | 'to_scale', type: string, note: string) => {
-    startPreload();
     setFormData((prev) => ({
       ...prev,
       [field]: `${type.toLowerCase()} ${note}`,
@@ -80,7 +92,6 @@ const LineGenerator: React.FC = () => {
   };
 
   const addPattern = (pattern: Pattern) => {
-    startPreload();
     setFormData((prev) => ({
       ...prev,
       patterns: [...prev.patterns, pattern],
@@ -114,6 +125,8 @@ const LineGenerator: React.FC = () => {
     setFormData((prev) => ({ ...prev, patterns: newPatterns }));
   };
 
+  const isComponentLoading = isLoading || apiLoading;
+
   return (
     <div className="min-h-screen bg-background text-foreground py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -140,7 +153,7 @@ const LineGenerator: React.FC = () => {
                 onToScaleChange={(type: string, note: string) => {
                   handleScaleChange('to_scale', type, note);
                 }}
-                isLoading={isLoading}
+                isLoading={isComponentLoading}
               />
 
               <PositionSelector
@@ -148,7 +161,7 @@ const LineGenerator: React.FC = () => {
                 onPositionChange={(position: number) => {
                   setFormData((prev) => ({ ...prev, position }));
                 }}
-                isLoading={isLoading}
+                isLoading={isComponentLoading}
               />
 
               <PatternSelector
@@ -164,11 +177,13 @@ const LineGenerator: React.FC = () => {
                 <Button
                   onClick={(e) => void handleSubmit(e)}
                   disabled={
-                    formData.patterns.length === 0 || isLoading || isServerHealthy === false
+                    formData.patterns.length === 0 ||
+                    isComponentLoading ||
+                    isServerHealthy === false
                   }
                   className="w-full py-6 text-lg font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow relative z-[60]"
                 >
-                  {isLoading ? (
+                  {isComponentLoading ? (
                     <>
                       <svg
                         className="animate-spin -ml-1 mr-3 h-5 w-5"
@@ -200,7 +215,7 @@ const LineGenerator: React.FC = () => {
             </CardContent>
           </Card>
 
-          <ResultsDisplay result={result} error={error} notationRefs={notationRefs} />
+          <ResultsDisplay result={result} error={error} onNotationRef={handleNotationRef} />
         </div>
       </div>
     </div>

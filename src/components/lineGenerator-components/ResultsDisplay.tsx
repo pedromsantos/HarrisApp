@@ -26,11 +26,11 @@ const ScaleInfo: React.FC<ScaleInfoProps> = ({ fromScale, toScale }) => (
 interface LineNotationProps {
   line: string[];
   tabData: string[] | string | undefined;
-  notationRef: (el: HTMLDivElement | null) => void;
+  onNotationRef: (el: HTMLDivElement | null, index: number, line: string[]) => void;
   index: number;
 }
 
-const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef, index }) => {
+const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, onNotationRef, index }) => {
   const renderTabData = () => {
     if (Array.isArray(tabData)) return tabData.join('\n');
     if (typeof tabData === 'string') return tabData;
@@ -45,7 +45,9 @@ const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef,
       </div>
 
       <div
-        ref={notationRef}
+        ref={(el) => {
+          onNotationRef(el, index, line);
+        }}
         data-testid={`notation-container-${String(index)}`}
         className="p-2 mb-1 bg-background rounded overflow-auto"
       ></div>
@@ -62,10 +64,10 @@ const LineNotation: React.FC<LineNotationProps> = ({ line, tabData, notationRef,
 export interface ResultsDisplayProps {
   result: LineGeneratorResponse | null;
   error: string | null;
-  notationRefs: React.RefObject<(HTMLDivElement | null)[]>;
+  onNotationRef: (el: HTMLDivElement | null, index: number, line: string[]) => void;
 }
 
-export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result, error, notationRefs }) => (
+export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result, error, onNotationRef }) => (
   <Card className="h-fit">
     <CardHeader>
       <CardTitle>Generated Lines</CardTitle>
@@ -81,7 +83,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result, error, n
                 key={line.join('-')}
                 line={line}
                 tabData={result.tabs[index]}
-                notationRef={(el) => (notationRefs.current[index] = el)}
+                onNotationRef={onNotationRef}
                 index={index}
               />
             ))}
