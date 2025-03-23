@@ -61,7 +61,6 @@ export class AbcNote {
       8: (p) => `${p.toLowerCase()}''''`,
     };
 
-    // Get the appropriate notation function based on octave, or default to just the pitch
     const notationFn = octaveNotations[this.octave] ?? ((p) => p);
     return notationFn(this.pitch.toString());
   }
