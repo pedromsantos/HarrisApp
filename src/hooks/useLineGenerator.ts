@@ -4,7 +4,7 @@ import { LineGeneratorRequest, LineGeneratorResponse } from '@/types/lineGenerat
 
 const API_BASE_URL = 'https://barry-harris-line-generator.pedro-santos-personal.workers.dev';
 
-const HEALTH_CHECK_INTERVAL = 30 * 1000;
+const HEALTH_CHECK_INTERVAL = 60 * 1000;
 
 type UseLineGeneratorReturn = {
   result: LineGeneratorResponse | null;

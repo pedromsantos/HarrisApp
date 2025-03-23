@@ -36,10 +36,12 @@ export function ThemeProvider({
     root.classList.remove('light', 'dark');
     root.classList.add(newTheme);
     root.setAttribute('data-theme', newTheme);
+    root.style.colorScheme = newTheme;
   };
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
+    applyTheme(newTheme);
   };
 
   useEffect(() => {
@@ -52,10 +54,11 @@ export function ThemeProvider({
 
   useEffect(() => {
     document.documentElement.classList.add('theme-ready');
-
     applyTheme(theme);
 
-    return () => {};
+    return () => {
+      document.documentElement.classList.remove('theme-ready');
+    };
   }, [theme]);
 
   const value = {
