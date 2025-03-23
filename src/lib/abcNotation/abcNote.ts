@@ -11,6 +11,10 @@ export class AbcPitch {
     return this.toAccidental();
   }
 
+  get pitchNaturalName(): string {
+    return this.naturalName;
+  }
+
   private toAccidental(): string {
     if (this.accidental === 1) {
       return `^${this.naturalName}`;
@@ -41,46 +45,24 @@ export class AbcNote {
   }
 
   toString(): string {
-    return this.pitch.toString() + this.toOctave() + new AbcEightNote().toString();
+    return this.toOctave() + new AbcEightNote().toString();
   }
 
   private toOctave(): string {
-    if (this.octave === 0) {
-      return ',,,,';
-    }
+    const octaveNotations: Record<number, (pitch: string) => string> = {
+      0: (p) => `${p.toUpperCase()},,,`,
+      1: (p) => `${p.toUpperCase()},,`,
+      2: (p) => `${p.toUpperCase()},`,
+      3: (p) => p.toUpperCase(),
+      4: (p) => p.toLowerCase(),
+      5: (p) => `${p.toLowerCase()}'`,
+      6: (p) => `${p.toLowerCase()}''`,
+      7: (p) => `${p.toLowerCase()}'''`,
+      8: (p) => `${p.toLowerCase()}''''`,
+    };
 
-    if (this.octave === 1) {
-      return ',,,';
-    }
-
-    if (this.octave === 2) {
-      return ',,';
-    }
-
-    if (this.octave === 3) {
-      return ',';
-    }
-
-    if (this.octave === 4) {
-      return "'";
-    }
-
-    if (this.octave === 5) {
-      return "''";
-    }
-
-    if (this.octave === 6) {
-      return "'''";
-    }
-
-    if (this.octave === 7) {
-      return "''''";
-    }
-
-    if (this.octave === 8) {
-      return "'''''";
-    }
-
-    return '';
+    // Get the appropriate notation function based on octave, or default to just the pitch
+    const notationFn = octaveNotations[this.octave] ?? ((p) => p);
+    return notationFn(this.pitch.toString());
   }
 }
