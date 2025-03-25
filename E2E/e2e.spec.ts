@@ -109,11 +109,15 @@ test.describe('Harris Jazz Lines App E2E Tests', () => {
   });
 
   test('can change position', async ({ page }) => {
-    const positionInput = page.locator('input[type="number"]');
-    await positionInput.waitFor({ state: 'visible' });
-    await positionInput.clear();
-    await positionInput.fill('7');
-    await expect(positionInput).toHaveValue('7');
+    const positionButton = page.locator('[data-testid="position-selector"] [role="combobox"]');
+    await positionButton.waitFor({ state: 'visible' });
+    await positionButton.click();
+
+    await page.locator('[role="listbox"]').waitFor({ state: 'visible' });
+    await page.locator('[role="option"]').filter({ hasText: 'A8' }).first().click();
+
+    // Verify the button text now shows A8
+    await expect(positionButton).toHaveText('A8');
   });
 
   test('can reorder patterns', async ({ page }) => {
