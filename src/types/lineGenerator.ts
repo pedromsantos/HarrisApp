@@ -11,11 +11,12 @@ export type Pattern =
   | 'third_up'
   | 'third_down';
 
+export type Position = 'Open' | 'C' | 'A' | 'G' | 'E' | 'D' | 'C8' | 'A8' | 'G8' | 'E8';
 export interface LineGeneratorRequest {
   from_scale: string;
   to_scale: string;
   patterns: Pattern[];
-  position?: number;
+  position?: Position | number;
 }
 
 export interface LineGeneratorResponse {

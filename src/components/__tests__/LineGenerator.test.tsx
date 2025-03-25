@@ -84,9 +84,11 @@ describe('LineGenerator', () => {
 
     it('shows position selector with default value', () => {
       render(<LineGenerator />);
-      const positionInput = screen.getByRole('spinbutton', { name: /position/i });
-      expect(positionInput).toBeInTheDocument();
-      expect(positionInput).toHaveValue(3); // Default value from the component
+      const positionSelector = screen.getByTestId('position-selector');
+      expect(positionSelector).toBeInTheDocument();
+
+      const positionButton = within(positionSelector).getByRole('combobox');
+      expect(positionButton).toHaveTextContent('Open'); // Default value from the component
     });
   });
 
@@ -139,7 +141,7 @@ describe('LineGenerator', () => {
       expect(localMockGenerateLines).toHaveBeenCalled();
     });
 
-    it('includes position input in the form', () => {
+    it('includes position selector in the form', () => {
       mockUseLineGenerator.mockReturnValue({
         result: null,
         error: null,
@@ -151,8 +153,8 @@ describe('LineGenerator', () => {
 
       render(<LineGenerator />);
 
-      const positionInput = screen.getByTestId('position-input');
-      expect(positionInput).toBeInTheDocument();
+      const positionSelector = screen.getByTestId('position-selector');
+      expect(positionSelector).toBeInTheDocument();
 
       const generateButton = screen.getByRole('button', { name: /generate/i });
       expect(generateButton).toBeInTheDocument();
@@ -319,8 +321,9 @@ describe('LineGenerator', () => {
           expect(select).toBeDisabled();
         });
 
-      const positionInput = screen.getByRole('spinbutton', { name: /position/i });
-      expect(positionInput).toBeDisabled();
+      const positionSelector = screen.getByTestId('position-selector');
+      const positionButton = within(positionSelector).getByRole('combobox');
+      expect(positionButton).toBeDisabled();
     });
 
     it('disables generate button when server is unhealthy', () => {

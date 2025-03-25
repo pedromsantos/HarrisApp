@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { useLineGenerator } from '@/hooks/useLineGenerator';
 import { convertToABC } from '@/lib/musicNotation';
-import { LineGeneratorRequest, Pattern } from '@/types/lineGenerator';
+import { LineGeneratorRequest, Pattern, Position } from '@/types/lineGenerator';
 
 import { PATTERNS } from './lineGenerator-components/constants';
 import { ErrorCard } from './lineGenerator-components/ErrorCard';
@@ -17,12 +17,29 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 const preloadABCJS = () => import('abcjs');
 
+const positionToNumber = (position: Position): number => {
+  const positionMap: Record<Position, number> = {
+    Open: 0,
+    C: 1,
+    A: 2,
+    G: 3,
+    E: 4,
+    D: 5,
+    C8: 6,
+    A8: 7,
+    G8: 8,
+    E8: 9,
+  };
+
+  return positionMap[position];
+};
+
 const LineGenerator: React.FC = () => {
   const [formData, setFormData] = useState<LineGeneratorRequest>({
     from_scale: 'dominant G3',
     to_scale: 'major C4',
     patterns: [],
-    position: 3,
+    position: 'Open',
   });
   const [availablePatterns, setAvailablePatterns] = useState<Pattern[]>(PATTERNS);
   const notationRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -78,7 +95,17 @@ const LineGenerator: React.FC = () => {
     setLocalIsLoading(true);
 
     try {
-      await generateLines(formData);
+      const position = formData.position ?? 'Open';
+      const positionNumber = positionToNumber(position as Position);
+
+      const apiRequest = {
+        from_scale: formData.from_scale,
+        to_scale: formData.to_scale,
+        patterns: formData.patterns,
+        position: positionNumber,
+      } as LineGeneratorRequest;
+
+      await generateLines(apiRequest);
     } finally {
       setLocalIsLoading(false);
     }
@@ -157,8 +184,8 @@ const LineGenerator: React.FC = () => {
               />
 
               <PositionSelector
-                position={formData.position ?? 0}
-                onPositionChange={(position: number) => {
+                position={(formData.position ?? 'Open') as Position}
+                onPositionChange={(position: Position) => {
                   setFormData((prev) => ({ ...prev, position }));
                 }}
                 isLoading={isComponentLoading}
