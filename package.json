@@ -9,7 +9,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.23.0",
+    "@eslint/js": "^9.24.0",
     "@playwright/test": "^1.51.1",
     "@tailwindcss/vite": "^4.1.2",
     "@testing-library/dom": "^10.4.0",
