@@ -1,59 +1,714 @@
 openapi: 3.0.0
 info:
-  title: Barry Harris Line Generator API
-  description: An API that generates musical lines based on Barry Harris' concepts
+  title: Harris Jazz Lines API
+  description: API for music theory operations and jazz line generation
   version: 1.0.0
 servers:
-  - url: http://barry-harris-line-generator.pedro-santos-personal.workers.dev
+  - url: https://api.harrisjazzlines.com
     description: Production server
 paths:
-  /lines:
-    post:
-      summary: Generate musical lines
-      description: Generates musical lines based on given scales and patterns
-      operationId: generateLines
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LineGeneratorRequest"
-      responses:
-        "200":
-          description: Successfully generated lines
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LineGeneratorResponse"
-        "400":
-          description: Invalid request body or scale format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Invalid HTTP method
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /health:
     get:
-      summary: Health check endpoint
-      description: Returns OK if the service is healthy
-      operationId: healthCheck
+      summary: Health check
+      description: Returns OK if the API is running
       responses:
         "200":
-          description: Service is healthy
+          description: API is healthy
           content:
             text/plain:
               schema:
                 type: string
                 example: "OK"
 
+  /pitch/midi:
+    get:
+      summary: Get MIDI value for pitch
+      description: Returns the MIDI note number for a given pitch
+      parameters:
+        - $ref: "#/components/parameters/PitchParam"
+      responses:
+        "200":
+          description: MIDI value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MidiResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /lines:
+    post:
+      summary: Generate jazz lines
+      description: Generates jazz lines based on specified scales and patterns
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateLinesRequest"
+      responses:
+        "200":
+          description: Generated lines
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LineResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /pitch/transpose:
+    post:
+      summary: Transpose a pitch
+      description: Transposes a pitch by a specified interval in the given direction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransposeRequest"
+      responses:
+        "200":
+          description: Transposed pitch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PitchResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /pitch/interval:
+    get:
+      summary: Get interval between pitches
+      description: Returns the interval between two pitches
+      parameters:
+        - $ref: "#/components/parameters/Pitch1Param"
+        - $ref: "#/components/parameters/Pitch2Param"
+      responses:
+        "200":
+          description: Interval
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntervalResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /pitch/adjust-octave:
+    post:
+      summary: Adjust pitch octave
+      description: Adjusts the octave of a pitch up or down
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdjustOctaveRequest"
+      responses:
+        "200":
+          description: Pitch with adjusted octave
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PitchResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /pitch/distance:
+    get:
+      summary: Get distance between pitches
+      description: Returns the distance in semitones between two pitches
+      parameters:
+        - $ref: "#/components/parameters/Pitch1Param"
+        - $ref: "#/components/parameters/Pitch2Param"
+      responses:
+        "200":
+          description: Distance in semitones
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DistanceResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /pitch/details:
+    get:
+      summary: Get pitch details
+      description: Returns detailed information about a pitch
+      parameters:
+        - $ref: "#/components/parameters/PitchParam"
+      responses:
+        "200":
+          description: Pitch details
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /pitch/enharmonic:
+    get:
+      summary: Check if pitches are enharmonic
+      description: Determines if two pitches are enharmonically equivalent
+      parameters:
+        - $ref: "#/components/parameters/Pitch1Param"
+        - $ref: "#/components/parameters/Pitch2Param"
+      responses:
+        "200":
+          description: Enharmonic equivalence result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BooleanResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /pitch/line:
+    post:
+      summary: Create line from pitches
+      description: Creates a melodic line from an array of pitches
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLineRequest"
+      responses:
+        "200":
+          description: Created line
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LineResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/notes:
+    get:
+      summary: Get scale notes
+      description: Returns all notes in a given scale
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+      responses:
+        "200":
+          description: Scale notes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/pitch-from-degree:
+    get:
+      summary: Get pitch from scale degree
+      description: Returns the pitch at a specified scale degree
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/DegreeParam"
+      responses:
+        "200":
+          description: Pitch at the specified scale degree
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PitchResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/up:
+    get:
+      summary: Get scale notes ascending
+      description: Returns the notes of a scale in ascending order
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+      responses:
+        "200":
+          description: Scale notes ascending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/down:
+    get:
+      summary: Get scale notes descending
+      description: Returns the notes of a scale in descending order
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+      responses:
+        "200":
+          description: Scale notes descending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/degree-from-pitch:
+    get:
+      summary: Get scale degree from pitch
+      description: Returns the degree of a given pitch in a scale
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/PitchParam"
+      responses:
+        "200":
+          description: Scale degree of the pitch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleDegreeResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/contains-pitch:
+    get:
+      summary: Check if scale contains pitch
+      description: Determines if a scale contains a given pitch
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/PitchParam"
+      responses:
+        "200":
+          description: Result of whether scale contains pitch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BooleanResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/down-min-half-steps:
+    get:
+      summary: Get scale down with minimal half steps
+      description: Returns scale notes descending with minimal half steps
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/FromDegreeParam"
+        - $ref: "#/components/parameters/ToDegreeParam"
+      responses:
+        "200":
+          description: Scale notes descending with minimal half steps
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/down-max-half-steps:
+    get:
+      summary: Get scale down with maximal half steps
+      description: Returns scale notes descending with maximal half steps
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/FromDegreeParam"
+        - $ref: "#/components/parameters/ToDegreeParam"
+      responses:
+        "200":
+          description: Scale notes descending with maximal half steps
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/chord-up:
+    get:
+      summary: Get scale chord notes ascending
+      description: Returns the chord notes of a scale in ascending order
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/DegreeParam"
+      responses:
+        "200":
+          description: Scale chord notes ascending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/chord-down:
+    get:
+      summary: Get scale chord notes descending
+      description: Returns the chord notes of a scale in descending order
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/DegreeParam"
+      responses:
+        "200":
+          description: Scale chord notes descending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/triad-up:
+    get:
+      summary: Get scale triad notes ascending
+      description: Returns the triad notes of a scale in ascending order
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/DegreeParam"
+      responses:
+        "200":
+          description: Scale triad notes ascending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /scale/triad-down:
+    get:
+      summary: Get scale triad notes descending
+      description: Returns the triad notes of a scale in descending order
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/DegreeParam"
+      responses:
+        "200":
+          description: Scale triad notes descending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /chord/pitches-from-definition:
+    post:
+      summary: Get chord pitches from definition
+      description: Returns the pitches of a chord based on root, pattern, voicing, and inversion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConstructChordRequest"
+      responses:
+        "200":
+          description: Chord pitches
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /chord/pitches:
+    get:
+      summary: Get chord pitches
+      description: Returns the pitches that make up a chord
+      parameters:
+        - $ref: "#/components/parameters/ChordParam"
+      responses:
+        "200":
+          description: Chord pitches
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /chord/transpose:
+    post:
+      summary: Transpose chord
+      description: Transposes a chord by a specified interval in the given direction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransposeChordRequest"
+      responses:
+        "200":
+          description: Transposed chord
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChordResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /chord/transpose-from-definition:
+    post:
+      summary: Transpose chord from definition
+      description: Transposes a chord defined by root, pattern, voicing, and inversion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransposeChordFromDefinitionRequest"
+      responses:
+        "200":
+          description: Transposed chord pitches
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScaleNotesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /guitar/tablature/from-notes:
+    post:
+      summary: Generate guitar tablature from notes
+      description: Creates guitar tablature from a series of notes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotesTabRequest"
+      responses:
+        "200":
+          description: Guitar tablature
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TabResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /guitar/tablature/from-scale:
+    get:
+      summary: Generate guitar tablature from scale
+      description: Creates guitar tablature from a scale
+      parameters:
+        - $ref: "#/components/parameters/ScaleParam"
+        - $ref: "#/components/parameters/PositionParam"
+        - $ref: "#/components/parameters/TuningParam"
+      responses:
+        "200":
+          description: Guitar tablature
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TabResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /guitar/arpeggio-fingering:
+    get:
+      summary: Get guitar arpeggio fingering
+      description: Returns guitar arpeggio fingering for a chord
+      parameters:
+        - $ref: "#/components/parameters/ChordParam"
+        - $ref: "#/components/parameters/PositionParam"
+        - $ref: "#/components/parameters/TuningParam"
+      responses:
+        "200":
+          description: Guitar arpeggio fingering
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalFretsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /guitar/chord-fingering:
+    get:
+      summary: Get guitar chord fingering
+      description: Returns guitar chord fingering
+      parameters:
+        - $ref: "#/components/parameters/ChordParam"
+        - name: bass_string
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The bass string number (1-6)
+          example: "5"
+        - name: position
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The fretboard position
+          example: "C"
+        - $ref: "#/components/parameters/TuningParam"
+      responses:
+        "200":
+          description: Guitar chord fingering
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HorizontalFretsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /guitar/vertical-frets/from-pitches:
+    post:
+      summary: Generate vertical frets from pitches
+      description: Creates vertical fret notation from a series of pitches
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PitchesVerticalFretsRequest"
+      responses:
+        "200":
+          description: Vertical frets notation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerticalFretsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
 components:
+  parameters:
+    PitchParam:
+      name: pitch
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The pitch notation (e.g. "C4", "F#3")
+      example: "C4"
+
+    Pitch1Param:
+      name: pitch1
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The first pitch
+      example: "C4"
+
+    Pitch2Param:
+      name: pitch2
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The second pitch
+      example: "G4"
+
+    ScaleParam:
+      name: scale
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The scale name (e.g. "C major", "A minor")
+      example: "C major"
+
+    DegreeParam:
+      name: degree
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The scale degree
+      example: "3"
+
+    TargetParam:
+      name: target
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The target scale
+      example: "C7"
+
+    ChordParam:
+      name: chord
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The chord name (e.g. "Cmaj7", "G7")
+      example: "Cmaj7"
+
+    PositionParam:
+      name: position
+      in: query
+      required: false
+      schema:
+        type: string
+      description: The fretboard position
+      example: "5"
+
+    TuningParam:
+      name: tuning
+      in: query
+      required: false
+      schema:
+        type: string
+      description: The guitar tuning
+      example: "EADGBE"
+
+    FromDegreeParam:
+      name: from_degree
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The starting scale degree
+      example: "I"
+
+    ToDegreeParam:
+      name: to_degree
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The target scale degree
+      example: "I"
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        text/plain:
+          schema:
+            type: string
+
+    ServerError:
+      description: Server error
+      content:
+        text/plain:
+          schema:
+            type: string
+
   schemas:
-    LineGeneratorRequest:
+    LineResponse:
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          description: The generated musical lines
+          example: [["C4", "D4", "E4"], ["F4", "G4", "A4"]]
+        tabs:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          description: The generated tablature notation
+          example: [["|-1-2-3-|"], ["|-4-5-6-|"]]
+
+    GenerateLinesRequest:
       type: object
       required:
         - from_scale
@@ -62,55 +717,279 @@ components:
       properties:
         from_scale:
           type: string
-          description: The starting scale in format 'type note', e.g., 'dominant G3'
-          example: "dominant G3"
+          description: The starting scale
+          example: "G7"
         to_scale:
           type: string
-          description: The target scale in format 'type note', e.g., 'major C4'
-          example: "major C4"
+          description: The target scale
+          example: "Cmaj7"
         patterns:
           type: array
-          description: List of patterns to apply
           items:
             type: string
-            enum: ["chord_up", "scale_down"]
-          example: ["chord_up"]
+          description: The patterns to use for line generation
+          example: ["chord_up", "scale_down"]
         position:
           type: integer
-          description: Optional position parameter
-          minimum: 0
-          example: 0
+          description: The position on the instrument
+          example: 1
 
-    LineGeneratorResponse:
+    TransposeRequest:
       type: object
       required:
-        - lines
-        - tabs
+        - pitch
+        - interval
+        - direction
       properties:
-        lines:
-          type: array
-          description: Array of pitch lines
-          items:
-            type: array
-            items:
-              type: string
-              pattern: "^[A-G](?:#{1,2}|b{1,2})?[0-9]$"
-          example: [["G3", "B3", "D4", "F4"], ["E4", "B4", "E5", "B5"]]
-        tabs:
-          type: array
-          description: Array of guitar tab lines
-          items:
-            type: array
-            items:
-              type: string
-          example: [["0", "-", "2", "-"], ["1", "-", "3", "-"]]
-
-    ErrorResponse:
-      type: object
-      required:
-        - error
-      properties:
-        error:
+        pitch:
           type: string
-          description: Error message
-          example: "Invalid scale format"
+          description: The pitch to transpose
+          example: "C4"
+        interval:
+          type: string
+          description: The interval to transpose by
+          example: "M3"
+        direction:
+          type: string
+          description: The direction to transpose (up or down)
+          example: "up"
+          enum: [up, down]
+
+    AdjustOctaveRequest:
+      type: object
+      required:
+        - pitch
+        - direction
+      properties:
+        pitch:
+          type: string
+          description: The pitch to adjust
+          example: "C4"
+        direction:
+          type: string
+          description: The direction to adjust (up or down)
+          example: "up"
+          enum: [up, down]
+
+    CreateLineRequest:
+      type: object
+      required:
+        - pitches
+      properties:
+        pitches:
+          type: array
+          items:
+            type: string
+          description: The pitches to create a line from
+          example: ["C4", "E4", "G4"]
+
+    PitchResponse:
+      type: object
+      properties:
+        pitch:
+          type: string
+          description: The pitch notation
+          example: "C4"
+
+    IntervalResponse:
+      type: object
+      properties:
+        interval:
+          type: string
+          description: The interval notation
+          example: "M3"
+
+    MidiResponse:
+      type: object
+      properties:
+        midi:
+          type: integer
+          description: The MIDI note number
+          example: 60
+
+    DistanceResponse:
+      type: object
+      properties:
+        distance:
+          type: integer
+          description: The distance in semitones
+          example: 4
+
+    BooleanResponse:
+      type: object
+      properties:
+        result:
+          type: boolean
+          description: The result of the operation
+          example: true
+
+    ScaleNotesResponse:
+      type: object
+      properties:
+        notes:
+          type: array
+          items:
+            type: string
+          description: The notes in the scale
+          example: ["C", "D", "E", "F", "G", "A", "B"]
+
+    ScaleDegreeResponse:
+      type: object
+      properties:
+        degree:
+          type: string
+          description: The scale degree
+          example: "3"
+
+    ConstructChordRequest:
+      type: object
+      required:
+        - root
+        - pattern
+      properties:
+        root:
+          type: string
+          description: The root note of the chord
+          example: "C"
+        pattern:
+          type: string
+          description: The chord pattern
+          example: "maj7"
+        voicing:
+          type: string
+          description: The chord voicing
+          example: "Drop2"
+        inversion:
+          type: string
+          description: The chord inversion
+          example: "1"
+
+    TransposeChordRequest:
+      type: object
+      required:
+        - chord
+        - interval
+        - direction
+      properties:
+        chord:
+          type: string
+          description: The chord to transpose
+          example: "Cmaj7"
+        interval:
+          type: string
+          description: The interval to transpose by
+          example: "P5"
+        direction:
+          type: string
+          description: The direction to transpose
+          example: "up"
+          enum: [up, down]
+
+    TransposeChordFromDefinitionRequest:
+      type: object
+      required:
+        - root
+        - pattern
+        - interval
+        - direction
+      properties:
+        root:
+          type: string
+          description: The root note of the chord
+          example: "C4"
+        pattern:
+          type: string
+          description: The chord pattern
+          example: "Major7"
+        voicing:
+          type: string
+          description: The chord voicing
+          example: "Closed"
+        inversion:
+          type: string
+          description: The chord inversion
+          example: "Root"
+        interval:
+          type: string
+          description: The interval to transpose by
+          example: "P5"
+        direction:
+          type: string
+          description: The direction to transpose
+          example: "up"
+          enum: [up, down]
+
+    ChordResponse:
+      type: object
+      properties:
+        chord:
+          type: string
+          description: The chord notation
+          example: "Gmaj7"
+
+    NotesTabRequest:
+      type: object
+      required:
+        - notes
+      properties:
+        notes:
+          type: array
+          items:
+            type: string
+          description: The notes to generate tablature from
+          example: ["C4", "E4", "G4"]
+        position:
+          type: string
+          description: The fretboard position
+          example: "5"
+        tuning:
+          type: string
+          description: The guitar tuning
+          example: "EADGBE"
+
+    PitchesVerticalFretsRequest:
+      type: object
+      required:
+        - pitches
+        - position
+      properties:
+        pitches:
+          type: array
+          items:
+            type: string
+          description: The pitches to generate vertical frets from
+          example: ["C4", "E4", "G4"]
+        position:
+          type: string
+          description: The fretboard position
+          example: "5"
+        tuning:
+          type: string
+          description: The guitar tuning
+          example: "EADGBE"
+
+    TabResponse:
+      type: object
+      properties:
+        tab:
+          type: string
+          description: The tablature notation
+          example: "|-0-|-2-|-3-|"
+
+    HorizontalFretsResponse:
+      type: object
+      properties:
+        frets:
+          type: array
+          items:
+            type: string
+          description: The fret positions
+          example: ["0", "2", "3"]
+
+    VerticalFretsResponse:
+      type: object
+      properties:
+        frets:
+          type: string
+          description: The vertical fret notation
+          example: "0\n2\n3"

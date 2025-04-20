@@ -145,6 +145,7 @@
   <body>
     <div class="header">
       <h1>Harris Jazz Lines API Test</h1>
+      <p>Testing against: <code>https://api.harrisjazzlines.com</code></p>
     </div>
 
     <div class="container">
@@ -171,12 +172,12 @@
 
           <div class="endpoint-group">
             <div class="endpoint-title">Generate Lines</div>
-            <div class="endpoint-description">Generate jazz lines from chord progression</div>
+            <div class="endpoint-description">Generate jazz lines from scales and patterns</div>
             <div class="endpoint-inputs">
               <input
                 type="text"
                 id="linesInput"
-                value='{"chord_progression":["G7", "Cmaj7"],"patterns":["3,5,7,9"],"include_approach_notes":true,"scale":"G mixolydian","position":1}'
+                value='{"from_scale":"dominant G3","to_scale":"major C4","patterns":["half_step_up","chord_up"],"position":0}'
                 placeholder="Enter JSON payload"
               />
               <button id="linesBtn" class="api-test">Generate Lines</button>
@@ -425,6 +426,13 @@
             <div class="endpoint-description">Get scale descending with minimum half steps</div>
             <div class="endpoint-inputs">
               <input type="text" id="scaleDownMinInput" value="C major" placeholder="Enter scale" />
+              <input
+                type="text"
+                id="fromDegreeMinInput"
+                value="I"
+                placeholder="From degree (e.g. I)"
+              />
+              <input type="text" id="toDegreeMinInput" value="I" placeholder="To degree (e.g. I)" />
               <button id="scaleDownMinBtn" class="api-test">Scale Down Min</button>
             </div>
           </div>
@@ -434,6 +442,13 @@
             <div class="endpoint-description">Get scale descending with maximum half steps</div>
             <div class="endpoint-inputs">
               <input type="text" id="scaleDownMaxInput" value="C major" placeholder="Enter scale" />
+              <input
+                type="text"
+                id="fromDegreeMaxInput"
+                value="I"
+                placeholder="From degree (e.g. I)"
+              />
+              <input type="text" id="toDegreeMaxInput" value="I" placeholder="To degree (e.g. I)" />
               <button id="scaleDownMaxBtn" class="api-test">Scale Down Max</button>
             </div>
           </div>
@@ -443,7 +458,7 @@
             <div class="endpoint-description">Build chord upward from scale</div>
             <div class="endpoint-inputs">
               <input type="text" id="chordUpScaleInput" value="C major" placeholder="Enter scale" />
-              <input type="text" id="chordUpStartInput" value="C4" placeholder="Enter start note" />
+              <input type="text" id="chordUpDegreeInput" value="3" placeholder="Enter degree" />
               <button id="chordUpBtn" class="api-test">Chord Up</button>
             </div>
           </div>
@@ -458,12 +473,7 @@
                 value="C major"
                 placeholder="Enter scale"
               />
-              <input
-                type="text"
-                id="chordDownStartInput"
-                value="C4"
-                placeholder="Enter start note"
-              />
+              <input type="text" id="chordDownDegreeInput" value="3" placeholder="Enter degree" />
               <button id="chordDownBtn" class="api-test">Chord Down</button>
             </div>
           </div>
@@ -473,7 +483,7 @@
             <div class="endpoint-description">Build triad upward from scale</div>
             <div class="endpoint-inputs">
               <input type="text" id="triadUpScaleInput" value="C major" placeholder="Enter scale" />
-              <input type="text" id="triadUpStartInput" value="C4" placeholder="Enter start note" />
+              <input type="text" id="triadUpDegreeInput" value="3" placeholder="Enter degree" />
               <button id="triadUpBtn" class="api-test">Triad Up</button>
             </div>
           </div>
@@ -488,12 +498,7 @@
                 value="C major"
                 placeholder="Enter scale"
               />
-              <input
-                type="text"
-                id="triadDownStartInput"
-                value="C4"
-                placeholder="Enter start note"
-              />
+              <input type="text" id="triadDownDegreeInput" value="3" placeholder="Enter degree" />
               <button id="triadDownBtn" class="api-test">Triad Down</button>
             </div>
           </div>
@@ -824,43 +829,51 @@
 
       document.getElementById('scaleDownMinBtn').addEventListener('click', () => {
         const scale = document.getElementById('scaleDownMinInput').value;
-        fetchWithErrorHandling(`/scale/down-min-half-steps?scale=${encodeURIComponent(scale)}`);
+        const fromDegree = document.getElementById('fromDegreeMinInput').value;
+        const toDegree = document.getElementById('toDegreeMinInput').value;
+        fetchWithErrorHandling(
+          `/scale/down-min-half-steps?scale=${encodeURIComponent(scale)}&from_degree=${encodeURIComponent(fromDegree)}&to_degree=${encodeURIComponent(toDegree)}`
+        );
       });
 
       document.getElementById('scaleDownMaxBtn').addEventListener('click', () => {
         const scale = document.getElementById('scaleDownMaxInput').value;
-        fetchWithErrorHandling(`/scale/down-max-half-steps?scale=${encodeURIComponent(scale)}`);
+        const fromDegree = document.getElementById('fromDegreeMaxInput').value;
+        const toDegree = document.getElementById('toDegreeMaxInput').value;
+        fetchWithErrorHandling(
+          `/scale/down-max-half-steps?scale=${encodeURIComponent(scale)}&from_degree=${encodeURIComponent(fromDegree)}&to_degree=${encodeURIComponent(toDegree)}`
+        );
       });
 
       document.getElementById('chordUpBtn').addEventListener('click', () => {
         const scale = document.getElementById('chordUpScaleInput').value;
-        const start = document.getElementById('chordUpStartInput').value;
+        const degree = document.getElementById('chordUpDegreeInput').value;
         fetchWithErrorHandling(
-          `/scale/chord-up?scale=${encodeURIComponent(scale)}&start=${encodeURIComponent(start)}`
+          `/scale/chord-up?scale=${encodeURIComponent(scale)}&degree=${encodeURIComponent(degree)}`
         );
       });
 
       document.getElementById('chordDownBtn').addEventListener('click', () => {
         const scale = document.getElementById('chordDownScaleInput').value;
-        const start = document.getElementById('chordDownStartInput').value;
+        const degree = document.getElementById('chordDownDegreeInput').value;
         fetchWithErrorHandling(
-          `/scale/chord-down?scale=${encodeURIComponent(scale)}&start=${encodeURIComponent(start)}`
+          `/scale/chord-down?scale=${encodeURIComponent(scale)}&degree=${encodeURIComponent(degree)}`
         );
       });
 
       document.getElementById('triadUpBtn').addEventListener('click', () => {
         const scale = document.getElementById('triadUpScaleInput').value;
-        const start = document.getElementById('triadUpStartInput').value;
+        const degree = document.getElementById('triadUpDegreeInput').value;
         fetchWithErrorHandling(
-          `/scale/triad-up?scale=${encodeURIComponent(scale)}&start=${encodeURIComponent(start)}`
+          `/scale/triad-up?scale=${encodeURIComponent(scale)}&degree=${encodeURIComponent(degree)}`
         );
       });
 
       document.getElementById('triadDownBtn').addEventListener('click', () => {
         const scale = document.getElementById('triadDownScaleInput').value;
-        const start = document.getElementById('triadDownStartInput').value;
+        const degree = document.getElementById('triadDownDegreeInput').value;
         fetchWithErrorHandling(
-          `/scale/triad-down?scale=${encodeURIComponent(scale)}&start=${encodeURIComponent(start)}`
+          `/scale/triad-down?scale=${encodeURIComponent(scale)}&degree=${encodeURIComponent(degree)}`
         );
       });
 
