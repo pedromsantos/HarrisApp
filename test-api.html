@@ -1,0 +1,924 @@
+<!doctype html>
+<html>
+  <head>
+    <title>API Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        height: calc(100vh - 120px);
+      }
+      .left-column {
+        flex: 1;
+        overflow-y: auto;
+        width: 50%;
+      }
+      .right-column {
+        flex: 1;
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px);
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+      }
+      .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+        border-radius: 5px 5px 0 0;
+      }
+      .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+        font-size: 16px;
+      }
+      .tab button:hover {
+        background-color: #ddd;
+      }
+      .tab button.active {
+        background-color: #ccc;
+      }
+      .tabcontent {
+        display: none;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+      }
+      .endpoint-group {
+        margin-bottom: 20px;
+      }
+      .endpoint-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .endpoint-description {
+        margin-bottom: 10px;
+        font-size: 14px;
+        color: #555;
+      }
+      .endpoint-inputs {
+        margin-bottom: 15px;
+      }
+      button.api-test {
+        margin: 5px 5px 5px 0;
+        padding: 8px 16px;
+        cursor: pointer;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+      }
+      button.api-test:hover {
+        background-color: #45a049;
+      }
+      pre {
+        background: #f4f4f4;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+        flex-grow: 1;
+        height: 100%;
+        margin: 0;
+      }
+      .success {
+        color: green;
+      }
+      .error {
+        color: red;
+      }
+      input[type='text'] {
+        padding: 8px;
+        margin-right: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: calc(100% - 100px);
+        box-sizing: border-box;
+      }
+      .environment-selector {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f0f8ff;
+        border-radius: 5px;
+        border: 1px solid #cce0ff;
+      }
+      .environment-selector label {
+        margin-right: 10px;
+      }
+      .header {
+        margin-bottom: 20px;
+      }
+      .output-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 100px);
+      }
+      .output-header {
+        margin-bottom: 10px;
+      }
+      @media (max-width: 1000px) {
+        .container {
+          flex-direction: column;
+        }
+        .left-column {
+          max-width: 100%;
+        }
+        .right-column {
+          position: relative;
+          max-height: 400px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Harris Jazz Lines API Test</h1>
+    </div>
+
+    <div class="container">
+      <div class="left-column">
+        <div class="tab">
+          <button class="tablinks" onclick="openTab(event, 'Common')" id="defaultOpen">
+            Common
+          </button>
+          <button class="tablinks" onclick="openTab(event, 'Pitch')">Pitch</button>
+          <button class="tablinks" onclick="openTab(event, 'Chord')">Chord</button>
+          <button class="tablinks" onclick="openTab(event, 'Scale')">Scale</button>
+          <button class="tablinks" onclick="openTab(event, 'Guitar')">Guitar</button>
+        </div>
+
+        <!-- Common Tab -->
+        <div id="Common" class="tabcontent">
+          <div class="endpoint-group">
+            <div class="endpoint-title">Health Check</div>
+            <div class="endpoint-description">Test if the API is up and running</div>
+            <div class="endpoint-inputs">
+              <button id="healthBtn" class="api-test">Test Health</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Generate Lines</div>
+            <div class="endpoint-description">Generate jazz lines from chord progression</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="linesInput"
+                value='{"chord_progression":["G7", "Cmaj7"],"patterns":["3,5,7,9"],"include_approach_notes":true,"scale":"G mixolydian","position":1}'
+                placeholder="Enter JSON payload"
+              />
+              <button id="linesBtn" class="api-test">Generate Lines</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pitch Tab -->
+        <div id="Pitch" class="tabcontent">
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Pitch MIDI</div>
+            <div class="endpoint-description">Get MIDI number for a pitch</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="midiPitchInput"
+                value="C4"
+                placeholder="Enter pitch (e.g. C4)"
+              />
+              <button id="pitchMidiBtn" class="api-test">Get MIDI</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Transpose Pitch</div>
+            <div class="endpoint-description">Transpose a pitch by an interval</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="transposePitchInput"
+                value='{"pitch":"C4","interval":"M3","direction":"up"}'
+                placeholder="Enter JSON payload"
+              />
+              <button id="transposePitchBtn" class="api-test">Transpose</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Interval</div>
+            <div class="endpoint-description">Find interval between two pitches</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="intervalPitch1Input" value="C4" placeholder="First pitch" />
+              <input type="text" id="intervalPitch2Input" value="G4" placeholder="Second pitch" />
+              <button id="getIntervalBtn" class="api-test">Get Interval</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Adjust Octave</div>
+            <div class="endpoint-description">Adjust the octave of a pitch</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="adjustOctaveInput"
+                value='{"pitch":"C4","direction":"up"}'
+                placeholder="Enter JSON payload"
+              />
+              <button id="adjustOctaveBtn" class="api-test">Adjust Octave</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Calculate Distance</div>
+            <div class="endpoint-description">Calculate semitone distance between pitches</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="distancePitch1Input" value="C4" placeholder="First pitch" />
+              <input type="text" id="distancePitch2Input" value="G4" placeholder="Second pitch" />
+              <button id="calculateDistanceBtn" class="api-test">Calculate Distance</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Pitch Details</div>
+            <div class="endpoint-description">Get detailed information about a pitch</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="pitchDetailsInput" value="C4" placeholder="Enter pitch" />
+              <button id="getPitchDetailsBtn" class="api-test">Get Details</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Are Enharmonic</div>
+            <div class="endpoint-description">Check if two pitches are enharmonic</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="enharmonicPitch1Input" value="C#4" placeholder="First pitch" />
+              <input
+                type="text"
+                id="enharmonicPitch2Input"
+                value="Db4"
+                placeholder="Second pitch"
+              />
+              <button id="areEnharmonicBtn" class="api-test">Check Enharmonic</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Create Line</div>
+            <div class="endpoint-description">Create a line from a list of pitches</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="createLineInput"
+                value='{"pitches":["C4","E4","G4"]}'
+                placeholder="Enter JSON payload"
+              />
+              <button id="createLineBtn" class="api-test">Create Line</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chord Tab -->
+        <div id="Chord" class="tabcontent">
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Chord Pitches</div>
+            <div class="endpoint-description">Get pitches for a chord by name</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="getChordPitchesInput"
+                value="Cmaj7"
+                placeholder="Enter chord name"
+              />
+              <button id="getChordPitchesBtn" class="api-test">Get Pitches</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Chord Pitches from Definition</div>
+            <div class="endpoint-description">Get pitches for a chord defined by components</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="chordPitchesDefinitionInput"
+                value='{"root":"C4","pattern":"Major7","voicing":"Closed","inversion":"Root"}'
+                placeholder="Enter JSON payload"
+              />
+              <button id="getChordPitchesDefinitionBtn" class="api-test">Get Pitches</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Transpose Chord from Definition</div>
+            <div class="endpoint-description">Transpose a chord defined by components</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="transposeChordDefInput"
+                value='{"root":"C4","pattern":"Major7","voicing":"Closed","inversion":"Root","interval":"P5","direction":"up"}'
+                placeholder="Enter JSON payload"
+              />
+              <button id="transposeChordDefBtn" class="api-test">Transpose Chord</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Transpose Chord</div>
+            <div class="endpoint-description">Transpose a chord by an interval</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="transposeChordInput"
+                value='{"chord":"Cmaj7","interval":"P5","direction":"up"}'
+                placeholder="Enter JSON payload"
+              />
+              <button id="transposeChordBtn" class="api-test">Transpose Chord</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scale Tab -->
+        <div id="Scale" class="tabcontent">
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Scale Notes</div>
+            <div class="endpoint-description">Get notes in a scale</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="getScaleNotesInput"
+                value="C major"
+                placeholder="Enter scale (e.g. C major)"
+              />
+              <button id="getScaleNotesBtn" class="api-test">Get Notes</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Pitch from Degree</div>
+            <div class="endpoint-description">Get a pitch from a scale degree</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="scaleInput" value="C major" placeholder="Enter scale" />
+              <input type="text" id="degreeInput" value="3" placeholder="Enter degree" />
+              <button id="getPitchFromDegreeBtn" class="api-test">Get Pitch</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Scale Up</div>
+            <div class="endpoint-description">Get scale ascending</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="scaleUpInput" value="C major" placeholder="Enter scale" />
+              <button id="scaleUpBtn" class="api-test">Scale Up</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Scale Down</div>
+            <div class="endpoint-description">Get scale descending</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="scaleDownInput" value="C major" placeholder="Enter scale" />
+              <button id="scaleDownBtn" class="api-test">Scale Down</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Degree from Pitch</div>
+            <div class="endpoint-description">Get degree of a pitch in a scale</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="degreePitchScaleInput"
+                value="C major"
+                placeholder="Enter scale"
+              />
+              <input type="text" id="degreePitchInput" value="E3" placeholder="Enter pitch" />
+              <button id="getDegreeFromPitchBtn" class="api-test">Get Degree</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Does Scale Contain Pitch</div>
+            <div class="endpoint-description">Check if a scale contains a pitch</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="containsPitchScaleInput"
+                value="C major"
+                placeholder="Enter scale"
+              />
+              <input type="text" id="containsPitchInput" value="E3" placeholder="Enter pitch" />
+              <button id="doesScaleContainPitchBtn" class="api-test">Check Pitch</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Scale Down Min Half Steps</div>
+            <div class="endpoint-description">Get scale descending with minimum half steps</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="scaleDownMinInput" value="C major" placeholder="Enter scale" />
+              <button id="scaleDownMinBtn" class="api-test">Scale Down Min</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Scale Down Max Half Steps</div>
+            <div class="endpoint-description">Get scale descending with maximum half steps</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="scaleDownMaxInput" value="C major" placeholder="Enter scale" />
+              <button id="scaleDownMaxBtn" class="api-test">Scale Down Max</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Chord Up</div>
+            <div class="endpoint-description">Build chord upward from scale</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="chordUpScaleInput" value="C major" placeholder="Enter scale" />
+              <input type="text" id="chordUpStartInput" value="C4" placeholder="Enter start note" />
+              <button id="chordUpBtn" class="api-test">Chord Up</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Chord Down</div>
+            <div class="endpoint-description">Build chord downward from scale</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="chordDownScaleInput"
+                value="C major"
+                placeholder="Enter scale"
+              />
+              <input
+                type="text"
+                id="chordDownStartInput"
+                value="C4"
+                placeholder="Enter start note"
+              />
+              <button id="chordDownBtn" class="api-test">Chord Down</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Triad Up</div>
+            <div class="endpoint-description">Build triad upward from scale</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="triadUpScaleInput" value="C major" placeholder="Enter scale" />
+              <input type="text" id="triadUpStartInput" value="C4" placeholder="Enter start note" />
+              <button id="triadUpBtn" class="api-test">Triad Up</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Triad Down</div>
+            <div class="endpoint-description">Build triad downward from scale</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="triadDownScaleInput"
+                value="C major"
+                placeholder="Enter scale"
+              />
+              <input
+                type="text"
+                id="triadDownStartInput"
+                value="C4"
+                placeholder="Enter start note"
+              />
+              <button id="triadDownBtn" class="api-test">Triad Down</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guitar Tab -->
+        <div id="Guitar" class="tabcontent">
+          <div class="endpoint-group">
+            <div class="endpoint-title">Generate Tablature from Notes</div>
+            <div class="endpoint-description">Generate guitar tablature from notes</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="tabFromNotesInput"
+                value='{"notes":["C4","E4","G4"],"position":null,"tuning":null}'
+                placeholder="Enter JSON payload"
+              />
+              <button id="generateTabFromNotesBtn" class="api-test">Generate Tab</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Generate Tablature from Scale</div>
+            <div class="endpoint-description">Generate guitar tablature from a scale</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="tabFromScaleInput" value="C major" placeholder="Enter scale" />
+              <input
+                type="text"
+                id="tabFromScalePositionInput"
+                value="open"
+                placeholder="Position (optional)"
+              />
+              <button id="generateTabFromScaleBtn" class="api-test">Generate Tab</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Chord Arpeggio Fingering</div>
+            <div class="endpoint-description">Get fingering for a chord arpeggio</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="chordArpeggioInput" value="Cmaj7" placeholder="Enter chord" />
+              <input
+                type="text"
+                id="arpeggioPositionInput"
+                value="open"
+                placeholder="Position (optional)"
+              />
+              <button id="getChordArpeggioBtn" class="api-test">Get Fingering</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Get Chord Fingering</div>
+            <div class="endpoint-description">Get fingering for a chord</div>
+            <div class="endpoint-inputs">
+              <input type="text" id="chordFingeringInput" value="CMaj7" placeholder="Enter chord" />
+              <input type="text" id="bassStringInput" value="6" placeholder="Bass string" />
+              <input type="text" id="positionInput" value="open" placeholder="Position" />
+              <button id="getChordFingeringBtn" class="api-test">Get Fingering</button>
+            </div>
+          </div>
+
+          <div class="endpoint-group">
+            <div class="endpoint-title">Generate Vertical Frets from Pitches</div>
+            <div class="endpoint-description">Generate vertical frets for pitches</div>
+            <div class="endpoint-inputs">
+              <input
+                type="text"
+                id="verticalFretsInput"
+                value='{"pitches":["C4","E4","G4"],"position":"open","tuning":null}'
+                placeholder="Enter JSON payload"
+              />
+              <button id="generateVerticalFretsBtn" class="api-test">Generate Frets</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="output-container">
+          <h2 class="output-header">Results:</h2>
+          <pre id="output">Results will appear here...</pre>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Function to get the base API URL
+      function getBaseApiUrl() {
+        return 'https://api.harrisjazzlines.com';
+      }
+
+      // Common function for fetching API data
+      async function fetchWithErrorHandling(endpoint, options = {}) {
+        const baseUrl = getBaseApiUrl();
+        const url = `${baseUrl}${endpoint}`;
+        const output = document.getElementById('output');
+        output.textContent = 'Loading...';
+
+        try {
+          const startTime = Date.now();
+          const response = await fetch(url, options);
+          const endTime = Date.now();
+          const responseTime = endTime - startTime;
+
+          let responseBody;
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            responseBody = await response.json();
+          } else {
+            responseBody = await response.text();
+          }
+
+          const statusClass = response.ok ? 'success' : 'error';
+
+          output.innerHTML =
+            `<span class="${statusClass}">Status: ${response.status} (${response.statusText})</span>\n` +
+            `URL: ${url}\n` +
+            `Method: ${options.method || 'GET'}\n` +
+            `Response Time: ${responseTime}ms\n` +
+            `Headers: ${JSON.stringify(
+              Object.fromEntries([...response.headers.entries()]),
+              null,
+              2
+            )}\n\n` +
+            `Body: ${
+              typeof responseBody === 'object'
+                ? JSON.stringify(responseBody, null, 2)
+                : responseBody
+            }`;
+        } catch (error) {
+          output.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+        }
+      }
+
+      // Tab system
+      function openTab(evt, tabName) {
+        const tabcontent = document.getElementsByClassName('tabcontent');
+        for (let i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = 'none';
+        }
+
+        const tablinks = document.getElementsByClassName('tablinks');
+        for (let i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(' active', '');
+        }
+
+        document.getElementById(tabName).style.display = 'block';
+        evt.currentTarget.className += ' active';
+      }
+
+      // Event listeners
+
+      // Common APIs
+      document.getElementById('healthBtn').addEventListener('click', () => {
+        fetchWithErrorHandling('/health');
+      });
+
+      document.getElementById('linesBtn').addEventListener('click', () => {
+        const data = document.getElementById('linesInput').value;
+        fetchWithErrorHandling('/lines', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: data,
+        });
+      });
+
+      // Pitch APIs
+      document.getElementById('pitchMidiBtn').addEventListener('click', () => {
+        const pitch = document.getElementById('midiPitchInput').value;
+        fetchWithErrorHandling(`/pitch/midi?pitch=${encodeURIComponent(pitch)}`);
+      });
+
+      document.getElementById('transposePitchBtn').addEventListener('click', () => {
+        const data = document.getElementById('transposePitchInput').value;
+        fetchWithErrorHandling('/pitch/transpose', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: data,
+        });
+      });
+
+      document.getElementById('getIntervalBtn').addEventListener('click', () => {
+        const pitch1 = document.getElementById('intervalPitch1Input').value;
+        const pitch2 = document.getElementById('intervalPitch2Input').value;
+        fetchWithErrorHandling(
+          `/pitch/interval?pitch1=${encodeURIComponent(pitch1)}&pitch2=${encodeURIComponent(
+            pitch2
+          )}`
+        );
+      });
+
+      document.getElementById('adjustOctaveBtn').addEventListener('click', () => {
+        const data = document.getElementById('adjustOctaveInput').value;
+        fetchWithErrorHandling('/pitch/adjust-octave', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: data,
+        });
+      });
+
+      document.getElementById('calculateDistanceBtn').addEventListener('click', () => {
+        const pitch1 = document.getElementById('distancePitch1Input').value;
+        const pitch2 = document.getElementById('distancePitch2Input').value;
+        fetchWithErrorHandling(
+          `/pitch/distance?pitch1=${encodeURIComponent(pitch1)}&pitch2=${encodeURIComponent(
+            pitch2
+          )}`
+        );
+      });
+
+      document.getElementById('getPitchDetailsBtn').addEventListener('click', () => {
+        const pitch = document.getElementById('pitchDetailsInput').value;
+        fetchWithErrorHandling(`/pitch/details?pitch=${encodeURIComponent(pitch)}`);
+      });
+
+      document.getElementById('areEnharmonicBtn').addEventListener('click', () => {
+        const pitch1 = document.getElementById('enharmonicPitch1Input').value;
+        const pitch2 = document.getElementById('enharmonicPitch2Input').value;
+        fetchWithErrorHandling(
+          `/pitch/enharmonic?pitch1=${encodeURIComponent(pitch1)}&pitch2=${encodeURIComponent(
+            pitch2
+          )}`
+        );
+      });
+
+      document.getElementById('createLineBtn').addEventListener('click', () => {
+        const data = document.getElementById('createLineInput').value;
+        fetchWithErrorHandling('/pitch/line', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: data,
+        });
+      });
+
+      // Chord APIs
+      document.getElementById('getChordPitchesBtn').addEventListener('click', () => {
+        const chord = document.getElementById('getChordPitchesInput').value;
+        fetchWithErrorHandling(`/chord/pitches?chord=${encodeURIComponent(chord)}`);
+      });
+
+      document.getElementById('getChordPitchesDefinitionBtn').addEventListener('click', () => {
+        const data = document.getElementById('chordPitchesDefinitionInput').value;
+        fetchWithErrorHandling('/chord/pitches-from-definition', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: data,
+        });
+      });
+
+      document.getElementById('transposeChordBtn').addEventListener('click', () => {
+        const data = document.getElementById('transposeChordInput').value;
+        fetchWithErrorHandling('/chord/transpose', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: data,
+        });
+      });
+
+      document.getElementById('transposeChordDefBtn').addEventListener('click', () => {
+        const data = document.getElementById('transposeChordDefInput').value;
+        fetchWithErrorHandling('/chord/transpose-from-definition', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: data,
+        });
+      });
+
+      // Scale APIs
+      document.getElementById('getScaleNotesBtn').addEventListener('click', () => {
+        const scale = document.getElementById('getScaleNotesInput').value;
+        fetchWithErrorHandling(`/scale/notes?scale=${encodeURIComponent(scale)}`);
+      });
+
+      document.getElementById('getPitchFromDegreeBtn').addEventListener('click', () => {
+        const scale = document.getElementById('scaleInput').value;
+        const degree = document.getElementById('degreeInput').value;
+        fetchWithErrorHandling(
+          `/scale/pitch-from-degree?scale=${encodeURIComponent(scale)}&degree=${encodeURIComponent(
+            degree
+          )}`
+        );
+      });
+
+      document.getElementById('scaleUpBtn').addEventListener('click', () => {
+        const scale = document.getElementById('scaleUpInput').value;
+        fetchWithErrorHandling(`/scale/up?scale=${encodeURIComponent(scale)}`);
+      });
+
+      document.getElementById('scaleDownBtn').addEventListener('click', () => {
+        const scale = document.getElementById('scaleDownInput').value;
+        fetchWithErrorHandling(`/scale/down?scale=${encodeURIComponent(scale)}`);
+      });
+
+      document.getElementById('getDegreeFromPitchBtn').addEventListener('click', () => {
+        const scale = document.getElementById('degreePitchScaleInput').value;
+        const pitch = document.getElementById('degreePitchInput').value;
+        fetchWithErrorHandling(
+          `/scale/degree-from-pitch?scale=${encodeURIComponent(scale)}&pitch=${encodeURIComponent(
+            pitch
+          )}`
+        );
+      });
+
+      document.getElementById('doesScaleContainPitchBtn').addEventListener('click', () => {
+        const scale = document.getElementById('containsPitchScaleInput').value;
+        const pitch = document.getElementById('containsPitchInput').value;
+        fetchWithErrorHandling(
+          `/scale/contains-pitch?scale=${encodeURIComponent(scale)}&pitch=${encodeURIComponent(
+            pitch
+          )}`
+        );
+      });
+
+      document.getElementById('scaleDownMinBtn').addEventListener('click', () => {
+        const scale = document.getElementById('scaleDownMinInput').value;
+        fetchWithErrorHandling(`/scale/down-min-half-steps?scale=${encodeURIComponent(scale)}`);
+      });
+
+      document.getElementById('scaleDownMaxBtn').addEventListener('click', () => {
+        const scale = document.getElementById('scaleDownMaxInput').value;
+        fetchWithErrorHandling(`/scale/down-max-half-steps?scale=${encodeURIComponent(scale)}`);
+      });
+
+      document.getElementById('chordUpBtn').addEventListener('click', () => {
+        const scale = document.getElementById('chordUpScaleInput').value;
+        const start = document.getElementById('chordUpStartInput').value;
+        fetchWithErrorHandling(
+          `/scale/chord-up?scale=${encodeURIComponent(scale)}&start=${encodeURIComponent(start)}`
+        );
+      });
+
+      document.getElementById('chordDownBtn').addEventListener('click', () => {
+        const scale = document.getElementById('chordDownScaleInput').value;
+        const start = document.getElementById('chordDownStartInput').value;
+        fetchWithErrorHandling(
+          `/scale/chord-down?scale=${encodeURIComponent(scale)}&start=${encodeURIComponent(start)}`
+        );
+      });
+
+      document.getElementById('triadUpBtn').addEventListener('click', () => {
+        const scale = document.getElementById('triadUpScaleInput').value;
+        const start = document.getElementById('triadUpStartInput').value;
+        fetchWithErrorHandling(
+          `/scale/triad-up?scale=${encodeURIComponent(scale)}&start=${encodeURIComponent(start)}`
+        );
+      });
+
+      document.getElementById('triadDownBtn').addEventListener('click', () => {
+        const scale = document.getElementById('triadDownScaleInput').value;
+        const start = document.getElementById('triadDownStartInput').value;
+        fetchWithErrorHandling(
+          `/scale/triad-down?scale=${encodeURIComponent(scale)}&start=${encodeURIComponent(start)}`
+        );
+      });
+
+      // Guitar APIs
+      document.getElementById('generateTabFromNotesBtn').addEventListener('click', () => {
+        const data = document.getElementById('tabFromNotesInput').value;
+        fetchWithErrorHandling('/guitar/tablature/from-notes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: data,
+        });
+      });
+
+      document.getElementById('generateTabFromScaleBtn').addEventListener('click', () => {
+        const scale = document.getElementById('tabFromScaleInput').value;
+        const position = document.getElementById('tabFromScalePositionInput').value;
+        let url = `/guitar/tablature/from-scale?scale=${encodeURIComponent(scale)}`;
+        if (position) {
+          url += `&position=${encodeURIComponent(position)}`;
+        }
+        fetchWithErrorHandling(url);
+      });
+
+      document.getElementById('getChordArpeggioBtn').addEventListener('click', () => {
+        const chord = document.getElementById('chordArpeggioInput').value;
+        const position = document.getElementById('arpeggioPositionInput').value;
+        let url = `/guitar/arpeggio-fingering?chord=${encodeURIComponent(chord)}`;
+        if (position) {
+          url += `&position=${encodeURIComponent(position)}`;
+        }
+        fetchWithErrorHandling(url);
+      });
+
+      document.getElementById('getChordFingeringBtn').addEventListener('click', () => {
+        const chord = document.getElementById('chordFingeringInput').value;
+        const bassString = document.getElementById('bassStringInput').value;
+        const position = document.getElementById('positionInput').value;
+        let url = `/guitar/chord-fingering?chord=${encodeURIComponent(
+          chord
+        )}&bass_string=${encodeURIComponent(bassString)}&position=${encodeURIComponent(position)}`;
+        fetchWithErrorHandling(url);
+      });
+
+      document.getElementById('generateVerticalFretsBtn').addEventListener('click', () => {
+        const data = document.getElementById('verticalFretsInput').value;
+        fetchWithErrorHandling('/guitar/vertical-frets/from-pitches', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: data,
+        });
+      });
+
+      // Open default tab on load
+      document.getElementById('defaultOpen').click();
+    </script>
+  </body>
+</html>
