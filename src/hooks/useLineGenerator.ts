@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { LineGeneratorRequest, LineGeneratorResponse } from '@/types/lineGenerator';
 
-const API_BASE_URL = 'https://api.harrisjazzlines.com';
+// Use proxy server in development, direct API in production
+const API_BASE_URL = import.meta.env.DEV ? '/api' : 'https://api.harrisjazzlines.com';
 
 const HEALTH_CHECK_INTERVAL = 60 * 1000;
 
@@ -23,7 +24,9 @@ export function useLineGenerator(): UseLineGeneratorReturn {
 
   const checkServerHealth = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/health`);
+      // Use different health endpoint for proxy vs direct API
+      const healthUrl = import.meta.env.DEV ? '/api/health' : `${API_BASE_URL}/health`;
+      const response = await fetch(healthUrl);
       const newStatus = response.ok;
       setIsServerHealthy(newStatus);
     } catch {
@@ -65,7 +68,10 @@ export function useLineGenerator(): UseLineGeneratorReturn {
   );
 
   const makeApiRequest = useCallback(async (formData: LineGeneratorRequest) => {
-    const response = await fetch(`${API_BASE_URL}/lines`, {
+    // Use proxy endpoint in development, direct API in production
+    const endpoint = import.meta.env.DEV ? '/api/lines' : `${API_BASE_URL}/lines`;
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
