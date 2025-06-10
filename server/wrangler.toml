@@ -1,0 +1,25 @@
+name = "harrisapp-backend"
+main = "src/worker.ts"
+compatibility_date = "2024-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables
+# Set these in Cloudflare dashboard or using wrangler secrets
+[vars]
+WES_API_BASE_URL = "https://api.harrisjazzlines.com"
+
+# Secrets (set using: wrangler secret put WES_API_KEY)
+# WES_API_KEY = "your-api-key-here" (use wrangler secret put instead)
+
+# Custom domain (optional - you can set this later)
+# routes = [
+#   { pattern = "api.yourharrisapp.com/*", custom_domain = true }
+# ]
+
+# For development
+[env.development]
+name = "harrisapp-backend-dev"
+
+# For production
+[env.production]
+name = "harrisapp-backend-prod"

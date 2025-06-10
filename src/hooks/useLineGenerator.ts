@@ -2,8 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { LineGeneratorRequest, LineGeneratorResponse } from '@/types/lineGenerator';
 
-// Use proxy server in development, direct API in production
-const API_BASE_URL = import.meta.env.DEV ? '/api' : 'https://api.harrisjazzlines.com';
+// Use proxy server in development, Cloudflare Worker in production
+const API_BASE_URL = import.meta.env.DEV
+  ? '/api'
+  : ((import.meta.env['VITE_API_URL'] as string | undefined) ??
+    'https://harrisapp-backend.your-worker-subdomain.workers.dev');
 
 const HEALTH_CHECK_INTERVAL = 60 * 1000;
 
@@ -68,8 +71,8 @@ export function useLineGenerator(): UseLineGeneratorReturn {
   );
 
   const makeApiRequest = useCallback(async (formData: LineGeneratorRequest) => {
-    // Use proxy endpoint in development, direct API in production
-    const endpoint = import.meta.env.DEV ? '/api/lines' : `${API_BASE_URL}/lines`;
+    // Use proxy endpoint in development, Cloudflare Worker in production
+    const endpoint = import.meta.env.DEV ? '/api/lines' : `${API_BASE_URL}/api/lines`;
 
     const response = await fetch(endpoint, {
       method: 'POST',

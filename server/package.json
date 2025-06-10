@@ -7,19 +7,25 @@
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "dev:worker": "wrangler dev",
+    "deploy:worker": "wrangler deploy",
+    "deploy:worker:prod": "wrangler deploy --env production",
+    "secret:put": "wrangler secret put WES_API_KEY"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
+    "@cloudflare/workers-types": "^4.20250610.0",
     "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
     "@types/node": "^20.5.0",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.1.6",
-    "ts-node-dev": "^2.0.0"
+    "wrangler": "^3.114.9"
   },
   "engines": {
     "node": ">=18.0.0"

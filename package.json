@@ -72,6 +72,10 @@
     "server:install": "cd server && npm install",
     "server:build": "cd server && npm run build",
     "server:start": "cd server && npm start",
+    "worker:dev": "cd server && npm run dev:worker",
+    "worker:deploy": "cd server && npm run deploy:worker",
+    "worker:deploy:prod": "cd server && npm run deploy:worker:prod",
+    "worker:secret": "cd server && npm run secret:put",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
     "preview": "vite preview"
