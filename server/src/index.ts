@@ -79,13 +79,11 @@ app.all('/api/*', async (req, res) => {
       });
     }
 
-    // Handle different response types
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
       const data = await response.json();
       res.json(data);
     } else {
-      // Handle plain text responses (like health endpoint)
       const text = await response.text();
       res.json({ message: text });
     }
