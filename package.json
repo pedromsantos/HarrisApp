@@ -6,7 +6,7 @@
     "@radix-ui/react-toggle": "^1.1.9",
     "abcjs": "^6.5.1",
     "react": "^19.0.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
@@ -18,7 +18,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "24.0.10",
     "@types/react": "19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/react-dom": "^19.1.7",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.36.0",
     "@vitejs/plugin-react": "4.6.0",
