@@ -116,6 +116,8 @@ npm run build
    - **Framework preset**: React
    - **Build command**: `npm run build`
    - **Build output directory**: `dist`
+   - **Build system version**: v3 (recommended for modern Node.js)
+   - **Node.js version**: `22.16.0` (or leave as default for v3 build system)
    - **Environment variables**:
      - `VITE_API_URL`: `https://harrisapp-backend.your-subdomain.workers.dev`
 
@@ -208,9 +210,16 @@ wrangler pages deployment list --project-name=harrisapp
 - `WES_API_KEY`: Your Harris Jazz Lines API key (Secret)
 - `WES_API_BASE_URL`: `https://api.harrisjazzlines.com` (Variable)
 
-### Pages (Cloudflare Dashboard → Pages → harrisapp → Settings → Environment variables)
+### Pages (Cloudflare Dashboard → Pages → harrisapp → Settings)
+
+**Build Configuration:**
+
+- **Build system version**: v3 (Build & deployments → Build system version)
+
+**Environment variables** (Environment variables):
 
 - `VITE_API_URL`: Your worker URL (e.g., `https://harrisapp-backend.your-subdomain.workers.dev`)
+- `NODE_VERSION`: `22.16.0` (optional, v3 uses this by default)
 
 ## Custom Domain Setup (Optional)
 
@@ -229,21 +238,25 @@ wrangler pages deployment list --project-name=harrisapp
 ### Common Issues
 
 1. **CORS Errors**
-
    - Check that your Worker includes CORS headers
    - Verify the Worker URL in frontend environment variables
 
 2. **API Key Not Working**
-
    - Ensure the secret is set: `wrangler secret put WES_API_KEY`
    - Check worker logs: `wrangler tail harrisapp-backend`
 
 3. **Build Failures**
-
    - Verify all dependencies are installed
    - Check build command matches your framework
+   - Ensure Node.js version compatibility (use 22.16.0 for Cloudflare Pages v3)
 
-4. **404 Errors on Refresh**
+4. **Node.js Version Incompatibility**
+   - Error: "The engine "node" is incompatible with this module"
+   - Solution: Set Node.js version to 22.16.0 in Cloudflare Pages build settings (v3 build system)
+   - Alternative: Use `.nvmrc` file (already included in project)
+   - Note: Ensure you're using Cloudflare Pages v3 build system for modern Node.js support
+
+5. **404 Errors on Refresh**
    - Ensure `_redirects` file is in the build output
    - Configure SPA redirects in Pages settings
 

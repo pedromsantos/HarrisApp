@@ -1,0 +1,10 @@
+{
+  "build": {
+    "rootDir": ".",
+    "command": "npm run build",
+    "outputDir": "dist",
+    "env": {
+      "NODE_VERSION": "22.16.0"
+    }
+  }
+}
