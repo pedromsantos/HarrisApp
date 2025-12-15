@@ -41,7 +41,7 @@
     "eslint-plugin-vitest": "^0.5.4",
     "husky": "^9.1.7",
     "jsdom": "^27.2.0",
-    "prettier": "^3.7.3",
+    "prettier": "^3.7.4",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.17",
     "tailwindcss-animate": "^1.0.7",
