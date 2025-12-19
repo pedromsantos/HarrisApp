@@ -2,6 +2,9 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import React, { useState } from 'react';
 
+import ChordInput from '@/components/instructionsExplorer-components/ChordInput';
+import InstructionsDisplay from '@/components/instructionsExplorer-components/InstructionsDisplay';
+import MaterializedResults from '@/components/instructionsExplorer-components/MaterializedResults';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useBarryHarrisInstructions } from '@/hooks/useBarryHarrisInstructions';
@@ -10,10 +13,6 @@ import {
   GuitarPosition,
   PathSelection,
 } from '@/types/barryHarrisInstructions';
-
-import ChordInput from './instructionsExplorer-components/ChordInput';
-import InstructionsDisplay from './instructionsExplorer-components/InstructionsDisplay';
-import MaterializedResults from './instructionsExplorer-components/MaterializedResults';
 
 const GUITAR_POSITIONS: GuitarPosition[] = ['Open', 'C', 'A', 'G', 'E', 'D', 'C8', 'A8', 'G8', 'E8'];
 

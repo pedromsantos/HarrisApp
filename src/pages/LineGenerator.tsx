@@ -1,19 +1,18 @@
 /* eslint-disable react/jsx-no-bind */
 import React, { useEffect, useRef, useState } from 'react';
 
+import { PATTERNS } from '@/components/lineGenerator-components/constants';
+import { ErrorCard } from '@/components/lineGenerator-components/ErrorCard';
+import { PatternSelector } from '@/components/lineGenerator-components/PatternSelector';
+import { PositionSelector } from '@/components/lineGenerator-components/PositionSelector';
+import { ResultsDisplay } from '@/components/lineGenerator-components/ResultsDisplay';
+import { ScaleSelector } from '@/components/lineGenerator-components/ScaleSelector';
+import { ServerErrorCard } from '@/components/lineGenerator-components/ServerErrorCard';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLineGenerator } from '@/hooks/useLineGenerator';
 import { convertToABC } from '@/lib/musicNotation';
 import { LineGeneratorRequest, Pattern, Position } from '@/types/lineGenerator';
-
-import { PATTERNS } from './lineGenerator-components/constants';
-import { ErrorCard } from './lineGenerator-components/ErrorCard';
-import { PatternSelector } from './lineGenerator-components/PatternSelector';
-import { PositionSelector } from './lineGenerator-components/PositionSelector';
-import { ResultsDisplay } from './lineGenerator-components/ResultsDisplay';
-import { ScaleSelector } from './lineGenerator-components/ScaleSelector';
-import { ServerErrorCard } from './lineGenerator-components/ServerErrorCard';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 const preloadABCJS = () => import('abcjs');
 

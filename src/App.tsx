@@ -3,11 +3,11 @@ import './App.css';
 import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-import LineGenerator from './components/LineGenerator';
 import Navigation from './components/Navigation';
 import { ThemeProvider } from './components/ThemeProvider';
 import Counterpoint from './pages/Counterpoint';
 import InstructionsExplorer from './pages/InstructionsExplorer';
+import LineGenerator from './pages/LineGenerator';
 
 const AppContent: React.FC = () => {
   return (

@@ -4,10 +4,10 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import LineGenerator from '@/components/LineGenerator';
 import { Button } from '@/components/ui/button';
 import { useLineGenerator } from '@/hooks/useLineGenerator';
 import { convertToABC } from '@/lib/musicNotation';
+import LineGenerator from '@/pages/LineGenerator';
 import { LineGeneratorResponse } from '@/types/lineGenerator';
 
 Element.prototype.scrollIntoView = vi.fn();
