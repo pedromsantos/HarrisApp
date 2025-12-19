@@ -52,9 +52,9 @@ V:2 name="CF" clef=treble
     cpNotes.length > 0
       ? `${cpNotes
           .map((note, i) => {
-            const interval = intervals[i] || '';
+            const interval = intervals[i] ?? '';
             // Add interval annotation below the note if available
-            const annotation = interval ? `"_${interval}"` : '';
+            const annotation = interval !== '' ? `"_${interval}"` : '';
             return `${annotation}${note}`;
           })
           .join(' | ')} |`

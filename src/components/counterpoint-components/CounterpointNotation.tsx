@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { convertToCounterpointABC } from '@/lib/counterpointNotation';
 
 const preloadABCJS = () => import('abcjs');
@@ -44,6 +44,7 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
     };
 
     void loadAbcjs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
