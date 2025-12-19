@@ -11,9 +11,27 @@ vi.mock('react-piano', () => ({
   Piano: ({ playNote }: { playNote: (midiNumber: number) => void }) => {
     return (
       <div data-testid="piano-mock">
-        <button onClick={() => { playNote(60); }}>C4</button>
-        <button onClick={() => { playNote(64); }}>E4</button>
-        <button onClick={() => { playNote(67); }}>G4</button>
+        <button
+          onClick={() => {
+            playNote(60);
+          }}
+        >
+          C4
+        </button>
+        <button
+          onClick={() => {
+            playNote(64);
+          }}
+        >
+          E4
+        </button>
+        <button
+          onClick={() => {
+            playNote(67);
+          }}
+        >
+          G4
+        </button>
       </div>
     );
   },
@@ -38,8 +56,6 @@ describe('PianoInput', () => {
     onNoteClick: vi.fn(),
     onOctaveChange: vi.fn(),
     octave: 4,
-    mode: 'cantus_firmus' as const,
-    onModeChange: vi.fn(),
     onUndo: vi.fn(),
     onClearCurrent: vi.fn(),
     onClearAll: vi.fn(),
@@ -57,22 +73,6 @@ describe('PianoInput', () => {
 
     expect(screen.getByTestId('piano-keyboard')).toBeInTheDocument();
     expect(screen.getByTestId('piano-mock')).toBeInTheDocument();
-  });
-
-  it('renders mode selector with cantus firmus selected', () => {
-    render(<PianoInput {...mockProps} />);
-
-    const cfButton = screen.getByTestId('mode-cantus-firmus');
-    expect(cfButton).toHaveClass('bg-primary');
-    expect(cfButton).toHaveTextContent('CF');
-  });
-
-  it('renders mode selector with counterpoint selected', () => {
-    render(<PianoInput {...mockProps} mode="counterpoint" />);
-
-    const cpButton = screen.getByTestId('mode-counterpoint');
-    expect(cpButton).toBeInTheDocument();
-    expect(cpButton).toHaveTextContent('CPL');
   });
 
   it('displays current octave', () => {
@@ -147,12 +147,6 @@ describe('PianoInput', () => {
     fireEvent.click(c4Button);
 
     expect(onNoteClick).toHaveBeenCalledWith('C4');
-  });
-
-  it('renders description text', () => {
-    render(<PianoInput {...mockProps} />);
-
-    expect(screen.getByText(/Select input mode and click piano keys to add notes/i)).toBeInTheDocument();
   });
 
   it('renders action buttons', () => {

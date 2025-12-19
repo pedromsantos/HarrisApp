@@ -6,15 +6,12 @@ import React, { useCallback, useRef } from 'react';
 import { MidiNumbers, Piano } from 'react-piano';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CounterpointMode } from '@/types/counterpoint';
+import { Card, CardContent } from '@/components/ui/card';
 
 export interface PianoInputProps {
   onNoteClick: (note: string) => void;
   onOctaveChange: (octave: number) => void;
   octave: number;
-  mode: CounterpointMode;
-  onModeChange: (mode: CounterpointMode) => void;
   onUndo: () => void;
   onClearCurrent: () => void;
   onClearAll: () => void;
@@ -39,8 +36,6 @@ export const PianoInput: React.FC<PianoInputProps> = ({
   onNoteClick,
   onOctaveChange,
   octave,
-  mode,
-  onModeChange,
   onUndo,
   onClearCurrent,
   onClearAll,
@@ -76,45 +71,9 @@ export const PianoInput: React.FC<PianoInputProps> = ({
     }
   }, [octave, onOctaveChange]);
 
-  const handleSetCantusFirmus = useCallback(() => {
-    onModeChange('cantus_firmus');
-  }, [onModeChange]);
-
-  const handleSetCounterpoint = useCallback(() => {
-    onModeChange('counterpoint');
-  }, [onModeChange]);
-
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Piano Input</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Select input mode and click piano keys to add notes
-        </p>
-      </CardHeader>
       <CardContent className="space-y-4">
-        {/* Mode Selector */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Input Mode:</span>
-          <div className="flex gap-2">
-            <Button
-              onClick={handleSetCantusFirmus}
-              variant={mode === 'cantus_firmus' ? 'default' : 'outline'}
-              size="sm"
-              data-testid="mode-cantus-firmus"
-            >
-              CF
-            </Button>
-            <Button
-              onClick={handleSetCounterpoint}
-              variant={mode === 'counterpoint' ? 'default' : 'outline'}
-              size="sm"
-              data-testid="mode-counterpoint"
-            >
-              CPL
-            </Button>
-          </div>
-        </div>
         {/* Octave Controls */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

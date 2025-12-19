@@ -57,6 +57,8 @@ const Counterpoint: React.FC = () => {
           cantusFirmus={state.cantusFirmus}
           counterpoint={state.counterpoint}
           intervals={state.intervals}
+          mode={state.mode}
+          onModeChange={setMode}
         />
 
         {/* Validation Actions */}
@@ -95,8 +97,6 @@ const Counterpoint: React.FC = () => {
           onNoteClick={addNote}
           onOctaveChange={setOctave}
           octave={state.octave}
-          mode={state.mode}
-          onModeChange={setMode}
           onUndo={undoNote}
           onClearCurrent={clearCurrentLine}
           onClearAll={clearAll}

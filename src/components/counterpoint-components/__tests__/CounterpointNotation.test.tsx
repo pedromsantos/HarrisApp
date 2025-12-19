@@ -13,8 +13,18 @@ vi.mock('abcjs', () => ({
 }));
 
 describe('CounterpointNotation', () => {
+  const mockOnModeChange = vi.fn();
+
   it('renders empty state when no notes', () => {
-    render(<CounterpointNotation cantusFirmus={[]} counterpoint={[]} intervals={[]} />);
+    render(
+      <CounterpointNotation
+        cantusFirmus={[]}
+        counterpoint={[]}
+        intervals={[]}
+        mode="cantus_firmus"
+        onModeChange={mockOnModeChange}
+      />
+    );
 
     expect(
       screen.getByText(/No notes yet. Start by selecting a mode and adding notes with the piano./i)
@@ -23,14 +33,30 @@ describe('CounterpointNotation', () => {
 
   it('renders notation container when cantus firmus has notes', () => {
     const cantusFirmus = ['C4', 'D4', 'E4'];
-    render(<CounterpointNotation cantusFirmus={cantusFirmus} counterpoint={[]} intervals={[]} />);
+    render(
+      <CounterpointNotation
+        cantusFirmus={cantusFirmus}
+        counterpoint={[]}
+        intervals={[]}
+        mode="cantus_firmus"
+        onModeChange={mockOnModeChange}
+      />
+    );
 
     expect(screen.getByTestId('notation-container')).toBeInTheDocument();
   });
 
   it('renders notation container when counterpoint has notes', () => {
     const counterpoint = ['E4', 'F4', 'G4'];
-    render(<CounterpointNotation cantusFirmus={[]} counterpoint={counterpoint} intervals={[]} />);
+    render(
+      <CounterpointNotation
+        cantusFirmus={[]}
+        counterpoint={counterpoint}
+        intervals={[]}
+        mode="counterpoint"
+        onModeChange={mockOnModeChange}
+      />
+    );
 
     expect(screen.getByTestId('notation-container')).toBeInTheDocument();
   });
@@ -43,6 +69,8 @@ describe('CounterpointNotation', () => {
         cantusFirmus={cantusFirmus}
         counterpoint={counterpoint}
         intervals={[]}
+        mode="cantus_firmus"
+        onModeChange={mockOnModeChange}
       />
     );
 
@@ -51,7 +79,15 @@ describe('CounterpointNotation', () => {
 
   it('renders notation container div with correct styling', () => {
     const cantusFirmus = ['C4', 'D4'];
-    render(<CounterpointNotation cantusFirmus={cantusFirmus} counterpoint={[]} intervals={[]} />);
+    render(
+      <CounterpointNotation
+        cantusFirmus={cantusFirmus}
+        counterpoint={[]}
+        intervals={[]}
+        mode="cantus_firmus"
+        onModeChange={mockOnModeChange}
+      />
+    );
 
     const container = screen.getByTestId('notation-container');
     expect(container).toHaveClass('p-4', 'bg-background', 'rounded', 'overflow-auto');
@@ -66,6 +102,8 @@ describe('CounterpointNotation', () => {
         cantusFirmus={cantusFirmus}
         counterpoint={counterpoint}
         intervals={[]}
+        mode="cantus_firmus"
+        onModeChange={mockOnModeChange}
       />
     );
 
