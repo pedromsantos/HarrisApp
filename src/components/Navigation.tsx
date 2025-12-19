@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-duplicate-string */
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -33,7 +32,7 @@ const Navigation: React.FC = () => {
           >
             Line Generator
           </Link>
-          <Link
+          {/* <Link
             to="/instructions-explorer"
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               isActive('/instructions-explorer')
@@ -42,7 +41,7 @@ const Navigation: React.FC = () => {
             }`}
           >
             Instructions Explorer
-          </Link>
+          </Link> */}
           <Link
             to="/counterpoint"
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${

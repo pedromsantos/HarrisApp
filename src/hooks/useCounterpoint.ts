@@ -17,8 +17,8 @@ const API_BASE_URL = import.meta.env.DEV
     'https://harrisapp-backend.your-worker-subdomain.workers.dev');
 
 const DEFAULT_EXAMPLE = {
-  cantusFirmus: ['C4', 'D4', 'E4', 'F4', 'E4', 'D4', 'C4'],
-  counterpoint: ['E4', 'F4', 'G4', 'A4', 'G4', 'F4', 'E4'],
+  counterpoint: ['C4', 'B3', 'D4', 'C4', 'A3', 'B3', 'C4'],
+  cantusFirmus: ['C3', 'G3', 'F3', 'E3', 'F3', 'D3', 'C3'],
 };
 
 type UseCounterpointReturn = {
@@ -52,26 +52,23 @@ export function useCounterpoint(): UseCounterpointReturn {
   const [isValidating, setIsValidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const addNote = useCallback(
-    (note: string) => {
-      setState((prev) => {
-        if (prev.mode === 'cantus_firmus') {
-          return {
-            ...prev,
-            cantusFirmus: [...prev.cantusFirmus, note],
-            validation: null,
-          };
-        } else {
-          return {
-            ...prev,
-            counterpoint: [...prev.counterpoint, note],
-            validation: null,
-          };
-        }
-      });
-    },
-    []
-  );
+  const addNote = useCallback((note: string) => {
+    setState((prev) => {
+      if (prev.mode === 'cantus_firmus') {
+        return {
+          ...prev,
+          cantusFirmus: [...prev.cantusFirmus, note],
+          validation: null,
+        };
+      } else {
+        return {
+          ...prev,
+          counterpoint: [...prev.counterpoint, note],
+          validation: null,
+        };
+      }
+    });
+  }, []);
 
   const undoNote = useCallback(() => {
     setState((prev) => {

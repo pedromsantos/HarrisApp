@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { ThemeProvider } from './components/ThemeProvider';
 import Counterpoint from './pages/Counterpoint';
-import InstructionsExplorer from './pages/InstructionsExplorer';
+// import InstructionsExplorer from './pages/InstructionsExplorer';
 import LineGenerator from './pages/LineGenerator';
 
 const AppContent: React.FC = () => {
@@ -19,7 +19,7 @@ const AppContent: React.FC = () => {
             <div className="px-4 py-2 sm:px-0">
               <Routes>
                 <Route path="/" element={<LineGenerator />} />
-                <Route path="/instructions-explorer" element={<InstructionsExplorer />} />
+                {/* <Route path="/instructions-explorer" element={<InstructionsExplorer />} /> */}
                 <Route path="/counterpoint" element={<Counterpoint />} />
               </Routes>
             </div>

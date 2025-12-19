@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useEffect, useRef } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +24,20 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
       try {
         const abcjs = await preloadABCJS();
         abcjsRef.current = abcjs;
+
+        // Trigger initial render after abcjs loads
+        if (notationRef.current !== null) {
+          try {
+            const abcNotation = convertToCounterpointABC(cantusFirmus, counterpoint, intervals);
+            abcjs.renderAbc(notationRef.current, abcNotation, {
+              responsive: 'resize',
+              add_classes: true,
+              staffwidth: 700,
+            });
+          } catch {
+            // Silently handle rendering errors
+          }
+        }
       } catch {
         // Silently handle abcjs loading errors
       }
@@ -39,7 +52,7 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
       const el = notationRef.current;
 
       try {
-        const abcNotation = convertToCounterpointABC(cantusFirmus, counterpoint);
+        const abcNotation = convertToCounterpointABC(cantusFirmus, counterpoint, intervals);
         abcjs.renderAbc(el, abcNotation, {
           responsive: 'resize',
           add_classes: true,
@@ -49,63 +62,23 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
         // Silently handle rendering errors
       }
     }
-  }, [cantusFirmus, counterpoint]);
+  }, [cantusFirmus, counterpoint, intervals]);
 
   const hasNotes = cantusFirmus.length > 0 || counterpoint.length > 0;
-  const hasIntervals = intervals.length > 0;
-  const minLength = Math.min(cantusFirmus.length, counterpoint.length);
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Music Notation</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Top staff: Counterpoint | Bottom staff: Cantus Firmus
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {hasNotes ? (
-          <div
-            ref={notationRef}
-            data-testid="notation-container"
-            className="p-4 bg-background rounded overflow-auto min-h-[200px]"
-          />
-        ) : (
-          <div className="p-8 text-center text-muted-foreground">
-            <p>No notes yet. Start by selecting a mode and adding notes with the piano.</p>
-          </div>
-        )}
-
-        {/* Harmonic Intervals */}
-        <div className="border-t pt-4">
-          <h3 className="text-sm font-medium mb-2">Harmonic Intervals</h3>
-          {hasIntervals ? (
-            <div className="space-y-2">
-              <div className="flex flex-wrap gap-2">
-                {intervals.map((interval, index) => (
-                  <div
-                    key={index}
-                    className="inline-flex items-center px-3 py-2 rounded-md bg-primary/10 text-primary border border-primary/20"
-                    data-testid={`interval-${String(index)}`}
-                  >
-                    <span className="text-sm font-medium">{interval}</span>
-                  </div>
-                ))}
-              </div>
-              {intervals.length < minLength && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  💡 Add more notes to both lines to calculate additional intervals
-                </p>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No intervals calculated yet. Add notes to both lines and click &quot;Calculate
-              Intervals&quot;.
-            </p>
-          )}
+      {hasNotes ? (
+        <div
+          ref={notationRef}
+          data-testid="notation-container"
+          className="p-4 bg-background rounded overflow-auto min-h-[200px]"
+        />
+      ) : (
+        <div className="p-8 text-center text-muted-foreground">
+          <p>No notes yet. Start by selecting a mode and adding notes with the piano.</p>
         </div>
-      </CardContent>
+      )}
     </Card>
   );
 };
