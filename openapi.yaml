@@ -571,6 +571,39 @@ paths:
         "400":
           $ref: "#/components/responses/BadRequest"
 
+  /counterpoint/evaluate:
+    post:
+      summary: Evaluate counterpoint
+      description: Evaluates a counterpoint line against a cantus firmus, automatically detecting the species and checking for rule violations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateCounterpointRequest"
+      responses:
+        "200":
+          description: Counterpoint evaluation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateCounterpointResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "unauthorized"
+                  message:
+                    type: string
+                    example: "Missing API key"
+
 components:
   parameters:
     PitchParam:
@@ -993,3 +1026,85 @@ components:
           type: string
           description: The vertical fret notation
           example: "0\n2\n3"
+
+    EvaluateCounterpointRequest:
+      type: object
+      required:
+        - cantus_firmus
+        - counterpoint
+      properties:
+        cantus_firmus:
+          type: array
+          items:
+            type: string
+          description: The cantus firmus (fixed melody) as an array of pitch strings
+          example: ["C4", "D4", "E4"]
+        counterpoint:
+          type: array
+          items:
+            type: string
+          description: The counterpoint line to evaluate as an array of pitch strings
+          example: ["E4", "F4", "G4"]
+
+    EvaluateCounterpointResponse:
+      type: object
+      required:
+        - species
+        - is_valid
+        - error_count
+        - warning_count
+        - violations
+      properties:
+        species:
+          type: string
+          description: The detected counterpoint species
+          example: "First"
+          enum: [First, Second, Third, Fourth, Fifth]
+        is_valid:
+          type: boolean
+          description: Whether the counterpoint is valid (no errors)
+          example: true
+        error_count:
+          type: integer
+          description: Number of error-level violations
+          example: 0
+        warning_count:
+          type: integer
+          description: Number of warning-level violations
+          example: 0
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ViolationDto"
+          description: List of all violations found
+
+    ViolationDto:
+      type: object
+      required:
+        - severity
+        - rule
+        - description
+      properties:
+        severity:
+          type: string
+          description: The severity level of the violation
+          example: "Error"
+          enum: [Error, Warning]
+        rule:
+          type: string
+          description: The name of the counterpoint rule that was violated
+          example: "DissonantInterval"
+        position:
+          type: integer
+          nullable: true
+          description: The position in the line where the violation occurs (if applicable)
+          example: 2
+        description:
+          type: string
+          description: A human-readable description of the violation
+          example: "Dissonant interval (MinorSecond) between C4 and D4"
+        suggestion:
+          type: string
+          nullable: true
+          description: An optional suggestion for fixing the violation
+          example: "Replace with a consonant interval (unison, third, fifth, sixth, or octave)"
