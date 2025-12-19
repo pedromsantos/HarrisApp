@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-bind */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import React, { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -84,7 +86,7 @@ const InstructionsExplorer: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Error Display */}
-        {error && (
+        {error !== null && error !== '' && (
           <Card className="border-destructive">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
@@ -138,7 +140,7 @@ const InstructionsExplorer: React.FC = () => {
                     key={position}
                     variant={guitarPosition === position ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setGuitarPosition(position)}
+                    onClick={() => { setGuitarPosition(position); }}
                     disabled={isLoading}
                   >
                     {position}

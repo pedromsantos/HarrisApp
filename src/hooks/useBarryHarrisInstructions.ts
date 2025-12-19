@@ -3,8 +3,8 @@ import { useCallback, useState } from 'react';
 import {
   GenerateInstructionsRequest,
   InstructionsResponse,
-  MaterializeInstructionsRequest,
   MaterializedLinesResponse,
+  MaterializeInstructionsRequest,
 } from '@/types/barryHarrisInstructions';
 
 // Use proxy server in development, Cloudflare Worker in production
@@ -59,9 +59,9 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
       }
       const response = data as { transitions?: unknown; metadata?: unknown };
       if (
-        !response.transitions ||
+        response.transitions === undefined ||
         !Array.isArray(response.transitions) ||
-        !response.metadata
+        response.metadata === undefined
       ) {
         throw new Error('Invalid response format: missing transitions or metadata');
       }
@@ -76,7 +76,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
         throw new Error('Invalid response format: not an object');
       }
       const response = data as { lines?: unknown };
-      if (!response.lines || !Array.isArray(response.lines)) {
+      if (response.lines === undefined || !Array.isArray(response.lines)) {
         throw new Error('Invalid response format: missing lines');
       }
       return true;

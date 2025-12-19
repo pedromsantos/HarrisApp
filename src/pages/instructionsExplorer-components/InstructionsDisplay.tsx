@@ -1,4 +1,6 @@
-import React, { useState, useMemo } from 'react';
+/* eslint-disable react/jsx-no-bind */
+/* eslint-disable react/no-array-index-key */
+import React, { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +35,7 @@ const InstructionsDisplay: React.FC<InstructionsDisplayProps> = ({
 
   const getFilteredPaths = (transitionIndex: number) => {
     const transition = instructions.transitions[transitionIndex];
+    if (!transition) return [];
     let filtered = transition.possible_paths;
 
     // Filter by target degree
@@ -55,7 +58,7 @@ const InstructionsDisplay: React.FC<InstructionsDisplayProps> = ({
 
   const getPagedPaths = (transitionIndex: number) => {
     const filtered = getFilteredPaths(transitionIndex);
-    const page = currentPages[transitionIndex] || 0;
+    const page = currentPages[transitionIndex] ?? 0;
     const start = page * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
     return {
@@ -187,7 +190,7 @@ const InstructionsDisplay: React.FC<InstructionsDisplayProps> = ({
                     transitionIndex={transitionIndex}
                     isSelected={isPathSelected(transitionIndex, path.path_id)}
                     onToggleSelection={() =>
-                      onTogglePathSelection(transitionIndex, path.path_id, path.instruction)
+                      { onTogglePathSelection(transitionIndex, path.path_id, path.instruction); }
                     }
                   />
                 ))}
@@ -200,7 +203,7 @@ const InstructionsDisplay: React.FC<InstructionsDisplayProps> = ({
                     variant="outline"
                     size="sm"
                     disabled={currentPage === 0}
-                    onClick={() => handlePageChange(transitionIndex, currentPage - 1)}
+                    onClick={() => { handlePageChange(transitionIndex, currentPage - 1); }}
                   >
                     Previous
                   </Button>
@@ -211,7 +214,7 @@ const InstructionsDisplay: React.FC<InstructionsDisplayProps> = ({
                     variant="outline"
                     size="sm"
                     disabled={currentPage >= totalPages - 1}
-                    onClick={() => handlePageChange(transitionIndex, currentPage + 1)}
+                    onClick={() => { handlePageChange(transitionIndex, currentPage + 1); }}
                   >
                     Next
                   </Button>

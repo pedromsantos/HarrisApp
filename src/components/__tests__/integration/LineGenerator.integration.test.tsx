@@ -75,7 +75,7 @@ describe('LineGenerator Integration', () => {
   };
 
   const getPatternText = (element: HTMLElement): string => {
-    return element.textContent ?? '';
+    return element.textContent || '';
   };
 
   const clickElement = async (
@@ -116,7 +116,7 @@ describe('LineGenerator Integration', () => {
   const getSelectedPatterns = (): HTMLElement[] => {
     const selectedPatternsSection = getSelectedPatternsSection();
     // If there are no patterns selected, the section will contain a message
-    const text = selectedPatternsSection.textContent ?? '';
+    const text = selectedPatternsSection.textContent || '';
     if (text.includes('No patterns selected')) {
       return [];
     }

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 import React, { useEffect, useRef } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +29,7 @@ const MaterializedResults: React.FC<MaterializedResultsProps> = ({ materializedL
   }, []);
 
   useEffect(() => {
-    if (abcjsRef.current && materializedLines) {
+    if (abcjsRef.current !== null) {
       const abcjs = abcjsRef.current;
       materializedLines.lines.forEach((line, index) => {
         const el = notationRefs.current[index];
@@ -87,7 +88,7 @@ const MaterializedResults: React.FC<MaterializedResultsProps> = ({ materializedL
 
               {/* ABC notation rendering */}
               <div
-                ref={(el) => handleNotationRef(el, index)}
+                ref={(el) => { handleNotationRef(el, index); }}
                 data-testid={`notation-container-${String(index)}`}
                 className="p-2 mb-1 bg-background rounded overflow-auto"
               />

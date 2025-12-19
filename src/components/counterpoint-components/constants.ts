@@ -1,0 +1,4 @@
+export const DEFAULT_EXAMPLE = {
+  cantusFirmus: ['C4', 'D4', 'E4', 'F4', 'E4', 'D4', 'C4'],
+  counterpoint: ['E4', 'F4', 'G4', 'A4', 'G4', 'F4', 'E4'],
+};
