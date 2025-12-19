@@ -14,7 +14,18 @@ import {
   PathSelection,
 } from '@/types/barryHarrisInstructions';
 
-const GUITAR_POSITIONS: GuitarPosition[] = ['Open', 'C', 'A', 'G', 'E', 'D', 'C8', 'A8', 'G8', 'E8'];
+const GUITAR_POSITIONS: GuitarPosition[] = [
+  'Open',
+  'C',
+  'A',
+  'G',
+  'E',
+  'D',
+  'C8',
+  'A8',
+  'G8',
+  'E8',
+];
 
 const InstructionsExplorer: React.FC = () => {
   const [chords, setChords] = useState<string[]>(['Dm7', 'G7', 'CMaj7']);
@@ -76,9 +87,7 @@ const InstructionsExplorer: React.FC = () => {
   };
 
   const isPathSelected = (transitionIndex: number, pathId: string): boolean => {
-    return selectedPaths.some(
-      (s) => s.transitionIndex === transitionIndex && s.pathId === pathId
-    );
+    return selectedPaths.some((s) => s.transitionIndex === transitionIndex && s.pathId === pathId);
   };
 
   return (
@@ -104,12 +113,7 @@ const InstructionsExplorer: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-destructive">{error}</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-2"
-                    onClick={clearError}
-                  >
+                  <Button variant="outline" size="sm" className="mt-2" onClick={clearError}>
                     Dismiss
                   </Button>
                 </div>
@@ -123,8 +127,8 @@ const InstructionsExplorer: React.FC = () => {
           <CardHeader>
             <CardTitle>Instructions Explorer</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Generate all possible Barry Harris line paths for your chord progression, then
-              explore and select your favorites to materialize.
+              Generate all possible Barry Harris line paths for your chord progression, then explore
+              and select your favorites to materialize.
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -139,7 +143,9 @@ const InstructionsExplorer: React.FC = () => {
                     key={position}
                     variant={guitarPosition === position ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => { setGuitarPosition(position); }}
+                    onClick={() => {
+                      setGuitarPosition(position);
+                    }}
                     disabled={isLoading}
                   >
                     {position}
@@ -147,7 +153,8 @@ const InstructionsExplorer: React.FC = () => {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground">
-                Select the fretboard position where you want to play. The API will find the best CAGED shapes for that position.
+                Select the fretboard position where you want to play. The API will find the best
+                CAGED shapes for that position.
               </p>
             </div>
 
@@ -211,11 +218,7 @@ const InstructionsExplorer: React.FC = () => {
                         Select one path per chord transition, then materialize to see the results
                       </p>
                     </div>
-                    <Button
-                      onClick={handleMaterializeSelected}
-                      disabled={isLoading}
-                      size="lg"
-                    >
+                    <Button onClick={handleMaterializeSelected} disabled={isLoading} size="lg">
                       {isLoading ? 'Materializing...' : 'Materialize Selected Paths'}
                     </Button>
                   </div>
@@ -226,9 +229,7 @@ const InstructionsExplorer: React.FC = () => {
         )}
 
         {/* Materialized Results */}
-        {materializedLines && (
-          <MaterializedResults materializedLines={materializedLines} />
-        )}
+        {materializedLines && <MaterializedResults materializedLines={materializedLines} />}
       </div>
     </div>
   );
