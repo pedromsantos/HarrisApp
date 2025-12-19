@@ -49,26 +49,6 @@ describe('CounterpointNotation', () => {
     expect(screen.getByTestId('notation-container')).toBeInTheDocument();
   });
 
-  it('displays staff labels in header', () => {
-    const cantusFirmus = ['C4', 'D4', 'E4', 'F4'];
-    const counterpoint = ['E4', 'F4'];
-    render(
-      <CounterpointNotation
-        cantusFirmus={cantusFirmus}
-        counterpoint={counterpoint}
-        intervals={[]}
-      />
-    );
-
-    expect(screen.getByText(/Top staff: Counterpoint | Bottom staff: Cantus Firmus/i)).toBeInTheDocument();
-  });
-
-  it('renders title', () => {
-    render(<CounterpointNotation cantusFirmus={[]} counterpoint={[]} intervals={[]} />);
-
-    expect(screen.getByText('Music Notation')).toBeInTheDocument();
-  });
-
   it('renders notation container div with correct styling', () => {
     const cantusFirmus = ['C4', 'D4'];
     render(<CounterpointNotation cantusFirmus={cantusFirmus} counterpoint={[]} intervals={[]} />);

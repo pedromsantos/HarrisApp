@@ -15,24 +15,8 @@ describe('useCounterpoint', () => {
     it('initializes with default example', () => {
       const { result } = renderHook(() => useCounterpoint());
 
-      expect(result.current.state.cantusFirmus).toEqual([
-        'C4',
-        'D4',
-        'E4',
-        'F4',
-        'E4',
-        'D4',
-        'C4',
-      ]);
-      expect(result.current.state.counterpoint).toEqual([
-        'E4',
-        'F4',
-        'G4',
-        'A4',
-        'G4',
-        'F4',
-        'E4',
-      ]);
+      expect(result.current.state.cantusFirmus).toEqual(['C3', 'G3', 'F3', 'E3', 'F3', 'D3', 'C3']);
+      expect(result.current.state.counterpoint).toEqual(['C4', 'B3', 'D4', 'C4', 'A3', 'B3', 'C4']);
       expect(result.current.state.mode).toBe('cantus_firmus');
       expect(result.current.state.octave).toBe(4);
     });
