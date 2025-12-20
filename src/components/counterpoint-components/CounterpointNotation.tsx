@@ -84,30 +84,41 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
   return (
     <Card>
       {hasNotes ? (
-        <div className="space-y-4">
-          <div className="relative p-4 bg-background rounded overflow-auto min-h-[200px]">
-            <div ref={notationRef} data-testid="notation-container" />
-            <div className="absolute right-1 top-[40%] flex flex-col gap-2">
-              <Button
-                onClick={handleCounterpointModeClick}
-                variant={mode === 'counterpoint' ? 'default' : 'outline'}
-                size="sm"
-                data-testid="mode-counterpoint"
-              >
-                Edit
-              </Button>
-            </div>
-            <div className="absolute right-1 bottom-[18%] flex flex-col gap-2">
-              <Button
-                onClick={handleCantusFirmusModeClick}
-                variant={mode === 'cantus_firmus' ? 'default' : 'outline'}
-                size="sm"
-                data-testid="mode-cantus-firmus"
-              >
-                Edit
-              </Button>
-            </div>
-          </div>
+        <div className="p-4">
+          <table className="w-full">
+            <tbody>
+              <tr>
+                <td className="align-middle pr-4">
+                  <div ref={notationRef} data-testid="notation-container" />
+                </td>
+                <td className="align-middle w-20">
+                  <div className="flex flex-col gap-2 items-center">
+                    <span className="text-sm font-medium pt-16">Edit Score</span>
+                    <div className="inline-flex rounded-md shadow-sm" role="group">
+                      <Button
+                        onClick={handleCounterpointModeClick}
+                        variant={mode === 'counterpoint' ? 'default' : 'outline'}
+                        size="sm"
+                        className="rounded-r-none"
+                        data-testid="mode-counterpoint"
+                      >
+                        CP
+                      </Button>
+                      <Button
+                        onClick={handleCantusFirmusModeClick}
+                        variant={mode === 'cantus_firmus' ? 'default' : 'outline'}
+                        size="sm"
+                        className="rounded-l-none border-l-0"
+                        data-testid="mode-cantus-firmus"
+                      >
+                        CF
+                      </Button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       ) : (
         <div className="p-8 text-center text-muted-foreground">
