@@ -14,7 +14,7 @@ const Navigation: React.FC = () => {
     <header className="bg-card shadow">
       <div className="max-w-7xl mx-auto py-3 px-4">
         <div className="flex justify-between items-center mb-3">
-          <h1 className="text-2xl font-bold text-card-foreground">Barry Harris Line Generator</h1>
+          <h1 className="text-2xl font-bold text-card-foreground">VibeMotif</h1>
           <div className="flex items-center gap-2">
             <span className="text-sm text-card-foreground/70 hidden md:inline">Toggle Theme</span>
             <ThemeToggle />
