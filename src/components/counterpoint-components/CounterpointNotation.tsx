@@ -170,6 +170,8 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
       const semitones = stepToSemitones(-(drag?.step ?? 0), originalNote);
       const newNote = transposeNote(originalNote, semitones);
 
+      if (!newNote || newNote === currentNote) return;
+
       targetNotes[noteIndex] = newNote;
       onNotesChange?.(targetNotes, targetMode);
 
