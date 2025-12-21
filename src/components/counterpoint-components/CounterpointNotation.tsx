@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useAbcNotation } from '@/hooks/useAbcNotation';
 import { convertToCounterpointABC } from '@/lib/counterpointNotation';
 import { CounterpointMode } from '@/types/counterpoint';
 
@@ -13,6 +14,7 @@ export interface CounterpointNotationProps {
   intervals: string[];
   mode: CounterpointMode;
   onModeChange: (mode: CounterpointMode) => void;
+  onNotesChange?: (notes: string[], mode: CounterpointMode) => void;
 }
 
 export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
@@ -21,9 +23,20 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
   intervals,
   mode,
   onModeChange,
+  onNotesChange,
 }) => {
   const notationRef = useRef<HTMLDivElement | null>(null);
   const abcjsRef = useRef<typeof import('abcjs') | null>(null);
+  const { transposeNote, stepToSemitones } = useAbcNotation();
+  const [abcString, setAbcString] = useState('');
+
+  const dragStateRef = useRef<{
+    mode: CounterpointMode | null;
+    index: number;
+    originalNote: string;
+  } | null>(null);
+
+  const dragResetTimerRef = useRef<number | null>(null);
 
   const handleCounterpointModeClick = useCallback(() => {
     onModeChange('counterpoint');
@@ -33,20 +46,178 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
     onModeChange('cantus_firmus');
   }, [onModeChange]);
 
+  const calculateNoteIndex = useCallback((voiceContent: string, notePosition: number): number => {
+    const rawSegments = voiceContent.split('|');
+    let currentPos = 0;
+    let validNoteCount = 0;
+
+    for (let i = 0; i < rawSegments.length; i++) {
+      const segment = rawSegments[i];
+      if (segment === undefined) continue;
+
+      const segmentEnd = currentPos + segment.length;
+      const hasContent = segment.trim() !== '';
+
+      if (notePosition >= currentPos && notePosition < segmentEnd) {
+        return hasContent ? validNoteCount : -1;
+      }
+
+      if (hasContent) {
+        validNoteCount++;
+      }
+
+      currentPos = segmentEnd + 1; // +1 for the | character
+    }
+
+    return -1;
+  }, []);
+
+  const clickListener = useCallback(
+    (
+      abcelem: unknown,
+      _tuneNumber: number,
+      _classes: string,
+      _analysis: unknown,
+      drag: { step?: number; index?: number } | undefined
+    ) => {
+      if (drag?.step === undefined || drag.step === 0 || !onNotesChange) {
+        return;
+      }
+
+      const elem = abcelem as {
+        startChar?: number;
+        endChar?: number;
+        elemType?: string;
+        pitches?: Array<{ verticalPos?: number }>;
+        abcelem?: { el_type?: string };
+      };
+
+      const lines = abcString.split('\n');
+      const cpLineIndex = lines.findIndex((line) => line.startsWith('[V:1]'));
+      const cfLineIndex = lines.findIndex((line) => line.startsWith('[V:2]'));
+
+      if (cpLineIndex === -1 || cfLineIndex === -1 || elem.startChar === undefined) {
+        return;
+      }
+
+      const startChar = elem.startChar;
+      const cpLine = lines[cpLineIndex];
+      const cfLine = lines[cfLineIndex];
+
+      if (cpLine === undefined || cfLine === undefined) {
+        return;
+      }
+
+      const cpLineStart = abcString.indexOf(cpLine);
+      const cfLineStart = abcString.indexOf(cfLine);
+
+      let targetMode: CounterpointMode;
+      let targetNotes: string[];
+      let voiceLine: string;
+      let voiceLineStart: number;
+
+      if (startChar >= cpLineStart && startChar < cfLineStart) {
+        targetMode = 'counterpoint';
+        targetNotes = [...counterpoint];
+        voiceLine = cpLine;
+        voiceLineStart = cpLineStart;
+      } else {
+        // Cantus Firmus voice
+        targetMode = 'cantus_firmus';
+        targetNotes = [...cantusFirmus];
+        voiceLine = cfLine;
+        voiceLineStart = cfLineStart;
+      }
+
+      const voiceContent = voiceLine.replace(/^\[V:\d\]\s*/, '');
+      const prefixLength = voiceLine.length - voiceContent.length;
+      const positionInLine = startChar - voiceLineStart;
+      const notePosition = Math.max(0, positionInLine - prefixLength);
+
+      const noteIndex = calculateNoteIndex(voiceContent, notePosition);
+
+      if (noteIndex === -1 || noteIndex >= targetNotes.length) {
+        return;
+      }
+
+      const currentNote = targetNotes[noteIndex];
+      if (currentNote === undefined) {
+        return;
+      }
+
+      const current = dragStateRef.current;
+
+      const isNewDrag = current?.mode !== targetMode || current.index !== noteIndex;
+
+      if (isNewDrag) {
+        dragStateRef.current = {
+          mode: targetMode,
+          index: noteIndex,
+          originalNote: currentNote,
+        };
+      }
+
+      if (dragStateRef.current === null) {
+        return;
+      }
+
+      const originalNote = dragStateRef.current.originalNote;
+
+      const semitones = stepToSemitones(-drag.step, originalNote);
+      const newNote = transposeNote(originalNote, semitones);
+
+      targetNotes[noteIndex] = newNote;
+
+      onNotesChange(targetNotes, targetMode);
+
+      if (dragResetTimerRef.current !== null) {
+        window.clearTimeout(dragResetTimerRef.current);
+      }
+      dragResetTimerRef.current = window.setTimeout(() => {
+        dragStateRef.current = null;
+        dragResetTimerRef.current = null;
+      }, 200);
+    },
+    [
+      abcString,
+      counterpoint,
+      cantusFirmus,
+      onNotesChange,
+      transposeNote,
+      stepToSemitones,
+      calculateNoteIndex,
+    ]
+  );
+
+  useEffect(() => {
+    const abcNotation = convertToCounterpointABC(cantusFirmus, counterpoint, intervals);
+    setAbcString(abcNotation);
+  }, [cantusFirmus, counterpoint, intervals]);
+
+  useEffect(() => {
+    return () => {
+      if (dragResetTimerRef.current !== null) {
+        window.clearTimeout(dragResetTimerRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const loadAbcjs = async () => {
       try {
         const abcjs = await preloadABCJS();
         abcjsRef.current = abcjs;
 
-        // Trigger initial render after abcjs loads
         if (notationRef.current !== null) {
           try {
-            const abcNotation = convertToCounterpointABC(cantusFirmus, counterpoint, intervals);
-            abcjs.renderAbc(notationRef.current, abcNotation, {
+            abcjs.renderAbc(notationRef.current, abcString, {
               responsive: 'resize',
               add_classes: true,
               staffwidth: 700,
+              clickListener: onNotesChange ? clickListener : undefined,
+              dragging: onNotesChange !== undefined,
+              selectionColor: '#3b82f6',
+              dragColor: '#10b981',
             });
           } catch {
             // Silently handle rendering errors
@@ -62,22 +233,25 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
   }, []);
 
   useEffect(() => {
-    if (abcjsRef.current !== null && notationRef.current !== null) {
+    if (abcjsRef.current !== null && notationRef.current !== null && abcString !== '') {
       const abcjs = abcjsRef.current;
       const el = notationRef.current;
 
       try {
-        const abcNotation = convertToCounterpointABC(cantusFirmus, counterpoint, intervals);
-        abcjs.renderAbc(el, abcNotation, {
+        abcjs.renderAbc(el, abcString, {
           responsive: 'resize',
           add_classes: true,
           staffwidth: 700,
+          clickListener: onNotesChange ? clickListener : undefined,
+          dragging: onNotesChange !== undefined,
+          selectionColor: '#3b82f6',
+          dragColor: '#10b981',
         });
       } catch {
         // Silently handle rendering errors
       }
     }
-  }, [cantusFirmus, counterpoint, intervals]);
+  }, [abcString, clickListener, onNotesChange]);
 
   const hasNotes = cantusFirmus.length > 0 || counterpoint.length > 0;
 

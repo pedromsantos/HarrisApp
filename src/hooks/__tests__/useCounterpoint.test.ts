@@ -87,6 +87,53 @@ describe('useCounterpoint', () => {
       expect(result.current.state.counterpoint.length).toBe(initialLength - 1);
     });
 
+    it('updates cantus firmus notes when mode is cantus_firmus', () => {
+      const { result } = renderHook(() => useCounterpoint());
+
+      const newNotes = ['C4', 'D4', 'E4', 'F4'];
+
+      act(() => {
+        result.current.updateNotes(newNotes, 'cantus_firmus');
+      });
+
+      expect(result.current.state.cantusFirmus).toEqual(newNotes);
+    });
+
+    it('updates counterpoint notes when mode is counterpoint', () => {
+      const { result } = renderHook(() => useCounterpoint());
+
+      const newNotes = ['G4', 'A4', 'B4', 'C5'];
+
+      act(() => {
+        result.current.updateNotes(newNotes, 'counterpoint');
+      });
+
+      expect(result.current.state.counterpoint).toEqual(newNotes);
+    });
+
+    it('clears validation when updating notes', () => {
+      const { result } = renderHook(() => useCounterpoint());
+
+      // Manually set validation
+      act(() => {
+        result.current.state.validation = {
+          species: 'First',
+          isValid: true,
+          errorCount: 0,
+          warningCount: 0,
+          violations: [],
+        };
+      });
+
+      expect(result.current.state.validation).not.toBeNull();
+
+      act(() => {
+        result.current.updateNotes(['C4', 'D4'], 'cantus_firmus');
+      });
+
+      expect(result.current.state.validation).toBeNull();
+    });
+
     it('clears validation when adding a note', () => {
       const { result } = renderHook(() => useCounterpoint());
 

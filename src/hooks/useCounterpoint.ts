@@ -25,6 +25,7 @@ type UseCounterpointReturn = {
   state: CounterpointState;
   addNote: (note: string) => void;
   undoNote: () => void;
+  updateNotes: (notes: string[], mode: CounterpointMode) => void;
   setMode: (mode: CounterpointMode) => void;
   setOctave: (octave: number) => void;
   clearCurrentLine: () => void;
@@ -82,6 +83,24 @@ export function useCounterpoint(): UseCounterpointReturn {
         return {
           ...prev,
           counterpoint: prev.counterpoint.slice(0, -1),
+          validation: null,
+        };
+      }
+    });
+  }, []);
+
+  const updateNotes = useCallback((notes: string[], mode: CounterpointMode) => {
+    setState((prev) => {
+      if (mode === 'cantus_firmus') {
+        return {
+          ...prev,
+          cantusFirmus: notes,
+          validation: null,
+        };
+      } else {
+        return {
+          ...prev,
+          counterpoint: notes,
           validation: null,
         };
       }
@@ -277,6 +296,7 @@ K:C
     state,
     addNote,
     undoNote,
+    updateNotes,
     setMode,
     setOctave,
     clearCurrentLine,

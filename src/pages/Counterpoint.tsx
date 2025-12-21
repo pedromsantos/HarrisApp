@@ -13,6 +13,7 @@ const Counterpoint: React.FC = () => {
     state,
     addNote,
     undoNote,
+    updateNotes,
     setMode,
     setOctave,
     clearCurrentLine,
@@ -59,6 +60,7 @@ const Counterpoint: React.FC = () => {
           intervals={state.intervals}
           mode={state.mode}
           onModeChange={setMode}
+          onNotesChange={updateNotes}
         />
 
         {/* Validation Actions */}

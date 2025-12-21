@@ -106,7 +106,6 @@ async function handleApiProxy(request: Request, env: Env): Promise<Response> {
       },
     });
   } catch (error) {
-    console.error('Error proxying request:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: {
