@@ -29,6 +29,7 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
   const abcjsRef = useRef<typeof import('abcjs') | null>(null);
   const { transposeNote, stepToSemitones, calculateNoteIndex } = useAbcNotation();
   const [abcString, setAbcString] = useState('');
+  const [selectedNote, setSelectedNote] = useState<string | null>(null);
 
   const dragStateRef = useRef<{
     mode: CounterpointMode | null;
@@ -111,8 +112,50 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
     dragResetTimerRef.current = window.setTimeout(() => {
       dragStateRef.current = null;
       dragResetTimerRef.current = null;
-    }, 200);
+      setSelectedNote(null);
+    }, 3000); // Keep selection visible for 3 seconds
   }, []);
+
+  const processNoteSelection = useCallback(
+    (targetMode: CounterpointMode, noteIndex: number, targetNotes: string[]) => {
+      const currentNote = targetNotes[noteIndex];
+      if (currentNote === undefined) return null;
+
+      updateDragState(targetMode, noteIndex, currentNote);
+
+      if (dragStateRef.current === null) return null;
+
+      // Show selected note
+      setSelectedNote(currentNote);
+
+      return { currentNote, targetNotes };
+    },
+    [updateDragState]
+  );
+
+  const processNoteDrag = useCallback(
+    (
+      isDragging: boolean,
+      drag: { step?: number; index?: number } | undefined,
+      currentNote: string,
+      targetNotes: string[],
+      targetMode: CounterpointMode,
+      noteIndex: number
+    ) => {
+      if (!isDragging || !dragStateRef.current || !drag) return;
+
+      const originalNote = dragStateRef.current.originalNote;
+      const semitones = stepToSemitones(-(drag.step ?? 0), originalNote);
+      const newNote = transposeNote(originalNote, semitones);
+
+      if (!newNote || newNote === currentNote) return;
+
+      targetNotes[noteIndex] = newNote;
+      onNotesChange?.(targetNotes, targetMode);
+      setSelectedNote(newNote);
+    },
+    [stepToSemitones, transposeNote, onNotesChange]
+  );
 
   const clickListener = useCallback(
     (
@@ -122,7 +165,10 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
       _analysis: unknown,
       drag: { step?: number; index?: number } | undefined
     ) => {
-      if (!shouldHandleDrag(drag)) return;
+      // Handle both drag and simple clicks
+      const isDragging = drag?.step !== undefined && drag.step !== 0;
+      if (!onNotesChange) return;
+      if (isDragging && !shouldHandleDrag(drag)) return;
 
       const elem = abcelem as {
         startChar?: number;
@@ -159,21 +205,13 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
       const noteIndex = calculateNoteIndex(voiceContent, notePosition);
       if (noteIndex === -1 || noteIndex >= targetNotes.length) return;
 
-      const currentNote = targetNotes[noteIndex];
-      if (currentNote === undefined) return;
+      const selectionResult = processNoteSelection(targetMode, noteIndex, targetNotes);
+      if (!selectionResult) return;
 
-      updateDragState(targetMode, noteIndex, currentNote);
+      const { currentNote } = selectionResult;
 
-      if (dragStateRef.current === null) return;
-
-      const originalNote = dragStateRef.current.originalNote;
-      const semitones = stepToSemitones(-(drag?.step ?? 0), originalNote);
-      const newNote = transposeNote(originalNote, semitones);
-
-      if (!newNote || newNote === currentNote) return;
-
-      targetNotes[noteIndex] = newNote;
-      onNotesChange?.(targetNotes, targetMode);
+      // If dragging, transpose the note
+      processNoteDrag(isDragging, drag, currentNote, targetNotes, targetMode, noteIndex);
 
       scheduleReset();
     },
@@ -183,9 +221,8 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
       getVoiceLines,
       determineTargetVoice,
       calculateNoteIndex,
-      updateDragState,
-      stepToSemitones,
-      transposeNote,
+      processNoteSelection,
+      processNoteDrag,
       onNotesChange,
       scheduleReset,
     ]
@@ -196,13 +233,50 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
     setAbcString(abcNotation);
   }, [cantusFirmus, counterpoint, intervals]);
 
-  useEffect(() => {
-    return () => {
-      if (dragResetTimerRef.current !== null) {
-        window.clearTimeout(dragResetTimerRef.current);
-      }
-    };
+  const getKeyStep = useCallback((e: KeyboardEvent): number | null => {
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      return e.shiftKey ? 12 : 1; // Shift = octave, normal = semitone
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      return e.shiftKey ? -12 : -1;
+    }
+    return null;
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!dragStateRef.current || !onNotesChange) return;
+
+      const { mode: targetMode, index: noteIndex } = dragStateRef.current;
+      if (targetMode === null) return;
+
+      const step = getKeyStep(e);
+      if (step === null) return;
+
+      const targetNotes = targetMode === 'counterpoint' ? [...counterpoint] : [...cantusFirmus];
+      const currentNote = targetNotes[noteIndex];
+      if (currentNote === undefined || currentNote === '') return;
+
+      const newNote = transposeNote(currentNote, step);
+      if (!newNote) return;
+
+      targetNotes[noteIndex] = newNote;
+      onNotesChange(targetNotes, targetMode);
+
+      // Update drag state and selected note display
+      dragStateRef.current.originalNote = newNote;
+      setSelectedNote(newNote);
+      scheduleReset();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [counterpoint, cantusFirmus, transposeNote, onNotesChange, scheduleReset, getKeyStep]);
 
   useEffect(() => {
     const loadAbcjs = async () => {
@@ -272,7 +346,14 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
                 </td>
                 <td className="align-middle w-20">
                   <div className="flex flex-col gap-2 items-center">
-                    <span className="text-sm font-medium pt-16">Edit Score</span>
+                    {selectedNote !== null && selectedNote !== '' && (
+                      <div className="text-center mb-2">
+                        <div className="text-xs text-muted-foreground">Selected</div>
+                        <div className="text-lg font-bold text-blue-600">{selectedNote}</div>
+                        <div className="text-xs text-muted-foreground mt-1">Use ↑↓ arrows</div>
+                      </div>
+                    )}
+                    <span className="text-sm font-medium">Edit Score</span>
                     <div className="inline-flex rounded-md shadow-sm" role="group">
                       <Button
                         onClick={handleCounterpointModeClick}
