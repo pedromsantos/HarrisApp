@@ -11,7 +11,13 @@ export default defineConfig({
     testTimeout: 10000,
     hookTimeout: 10000,
     include: ['**/__tests__/**/*.{test,spec}.{ts,tsx}', '**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['node_modules', '**/node_modules/**', 'E2E/**', '**/*.perf.test.{ts,tsx}', '**/*.visual.test.{ts,tsx}'],
+    exclude: [
+      'node_modules',
+      '**/node_modules/**',
+      'E2E/**',
+      '**/*.perf.test.{ts,tsx}',
+      '**/*.visual.test.{ts,tsx}',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
