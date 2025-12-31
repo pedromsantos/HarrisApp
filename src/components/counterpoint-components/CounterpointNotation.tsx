@@ -37,7 +37,7 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
     originalNote: string;
   } | null>(null);
 
-  const dragResetTimerRef = useRef<number | null>(null);
+  const dragResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleCounterpointModeClick = useCallback(() => {
     onModeChange('counterpoint');
@@ -107,9 +107,9 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
 
   const scheduleReset = useCallback(() => {
     if (dragResetTimerRef.current !== null) {
-      window.clearTimeout(dragResetTimerRef.current);
+      globalThis.clearTimeout(dragResetTimerRef.current);
     }
-    dragResetTimerRef.current = window.setTimeout(() => {
+    dragResetTimerRef.current = globalThis.setTimeout(() => {
       dragStateRef.current = null;
       dragResetTimerRef.current = null;
       setSelectedNote(null);
@@ -271,10 +271,10 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
       scheduleReset();
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    globalThis.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      globalThis.removeEventListener('keydown', handleKeyDown);
     };
   }, [counterpoint, cantusFirmus, transposeNote, onNotesChange, scheduleReset, getKeyStep]);
 
@@ -353,27 +353,29 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
                         <div className="text-xs text-muted-foreground mt-1">Use ↑↓ arrows</div>
                       </div>
                     )}
-                    <span className="text-sm font-medium">Edit Score</span>
-                    <div className="inline-flex rounded-md shadow-sm" role="group">
-                      <Button
-                        onClick={handleCounterpointModeClick}
-                        variant={mode === 'counterpoint' ? 'default' : 'outline'}
-                        size="sm"
-                        className="rounded-r-none"
-                        data-testid="mode-counterpoint"
-                      >
-                        CP
-                      </Button>
-                      <Button
-                        onClick={handleCantusFirmusModeClick}
-                        variant={mode === 'cantus_firmus' ? 'default' : 'outline'}
-                        size="sm"
-                        className="rounded-l-none border-l-0"
-                        data-testid="mode-cantus-firmus"
-                      >
-                        CF
-                      </Button>
-                    </div>
+                    <fieldset className="inline-flex flex-col gap-2">
+                      <legend className="text-sm font-medium">Edit Score</legend>
+                      <div className="inline-flex rounded-md shadow-sm">
+                        <Button
+                          onClick={handleCounterpointModeClick}
+                          variant={mode === 'counterpoint' ? 'default' : 'outline'}
+                          size="sm"
+                          className="rounded-r-none"
+                          data-testid="mode-counterpoint"
+                        >
+                          CP
+                        </Button>
+                        <Button
+                          onClick={handleCantusFirmusModeClick}
+                          variant={mode === 'cantus_firmus' ? 'default' : 'outline'}
+                          size="sm"
+                          className="rounded-l-none border-l-0"
+                          data-testid="mode-cantus-firmus"
+                        >
+                          CF
+                        </Button>
+                      </div>
+                    </fieldset>
                   </div>
                 </td>
               </tr>
