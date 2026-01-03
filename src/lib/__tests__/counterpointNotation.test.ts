@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { getDurationFromRatio, noteToABC, convertToCounterpointABC } from '../counterpointNotation';
+import { describe, expect, it } from 'vitest';
+
+import { convertToCounterpointABC, getDurationFromRatio, noteToABC } from '../counterpointNotation';
 
 describe('getDurationFromRatio', () => {
   it('returns "1/4" for ratio less than 0.8', () => {
@@ -50,7 +51,7 @@ describe('noteToABC', () => {
 
   it('handles different note names', () => {
     const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    notes.forEach(noteName => {
+    notes.forEach((noteName) => {
       // Octave 4 produces lowercase letters
       expect(noteToABC(`${noteName}4`)).toBe(noteName.toLowerCase());
     });
@@ -73,7 +74,7 @@ describe('convertToCounterpointABC', () => {
   it('converts single note counterpoint and cantus firmus', () => {
     const cf = ['C4'];
     const cp = ['E4'];
-    
+
     const result = convertToCounterpointABC(cf, cp);
     expect(result).toContain('V:1 name="CP"');
     expect(result).toContain('V:2 name="CF"');
@@ -84,9 +85,9 @@ describe('convertToCounterpointABC', () => {
   it('adds bar lines between each note in CP line', () => {
     const cf = ['C4', 'D4', 'E4'];
     const cp = ['E4', 'F4', 'G4'];
-    
+
     const result = convertToCounterpointABC(cf, cp);
-    
+
     // Should have bar lines between notes
     expect(result).toContain('|');
     const cpLine = result.split('[V:1]')[1].split('[V:2]')[0];
@@ -97,9 +98,9 @@ describe('convertToCounterpointABC', () => {
     const cf = ['C4', 'D4'];
     const cp = ['E4', 'F4'];
     const intervals = ['M3', 'm3'];
-    
+
     const result = convertToCounterpointABC(cf, cp, intervals);
-    
+
     // Should have interval annotations
     expect(result).toContain('"_M3"');
     expect(result).toContain('"_m3"');
@@ -108,9 +109,9 @@ describe('convertToCounterpointABC', () => {
   it('handles different note durations with duration parameter', () => {
     const cf = ['C4', 'D4'];
     const cp = ['E4', 'F4'];
-    
+
     const result = convertToCounterpointABC(cf, cp);
-    
+
     // All notes should get duration '4' (whole notes)
     expect(result).toContain('c4'); // lowercase for octave 4
     expect(result).toContain('d4');
@@ -121,20 +122,20 @@ describe('convertToCounterpointABC', () => {
   it('handles mixed octaves correctly', () => {
     const cf = ['C3', 'D4', 'E5'];
     const cp = ['E3', 'F4', 'G5'];
-    
+
     const result = convertToCounterpointABC(cf, cp);
-    
+
     expect(result).toContain('C4'); // octave 3 is uppercase
-    expect(result).toContain('d4');  // octave 4 is lowercase
+    expect(result).toContain('d4'); // octave 4 is lowercase
     expect(result).toContain("e'4"); // octave 5 is lowercase with apostrophe
   });
 
   it('creates proper ABC structure with header', () => {
     const cf = ['C4'];
     const cp = ['E4'];
-    
+
     const result = convertToCounterpointABC(cf, cp);
-    
+
     expect(result).toMatch(/^X:\d+/); // starts with X: reference number
     expect(result).toContain('T:Counterpoint Exercise');
     expect(result).toContain('M:4/4'); // time signature
@@ -149,9 +150,9 @@ describe('convertToCounterpointABC', () => {
   it('handles mismatched array lengths', () => {
     const cf = ['C4'];
     const cp = ['E4', 'F4'];
-    
+
     const result = convertToCounterpointABC(cf, cp);
-    
+
     // Should handle gracefully without errors
     expect(result).toContain('V:1 name="CP"');
     expect(result).toContain('V:2 name="CF"');
@@ -160,9 +161,9 @@ describe('convertToCounterpointABC', () => {
   it('handles empty counterpoint with notes in cantus firmus', () => {
     const cf = ['C4', 'D4'];
     const cp: string[] = [];
-    
+
     const result = convertToCounterpointABC(cf, cp);
-    
+
     expect(result).toContain('c4'); // lowercase for octave 4
     expect(result).toContain('d4');
     expect(result).toContain('z4 |'); // Empty CP line
@@ -172,9 +173,9 @@ describe('convertToCounterpointABC', () => {
     const cf = ['C4', 'D4', 'E4'];
     const cp = ['E4', 'F4', 'G4'];
     const intervals = ['M3']; // Only one interval
-    
+
     const result = convertToCounterpointABC(cf, cp, intervals);
-    
+
     // Should handle gracefully
     expect(result).toContain('"_M3"');
     expect(result).toContain('V:1 name="CP"');

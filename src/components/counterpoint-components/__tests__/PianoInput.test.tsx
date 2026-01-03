@@ -183,13 +183,13 @@ describe('PianoInput', () => {
     render(<PianoInput {...mockProps} onNoteClick={onNoteClick} />);
 
     const pianoContainer = screen.getByTestId('piano-keyboard');
-    
+
     // Mouse down
     fireEvent.mouseDown(pianoContainer);
-    
+
     // Mouse up
     fireEvent.mouseUp(pianoContainer);
-    
+
     // Try to click a note
     const c4Button = screen.getByText('C4');
     fireEvent.click(c4Button);
@@ -204,13 +204,13 @@ describe('PianoInput', () => {
     render(<PianoInput {...mockProps} onNoteClick={onNoteClick} />);
 
     const pianoContainer = screen.getByTestId('piano-keyboard');
-    
+
     // Mouse down
     fireEvent.mouseDown(pianoContainer);
-    
+
     // Mouse leaves the piano container
     fireEvent.mouseLeave(pianoContainer);
-    
+
     // Try to click a note
     const c4Button = screen.getByText('C4');
     fireEvent.click(c4Button);
@@ -257,12 +257,7 @@ describe('PianoInput', () => {
 
   it('disables action buttons based on props', () => {
     render(
-      <PianoInput
-        {...mockProps}
-        canUndo={false}
-        canClearCurrent={false}
-        canClearAll={false}
-      />
+      <PianoInput {...mockProps} canUndo={false} canClearCurrent={false} canClearAll={false} />
     );
 
     expect(screen.getByTestId('undo-button')).toBeDisabled();
