@@ -1531,4 +1531,72 @@ describe('CounterpointNotation', () => {
       }
     });
   });
+
+  describe('edge cases and error paths', () => {
+    it('handles click on non-note element gracefully', () => {
+      const cantusFirmus = ['C4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+          abcjsModule={mockAbcjsModule}
+        />
+      );
+
+      if (clickListenerCallback) {
+        // Click on non-note element (e.g., bar line)
+        const mockAbcelem = {
+          startChar: 0,
+          elemType: 'bar',
+        };
+
+        act(() => {
+          clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+        });
+
+        // Should not crash or change state
+        expect(mockOnNotesChange).not.toHaveBeenCalled();
+      }
+    });
+
+    it('handles missing onNotesChange prop gracefully', () => {
+      const cantusFirmus = ['C4'];
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          abcjsModule={mockAbcjsModule}
+        />
+      );
+
+      // Should render without errors
+      expect(screen.getByTestId('notation-container')).toBeInTheDocument();
+    });
+
+    it('handles empty counterpoint and cantus firmus arrays', () => {
+      render(
+        <CounterpointNotation
+          cantusFirmus={[]}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={vi.fn()}
+          abcjsModule={mockAbcjsModule}
+        />
+      );
+
+      expect(screen.getByTestId('notation-container')).toBeInTheDocument();
+    });
+  });
 });

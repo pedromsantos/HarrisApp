@@ -454,4 +454,33 @@ describe('useCounterpoint', () => {
       expect(revokeObjectURLSpy).toHaveBeenCalled();
     });
   });
+
+  describe('error handling', () => {
+    it('handles non-Error exceptions during validation', async () => {
+      (globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValue('String error');
+
+      const { result } = renderHook(() => useCounterpoint());
+
+      await act(async () => {
+        await result.current.validate();
+      });
+
+      expect(result.current.error).toBe('An unexpected error occurred during validation');
+      expect(result.current.isValidating).toBe(false);
+    });
+
+    it('handles Error instances during validation', async () => {
+      const errorMessage = 'Network error';
+      (globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new Error(errorMessage));
+
+      const { result } = renderHook(() => useCounterpoint());
+
+      await act(async () => {
+        await result.current.validate();
+      });
+
+      expect(result.current.error).toBe(errorMessage);
+      expect(result.current.isValidating).toBe(false);
+    });
+  });
 });

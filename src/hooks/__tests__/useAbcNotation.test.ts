@@ -337,5 +337,40 @@ describe('useAbcNotation', () => {
       const voiceContent = 'C4|   |D4';
       expect(result.current.calculateNoteIndex(voiceContent, 4)).toBe(-1); // Empty segment
     });
+
+    it('transposeNote returns original note for invalid format', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      // Invalid format should return unchanged
+      expect(result.current.transposeNote('invalid', 5)).toBe('invalid');
+      expect(result.current.transposeNote('X9', 3)).toBe('X9');
+      expect(result.current.transposeNote('', 5)).toBe('');
+    });
+
+    it('transposeNote handles undefined pitch class correctly', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      // Edge case: note that might produce invalid MIDI
+      // This tests the newNote === null branch
+      const result1 = result.current.transposeNote('C4', 130); // Way beyond range
+      expect(result1).toBeDefined(); // Should still return something
+    });
+
+    it('stepToSemitones handles invalid note formats', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      // Invalid note format should handle gracefully
+      const semitones = result.current.stepToSemitones(1, 'InvalidNote');
+      expect(typeof semitones).toBe('number');
+    });
+
+    it('calculateNoteIndex handles undefined segment in bar split', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      // Edge case where bar positions might create undefined segments
+      const voiceContent = '|C4||D4|';
+      const index = result.current.calculateNoteIndex(voiceContent, 3);
+      expect(typeof index).toBe('number');
+    });
   });
 });

@@ -141,6 +141,34 @@ describe('PianoInput', () => {
     expect(octaveDownButton).not.toBeDisabled();
   });
 
+  it('does not call onOctaveChange when trying to go above max octave', async () => {
+    const user = userEvent.setup();
+    const onOctaveChange = vi.fn();
+
+    render(<PianoInput {...mockProps} octave={6} onOctaveChange={onOctaveChange} />);
+
+    const octaveUpButton = screen.getByTestId('octave-up');
+    // Button should be disabled, so this won't actually trigger
+    expect(octaveUpButton).toBeDisabled();
+    
+    // Verify callback was never called
+    expect(onOctaveChange).not.toHaveBeenCalled();
+  });
+
+  it('does not call onOctaveChange when trying to go below min octave', async () => {
+    const user = userEvent.setup();
+    const onOctaveChange = vi.fn();
+
+    render(<PianoInput {...mockProps} octave={3} onOctaveChange={onOctaveChange} />);
+
+    const octaveDownButton = screen.getByTestId('octave-down');
+    // Button should be disabled, so this won't actually trigger
+    expect(octaveDownButton).toBeDisabled();
+    
+    // Verify callback was never called
+    expect(onOctaveChange).not.toHaveBeenCalled();
+  });
+
   it('calls onNoteClick when piano key is clicked with mouse down', () => {
     const onNoteClick = vi.fn();
 

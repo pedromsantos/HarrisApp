@@ -506,15 +506,14 @@ describe('LineGenerator', () => {
         await userEvent.click(updatedItems[0]);
       });
 
-      // Add third pattern  
+      // Add third pattern
       await act(async () => {
         const updatedItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
         await userEvent.click(updatedItems[0]);
       });
 
       const selectedPatternsSection = screen.getByTestId('selected-patterns-section');
-      const firstPatternBefore = within(selectedPatternsSection)
-        .getAllByTestId(/pattern-item-/)[0];
+      const firstPatternBefore = within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[0];
       const firstPatternTextBefore = firstPatternBefore.textContent;
 
       // Move the first pattern down (should work since it's not last)
@@ -527,8 +526,7 @@ describe('LineGenerator', () => {
       });
 
       // First pattern should now be second
-      const secondPatternAfter = within(selectedPatternsSection)
-        .getAllByTestId(/pattern-item-/)[1];
+      const secondPatternAfter = within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[1];
       expect(secondPatternAfter.textContent).toBe(firstPatternTextBefore);
     });
 
@@ -556,8 +554,8 @@ describe('LineGenerator', () => {
       });
 
       const selectedPatternsSection = screen.getByTestId('selected-patterns-section');
-      const secondPatternBefore = within(selectedPatternsSection)
-        .getAllByTestId(/pattern-item-/)[1];
+      const secondPatternBefore =
+        within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[1];
       const secondPatternTextBefore = secondPatternBefore.textContent;
 
       // Move the second pattern up (should work since it's not first)
@@ -570,8 +568,7 @@ describe('LineGenerator', () => {
       });
 
       // Second pattern should now be first
-      const firstPatternAfter = within(selectedPatternsSection)
-        .getAllByTestId(/pattern-item-/)[0];
+      const firstPatternAfter = within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[0];
       expect(firstPatternAfter.textContent).toBe(secondPatternTextBefore);
     });
 
@@ -659,12 +656,12 @@ describe('LineGenerator', () => {
       // Select major option
       const options = screen.getAllByRole('option');
       const majorOption = options.find((opt) => opt.textContent?.toLowerCase().includes('major'));
-      
+
       if (majorOption) {
         await act(async () => {
           await userEvent.click(majorOption);
         });
-        
+
         // Scale type should be updated
         expect(fromScaleTypeSelect).toHaveTextContent('Major');
       }
@@ -688,13 +685,13 @@ describe('LineGenerator', () => {
       // Select a note option (D4)
       const options = screen.getAllByRole('option');
       const noteOption = options.find((opt) => opt.textContent?.includes('D'));
-      
+
       if (noteOption) {
         await act(async () => {
           await userEvent.click(noteOption);
         });
-        
-        // Note should be updated  
+
+        // Note should be updated
         expect(toNoteSelect.textContent).toContain('D');
       }
     });
@@ -715,7 +712,7 @@ describe('LineGenerator', () => {
       // Select a different position (C is a valid position in the enum)
       const positionOptions = screen.getAllByRole('option');
       const cOption = positionOptions.find((opt) => opt.textContent === 'C');
-      
+
       if (cOption) {
         await act(async () => {
           await userEvent.click(cOption);

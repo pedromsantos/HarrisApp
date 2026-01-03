@@ -152,4 +152,22 @@ describe('ScaleSelector', () => {
       );
     });
   });
+
+  it('handles empty scale string gracefully in scale type parsing', async () => {
+    const onFromScaleChange = vi.fn();
+    render(<ScaleSelector {...defaultProps} fromScale="" onFromScaleChange={onFromScaleChange} />);
+
+    // Component should still render without crashing
+    const fromSection = getScaleSection('from scale');
+    expect(fromSection).toBeInTheDocument();
+  });
+
+  it('handles malformed scale string in scale note parsing', async () => {
+    const onFromScaleChange = vi.fn();
+    // Scale with no note part should use fallback
+    render(<ScaleSelector {...defaultProps} fromScale="Major" onFromScaleChange={onFromScaleChange} />);
+
+    const fromSection = getScaleSection('from scale');
+    expect(fromSection).toBeInTheDocument();
+  });
 });
