@@ -32,6 +32,14 @@ vi.mock('react-piano', () => ({
         >
           G4
         </button>
+        <button
+          onClick={() => {
+            playNote(-1);
+          }}
+          data-testid="invalid-note"
+        >
+          Invalid
+        </button>
       </div>
     );
   },
@@ -155,5 +163,126 @@ describe('PianoInput', () => {
     expect(screen.getByTestId('undo-button')).toBeInTheDocument();
     expect(screen.getByTestId('clear-current-button')).toBeInTheDocument();
     expect(screen.getByTestId('clear-all-button')).toBeInTheDocument();
+  });
+
+  it('does not call onNoteClick when mouse is not down', () => {
+    const onNoteClick = vi.fn();
+
+    render(<PianoInput {...mockProps} onNoteClick={onNoteClick} />);
+
+    // Click the piano button without mouseDown on container
+    const c4Button = screen.getByText('C4');
+    fireEvent.click(c4Button);
+
+    expect(onNoteClick).not.toHaveBeenCalled();
+  });
+
+  it('stops registering clicks on mouseUp', () => {
+    const onNoteClick = vi.fn();
+
+    render(<PianoInput {...mockProps} onNoteClick={onNoteClick} />);
+
+    const pianoContainer = screen.getByTestId('piano-keyboard');
+    
+    // Mouse down
+    fireEvent.mouseDown(pianoContainer);
+    
+    // Mouse up
+    fireEvent.mouseUp(pianoContainer);
+    
+    // Try to click a note
+    const c4Button = screen.getByText('C4');
+    fireEvent.click(c4Button);
+
+    // Should not be called because mouse was released
+    expect(onNoteClick).not.toHaveBeenCalled();
+  });
+
+  it('stops registering clicks on mouseLeave', () => {
+    const onNoteClick = vi.fn();
+
+    render(<PianoInput {...mockProps} onNoteClick={onNoteClick} />);
+
+    const pianoContainer = screen.getByTestId('piano-keyboard');
+    
+    // Mouse down
+    fireEvent.mouseDown(pianoContainer);
+    
+    // Mouse leaves the piano container
+    fireEvent.mouseLeave(pianoContainer);
+    
+    // Try to click a note
+    const c4Button = screen.getByText('C4');
+    fireEvent.click(c4Button);
+
+    // Should not be called because mouse left the container
+    expect(onNoteClick).not.toHaveBeenCalled();
+  });
+
+  it('calls onUndo when undo button clicked', async () => {
+    const user = userEvent.setup();
+    const onUndo = vi.fn();
+
+    render(<PianoInput {...mockProps} onUndo={onUndo} />);
+
+    const undoButton = screen.getByTestId('undo-button');
+    await user.click(undoButton);
+
+    expect(onUndo).toHaveBeenCalled();
+  });
+
+  it('calls onClearCurrent when clear current button clicked', async () => {
+    const user = userEvent.setup();
+    const onClearCurrent = vi.fn();
+
+    render(<PianoInput {...mockProps} onClearCurrent={onClearCurrent} />);
+
+    const clearCurrentButton = screen.getByTestId('clear-current-button');
+    await user.click(clearCurrentButton);
+
+    expect(onClearCurrent).toHaveBeenCalled();
+  });
+
+  it('calls onClearAll when clear all button clicked', async () => {
+    const user = userEvent.setup();
+    const onClearAll = vi.fn();
+
+    render(<PianoInput {...mockProps} onClearAll={onClearAll} />);
+
+    const clearAllButton = screen.getByTestId('clear-all-button');
+    await user.click(clearAllButton);
+
+    expect(onClearAll).toHaveBeenCalled();
+  });
+
+  it('disables action buttons based on props', () => {
+    render(
+      <PianoInput
+        {...mockProps}
+        canUndo={false}
+        canClearCurrent={false}
+        canClearAll={false}
+      />
+    );
+
+    expect(screen.getByTestId('undo-button')).toBeDisabled();
+    expect(screen.getByTestId('clear-current-button')).toBeDisabled();
+    expect(screen.getByTestId('clear-all-button')).toBeDisabled();
+  });
+
+  it('handles invalid MIDI number with fallback', () => {
+    const onNoteClick = vi.fn();
+
+    render(<PianoInput {...mockProps} onNoteClick={onNoteClick} />);
+
+    const pianoContainer = screen.getByTestId('piano-keyboard');
+    fireEvent.mouseDown(pianoContainer);
+
+    // Click the invalid note button
+    const invalidButton = screen.getByTestId('invalid-note');
+    fireEvent.click(invalidButton);
+
+    // Should call with fallback 'C4'
+    expect(onNoteClick).toHaveBeenCalledWith('C4');
   });
 });

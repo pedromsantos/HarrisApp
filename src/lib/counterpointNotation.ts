@@ -39,8 +39,8 @@ V:2 name="CF" clef=treble
 `;
   }
 
-  const ratio = counterpoint.length / (cantusFirmus.length || 1);
-  const cpDuration = getDurationFromRatio(ratio);
+  // Use fixed whole note duration (4) to prevent notes from shrinking as more are added
+  const cpDuration = '4';
 
   // Convert notes to ABC notation with bar lines between each note
   const cpNotes = counterpoint.length > 0 ? counterpoint.map((n) => noteToABC(n, cpDuration)) : [];

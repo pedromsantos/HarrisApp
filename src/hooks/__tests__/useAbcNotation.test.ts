@@ -210,4 +210,132 @@ describe('useAbcNotation', () => {
       expect(result.current.stepToSemitones(-7, 'C4')).toBe(-12);
     });
   });
+
+  describe('calculateNoteIndex', () => {
+    it('calculates note index from position in first segment', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      // First segment, position should map to index 0
+      const voiceContent = 'C4|D4|E4';
+      expect(result.current.calculateNoteIndex(voiceContent, 0)).toBe(0);
+      expect(result.current.calculateNoteIndex(voiceContent, 1)).toBe(0);
+    });
+
+    it('calculates note index from position in second segment', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      const voiceContent = 'C4|D4|E4';
+      // Position after first bar (|) should map to index 1
+      expect(result.current.calculateNoteIndex(voiceContent, 3)).toBe(1);
+      expect(result.current.calculateNoteIndex(voiceContent, 4)).toBe(1);
+    });
+
+    it('calculates note index from position in third segment', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      const voiceContent = 'C4|D4|E4';
+      // Position after second bar should map to index 2
+      expect(result.current.calculateNoteIndex(voiceContent, 6)).toBe(2);
+      expect(result.current.calculateNoteIndex(voiceContent, 7)).toBe(2);
+    });
+
+    it('handles empty segments correctly', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      const voiceContent = 'C4||D4';
+      // Empty segment should return -1
+      expect(result.current.calculateNoteIndex(voiceContent, 3)).toBe(-1);
+    });
+
+    it('handles segments with whitespace', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      const voiceContent = 'C4 | D4 | E4';
+      expect(result.current.calculateNoteIndex(voiceContent, 0)).toBe(0);
+      expect(result.current.calculateNoteIndex(voiceContent, 5)).toBe(1);
+    });
+
+    it('returns -1 for position beyond content', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      const voiceContent = 'C4|D4';
+      expect(result.current.calculateNoteIndex(voiceContent, 100)).toBe(-1);
+    });
+
+    it('handles single note without bars', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      const voiceContent = 'C4';
+      expect(result.current.calculateNoteIndex(voiceContent, 0)).toBe(0);
+      expect(result.current.calculateNoteIndex(voiceContent, 1)).toBe(0);
+    });
+
+    it('handles multiple segments with varying lengths', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      const voiceContent = 'C4|D4 E4|F4';
+      expect(result.current.calculateNoteIndex(voiceContent, 0)).toBe(0); // First segment
+      expect(result.current.calculateNoteIndex(voiceContent, 3)).toBe(1); // Second segment
+      expect(result.current.calculateNoteIndex(voiceContent, 9)).toBe(2); // Third segment
+    });
+
+    it('handles position at exact bar position', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      const voiceContent = 'C4|D4|E4';
+      // Position exactly on | should return -1 (bar is not a note)
+      expect(result.current.calculateNoteIndex(voiceContent, 2)).toBe(-1);
+      expect(result.current.calculateNoteIndex(voiceContent, 5)).toBe(-1);
+    });
+  });
+
+  describe('edge cases and error handling', () => {
+    it('handles notes with multiple accidentals gracefully', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      // parseAbcNote should handle invalid cases
+      const parsed = result.current.parseAbcNote('^^c');
+      expect(parsed).toBeDefined();
+    });
+
+    it('handles empty voice content in calculateNoteIndex', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      expect(result.current.calculateNoteIndex('', 0)).toBe(-1);
+      expect(result.current.calculateNoteIndex('|||', 1)).toBe(-1);
+    });
+
+    it('transposeNote handles extreme octaves', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      // Very high octave
+      expect(result.current.transposeNote('C8', 12)).toBe('C9');
+      // Very low octave
+      expect(result.current.transposeNote('C1', -12)).toBe('C0');
+    });
+
+    it('stepToSemitones handles wrapping around octave', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      // B to C wraps to next octave
+      expect(result.current.stepToSemitones(1, 'B4')).toBe(1);
+      // More than one octave: 8 steps from C = C->D->E->F->G->A->B->C->D = 14 semitones
+      expect(result.current.stepToSemitones(8, 'C4')).toBe(14);
+    });
+
+    it('handles notes with duration modifiers in parsing', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      expect(result.current.parseAbcNote('c/2')).toEqual({ pitch: 'C', octave: 4 });
+      expect(result.current.parseAbcNote('c3/4')).toEqual({ pitch: 'C', octave: 4 });
+      expect(result.current.parseAbcNote('c16')).toEqual({ pitch: 'C', octave: 4 });
+    });
+
+    it('calculateNoteIndex handles segments with only whitespace', () => {
+      const { result } = renderHook(() => useAbcNotation());
+
+      const voiceContent = 'C4|   |D4';
+      expect(result.current.calculateNoteIndex(voiceContent, 4)).toBe(-1); // Empty segment
+    });
+  });
 });
