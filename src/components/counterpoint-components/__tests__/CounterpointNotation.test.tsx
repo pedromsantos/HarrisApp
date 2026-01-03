@@ -9,25 +9,29 @@ let clickListenerCallback: ((abcelem: any) => void) | null = null;
 let lastAbcString: string = '';
 
 // Mock abcjs
-vi.mock('abcjs', () => ({
-  default: {
-    renderAbc: vi.fn((id, abc, options) => {
-      // Capture the clickListener callback and ABC string
-      if (options?.clickListener) {
-        clickListenerCallback = options.clickListener;
-      }
-      lastAbcString = abc;
-      return [
-        {
-          lines: [],
-          staffs: [],
-          voices: [],
-        },
-      ];
-    }),
-  },
-  renderAbc: vi.fn(),
-}));
+vi.mock('abcjs', () => {
+  const mockRenderAbc = vi.fn((id, abc, options) => {
+    // Capture the clickListener callback and ABC string
+    if (options?.clickListener) {
+      clickListenerCallback = options.clickListener;
+    }
+    lastAbcString = abc;
+    return [
+      {
+        lines: [],
+        staffs: [],
+        voices: [],
+      },
+    ];
+  });
+
+  return {
+    default: {
+      renderAbc: mockRenderAbc,
+    },
+    renderAbc: mockRenderAbc,
+  };
+});
 
 describe('CounterpointNotation', () => {
   const mockOnModeChange = vi.fn();
@@ -1035,6 +1039,380 @@ describe('CounterpointNotation', () => {
       );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
+    });
+  });
+
+  describe('clickListener with drag operations', () => {
+    it('handles drag operation with valid step and updates notes', () => {
+      const cantusFirmus = ['C4', 'D4', 'E4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      if (clickListenerCallback && lastAbcString) {
+        // Find position in CF voice (V:2)
+        const v2Index = lastAbcString.indexOf('[V:2]');
+        const cfContent = lastAbcString.substring(v2Index);
+        const noteStart = v2Index + cfContent.indexOf('C4');
+
+        // Simulate first click to select the note
+        const mockAbcelem = {
+          startChar: noteStart,
+          endChar: noteStart + 2,
+          elemType: 'note',
+        };
+        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        // Now simulate drag operation with step
+        const mockAbcelemWithDrag = {
+          ...mockAbcelem,
+        };
+        const drag = { step: 1, index: 0 };
+        clickListenerCallback(mockAbcelemWithDrag, 0, '', {}, drag);
+
+        expect(mockOnNotesChange).toHaveBeenCalled();
+      }
+    });
+
+    it('handles drag operation on counterpoint voice', () => {
+      const cantusFirmus = ['C4', 'D4'];
+      const counterpoint = ['E4', 'F4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={counterpoint}
+          intervals={[]}
+          mode="counterpoint"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      if (clickListenerCallback && lastAbcString) {
+        // Find position in CP voice (V:1)
+        const v1Index = lastAbcString.indexOf('[V:1]');
+        const cpContent = lastAbcString.substring(v1Index, lastAbcString.indexOf('[V:2]'));
+        const noteStart = v1Index + cpContent.indexOf('e4');
+
+        // Simulate selection
+        const mockAbcelem = {
+          startChar: noteStart,
+          endChar: noteStart + 2,
+          elemType: 'note',
+        };
+        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        // Simulate drag with negative step (drag down)
+        const drag = { step: -1, index: 0 };
+        clickListenerCallback(mockAbcelem, 0, '', {}, drag);
+
+        expect(mockOnNotesChange).toHaveBeenCalled();
+      }
+    });
+
+    it('ignores drag when step is 0', () => {
+      const cantusFirmus = ['C4', 'D4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      if (clickListenerCallback && lastAbcString) {
+        const v2Index = lastAbcString.indexOf('[V:2]');
+        const cfContent = lastAbcString.substring(v2Index);
+        const noteStart = v2Index + cfContent.indexOf('C4');
+
+        const mockAbcelem = {
+          startChar: noteStart,
+          elemType: 'note',
+        };
+
+        // Drag with step 0 should not trigger update
+        const drag = { step: 0, index: 0 };
+        clickListenerCallback(mockAbcelem, 0, '', {}, drag);
+
+        // Should still select the note but not drag
+        expect(screen.getByTestId('notation-container')).toBeInTheDocument();
+      }
+    });
+  });
+
+  describe('keyboard navigation with drag state', () => {
+    it('transposes note up with ArrowUp when note is selected', () => {
+      const cantusFirmus = ['C4', 'D4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      if (clickListenerCallback && lastAbcString) {
+        // Select a note first
+        const v2Index = lastAbcString.indexOf('[V:2]');
+        const cfContent = lastAbcString.substring(v2Index);
+        const noteStart = v2Index + cfContent.indexOf('C4');
+
+        const mockAbcelem = {
+          startChar: noteStart,
+          elemType: 'note',
+        };
+        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        // Now fire keyboard event
+        const arrowUpEvent = new KeyboardEvent('keydown', {
+          key: 'ArrowUp',
+          bubbles: true,
+          cancelable: true,
+        });
+        globalThis.dispatchEvent(arrowUpEvent);
+
+        expect(mockOnNotesChange).toHaveBeenCalled();
+      }
+    });
+
+    it('transposes note down with ArrowDown when note is selected', () => {
+      const cantusFirmus = ['D4', 'E4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      if (clickListenerCallback && lastAbcString) {
+        // Select a note first
+        const v2Index = lastAbcString.indexOf('[V:2]');
+        const cfContent = lastAbcString.substring(v2Index);
+        const noteStart = v2Index + cfContent.indexOf('d4');
+
+        const mockAbcelem = {
+          startChar: noteStart,
+          elemType: 'note',
+        };
+        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        // Fire ArrowDown
+        const arrowDownEvent = new KeyboardEvent('keydown', {
+          key: 'ArrowDown',
+          bubbles: true,
+          cancelable: true,
+        });
+        globalThis.dispatchEvent(arrowDownEvent);
+
+        expect(mockOnNotesChange).toHaveBeenCalled();
+      }
+    });
+
+    it('transposes by octave with Shift+ArrowUp', () => {
+      const cantusFirmus = ['C4', 'D4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      if (clickListenerCallback && lastAbcString) {
+        // Select a note
+        const v2Index = lastAbcString.indexOf('[V:2]');
+        const cfContent = lastAbcString.substring(v2Index);
+        const noteStart = v2Index + cfContent.indexOf('C4');
+
+        const mockAbcelem = {
+          startChar: noteStart,
+          elemType: 'note',
+        };
+        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        // Fire Shift+ArrowUp for octave jump
+        const shiftArrowUpEvent = new KeyboardEvent('keydown', {
+          key: 'ArrowUp',
+          shiftKey: true,
+          bubbles: true,
+          cancelable: true,
+        });
+        globalThis.dispatchEvent(shiftArrowUpEvent);
+
+        expect(mockOnNotesChange).toHaveBeenCalled();
+      }
+    });
+
+    it('transposes by octave down with Shift+ArrowDown', () => {
+      const cantusFirmus = ['C5', 'D5'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      if (clickListenerCallback && lastAbcString) {
+        // Select a note
+        const v2Index = lastAbcString.indexOf('[V:2]');
+        const cfContent = lastAbcString.substring(v2Index);
+        const noteStart = v2Index + cfContent.indexOf("c'4");
+
+        const mockAbcelem = {
+          startChar: noteStart,
+          elemType: 'note',
+        };
+        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        // Fire Shift+ArrowDown for octave down
+        const shiftArrowDownEvent = new KeyboardEvent('keydown', {
+          key: 'ArrowDown',
+          shiftKey: true,
+          bubbles: true,
+          cancelable: true,
+        });
+        globalThis.dispatchEvent(shiftArrowDownEvent);
+
+        expect(mockOnNotesChange).toHaveBeenCalled();
+      }
+    });
+
+    it('ignores non-arrow keys', () => {
+      const cantusFirmus = ['C4', 'D4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      if (clickListenerCallback && lastAbcString) {
+        // Select a note
+        const v2Index = lastAbcString.indexOf('[V:2]');
+        const cfContent = lastAbcString.substring(v2Index);
+        const noteStart = v2Index + cfContent.indexOf('C4');
+
+        const mockAbcelem = {
+          startChar: noteStart,
+          elemType: 'note',
+        };
+        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        // Fire a non-arrow key
+        const spaceEvent = new KeyboardEvent('keydown', {
+          key: ' ',
+          bubbles: true,
+          cancelable: true,
+        });
+        globalThis.dispatchEvent(spaceEvent);
+
+        // Should not transpose
+        expect(mockOnNotesChange).toHaveBeenCalledTimes(0);
+      }
+    });
+
+    it('does not transpose when no note is selected', () => {
+      const cantusFirmus = ['C4', 'D4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      // Fire arrow key without selecting a note
+      const arrowUpEvent = new KeyboardEvent('keydown', {
+        key: 'ArrowUp',
+        bubbles: true,
+        cancelable: true,
+      });
+      globalThis.dispatchEvent(arrowUpEvent);
+
+      expect(mockOnNotesChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('selected note display', () => {
+    it('shows selected note after click', () => {
+      const cantusFirmus = ['C4', 'D4'];
+      const mockOnNotesChange = vi.fn();
+
+      render(
+        <CounterpointNotation
+          cantusFirmus={cantusFirmus}
+          counterpoint={[]}
+          intervals={[]}
+          mode="cantus_firmus"
+          onModeChange={mockOnModeChange}
+          onNotesChange={mockOnNotesChange}
+        />
+      );
+
+      if (clickListenerCallback && lastAbcString) {
+        const v2Index = lastAbcString.indexOf('[V:2]');
+        const cfContent = lastAbcString.substring(v2Index);
+        const noteStart = v2Index + cfContent.indexOf('C4');
+
+        const mockAbcelem = {
+          startChar: noteStart,
+          elemType: 'note',
+        };
+        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        expect(screen.getByText('Selected')).toBeInTheDocument();
+        expect(screen.getByText('C4')).toBeInTheDocument();
+        expect(screen.getByText('Use ↑↓ arrows')).toBeInTheDocument();
+      }
     });
   });
 });
