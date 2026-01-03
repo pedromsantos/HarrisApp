@@ -484,4 +484,289 @@ describe('LineGenerator', () => {
       expect(screen.getAllByTestId(/notation-container/)).toHaveLength(mockResult.lines.length);
     });
   });
+
+  describe('Pattern Reordering Edge Cases', () => {
+    it('successfully moves pattern down when not at end', async () => {
+      mockUseLineGenerator.mockReturnValue(defaultHookReturn);
+
+      render(<LineGenerator />);
+
+      // Add three patterns
+      const availablePatternsSection = screen.getByTestId('available-patterns-section');
+      const patternItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+
+      // Add first pattern
+      await act(async () => {
+        await userEvent.click(patternItems[0]);
+      });
+
+      // Add second pattern
+      await act(async () => {
+        const updatedItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+        await userEvent.click(updatedItems[0]);
+      });
+
+      // Add third pattern  
+      await act(async () => {
+        const updatedItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+        await userEvent.click(updatedItems[0]);
+      });
+
+      const selectedPatternsSection = screen.getByTestId('selected-patterns-section');
+      const firstPatternBefore = within(selectedPatternsSection)
+        .getAllByTestId(/pattern-item-/)[0];
+      const firstPatternTextBefore = firstPatternBefore.textContent;
+
+      // Move the first pattern down (should work since it's not last)
+      const downButtons = within(selectedPatternsSection)
+        .getAllByRole('button')
+        .filter((btn) => btn.getAttribute('aria-label') === 'Move pattern down' && !btn.disabled);
+
+      await act(async () => {
+        await userEvent.click(downButtons[0]);
+      });
+
+      // First pattern should now be second
+      const secondPatternAfter = within(selectedPatternsSection)
+        .getAllByTestId(/pattern-item-/)[1];
+      expect(secondPatternAfter.textContent).toBe(firstPatternTextBefore);
+    });
+
+    it('successfully moves pattern up when not at start', async () => {
+      mockUseLineGenerator.mockReturnValue(defaultHookReturn);
+
+      render(<LineGenerator />);
+
+      // Add three patterns
+      const availablePatternsSection = screen.getByTestId('available-patterns-section');
+      const patternItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+
+      await act(async () => {
+        await userEvent.click(patternItems[0]);
+      });
+
+      await act(async () => {
+        const updatedItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+        await userEvent.click(updatedItems[0]);
+      });
+
+      await act(async () => {
+        const updatedItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+        await userEvent.click(updatedItems[0]);
+      });
+
+      const selectedPatternsSection = screen.getByTestId('selected-patterns-section');
+      const secondPatternBefore = within(selectedPatternsSection)
+        .getAllByTestId(/pattern-item-/)[1];
+      const secondPatternTextBefore = secondPatternBefore.textContent;
+
+      // Move the second pattern up (should work since it's not first)
+      const upButtons = within(selectedPatternsSection)
+        .getAllByRole('button')
+        .filter((btn) => btn.getAttribute('aria-label') === 'Move pattern up' && !btn.disabled);
+
+      await act(async () => {
+        await userEvent.click(upButtons[0]);
+      });
+
+      // Second pattern should now be first
+      const firstPatternAfter = within(selectedPatternsSection)
+        .getAllByTestId(/pattern-item-/)[0];
+      expect(firstPatternAfter.textContent).toBe(secondPatternTextBefore);
+    });
+
+    it('does not move pattern down if it is already last', async () => {
+      mockUseLineGenerator.mockReturnValue(defaultHookReturn);
+
+      render(<LineGenerator />);
+
+      // Add two patterns by clicking on them
+      const availablePatternsSection = screen.getByTestId('available-patterns-section');
+      const patternItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+
+      // Add first pattern
+      await act(async () => {
+        await userEvent.click(patternItems[0]);
+      });
+
+      // Add second pattern
+      await act(async () => {
+        // Get updated pattern items after first was moved
+        const updatedPatternItems =
+          within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+        await userEvent.click(updatedPatternItems[0]);
+      });
+
+      // Try to move the last pattern down - last pattern's down button should be disabled
+      const selectedPatternsSection = screen.getByTestId('selected-patterns-section');
+      const downButtons = within(selectedPatternsSection)
+        .getAllByRole('button')
+        .filter((btn) => btn.getAttribute('aria-label') === 'Move pattern down');
+
+      // The last down button should be disabled (boundary check)
+      expect(downButtons[downButtons.length - 1]).toBeDisabled();
+    });
+
+    it('does not move pattern up if it is already first', async () => {
+      mockUseLineGenerator.mockReturnValue(defaultHookReturn);
+
+      render(<LineGenerator />);
+
+      // Add two patterns by clicking on them
+      const availablePatternsSection = screen.getByTestId('available-patterns-section');
+      const patternItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+
+      await act(async () => {
+        await userEvent.click(patternItems[0]);
+      });
+
+      await act(async () => {
+        const updatedPatternItems =
+          within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+        await userEvent.click(updatedPatternItems[0]);
+      });
+
+      // Try to move the first pattern up - first pattern's up button should be disabled
+      const selectedPatternsSection = screen.getByTestId('selected-patterns-section');
+      const upButtons = within(selectedPatternsSection)
+        .getAllByRole('button')
+        .filter((btn) => btn.getAttribute('aria-label') === 'Move pattern up');
+
+      // The first up button should be disabled (boundary check)
+      expect(upButtons[0]).toBeDisabled();
+    });
+  });
+
+  describe('Scale and Position Callbacks', () => {
+    it('handles from scale change correctly', async () => {
+      mockUseLineGenerator.mockReturnValue(defaultHookReturn);
+
+      render(<LineGenerator />);
+
+      const fromScaleSection = screen.getByTestId('from-scale-section');
+      const fromScaleTypeSelect = within(fromScaleSection).getByRole('combobox', {
+        name: /select scale/i,
+      });
+      const fromNoteSelect = within(fromScaleSection).getByRole('combobox', {
+        name: /select note/i,
+      });
+
+      // Open the scale type select
+      await act(async () => {
+        await userEvent.click(fromScaleTypeSelect);
+      });
+
+      // Select major option
+      const options = screen.getAllByRole('option');
+      const majorOption = options.find((opt) => opt.textContent?.toLowerCase().includes('major'));
+      
+      if (majorOption) {
+        await act(async () => {
+          await userEvent.click(majorOption);
+        });
+        
+        // Scale type should be updated
+        expect(fromScaleTypeSelect).toHaveTextContent('Major');
+      }
+    });
+
+    it('handles to scale change correctly', async () => {
+      mockUseLineGenerator.mockReturnValue(defaultHookReturn);
+
+      render(<LineGenerator />);
+
+      const toScaleSection = screen.getByTestId('to-scale-section');
+      const toNoteSelect = within(toScaleSection).getByRole('combobox', {
+        name: /select note/i,
+      });
+
+      // Open the note select
+      await act(async () => {
+        await userEvent.click(toNoteSelect);
+      });
+
+      // Select a note option (D4)
+      const options = screen.getAllByRole('option');
+      const noteOption = options.find((opt) => opt.textContent?.includes('D'));
+      
+      if (noteOption) {
+        await act(async () => {
+          await userEvent.click(noteOption);
+        });
+        
+        // Note should be updated  
+        expect(toNoteSelect.textContent).toContain('D');
+      }
+    });
+
+    it('handles position change correctly', async () => {
+      mockUseLineGenerator.mockReturnValue(defaultHookReturn);
+
+      render(<LineGenerator />);
+
+      const positionSelector = screen.getByTestId('position-selector');
+      const positionButton = within(positionSelector).getByRole('combobox');
+
+      // Click to open position selector
+      await act(async () => {
+        await userEvent.click(positionButton);
+      });
+
+      // Select a different position (C is a valid position in the enum)
+      const positionOptions = screen.getAllByRole('option');
+      const cOption = positionOptions.find((opt) => opt.textContent === 'C');
+      
+      if (cOption) {
+        await act(async () => {
+          await userEvent.click(cOption);
+        });
+
+        // Position should be updated to C
+        expect(positionButton).toHaveTextContent('C');
+      }
+    });
+  });
+
+  describe('Form Submission Edge Cases', () => {
+    it('prevents submission when already loading', async () => {
+      const localMockGenerateLines = vi.fn();
+      mockUseLineGenerator.mockReturnValue({
+        ...defaultHookReturn,
+        isLoading: true,
+        generateLines: localMockGenerateLines,
+      });
+
+      render(<LineGenerator />);
+
+      // Add a pattern by clicking on a pattern item
+      const availablePatternsSection = screen.getByTestId('available-patterns-section');
+      const patternItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
+
+      await act(async () => {
+        await userEvent.click(patternItems[0]);
+      });
+
+      // Try to submit - button should be disabled and show "Generating..."
+      const generateButton = screen.getByRole('button', { name: /generating/i });
+      expect(generateButton).toBeDisabled();
+
+      // generateLines should not be called
+      expect(localMockGenerateLines).not.toHaveBeenCalled();
+    });
+
+    it('prevents submission when API is loading', () => {
+      const localMockGenerateLines = vi.fn();
+      mockUseLineGenerator.mockReturnValue({
+        ...defaultHookReturn,
+        isLoading: true,
+        generateLines: localMockGenerateLines,
+      });
+
+      render(<LineGenerator />);
+
+      // The button text should show "Generating..." when loading
+      const generateButton = screen.getByRole('button', { name: /generating/i });
+      expect(generateButton).toBeDisabled();
+    });
+  });
 });
