@@ -15,6 +15,7 @@ export interface CounterpointNotationProps {
   mode: CounterpointMode;
   onModeChange: (mode: CounterpointMode) => void;
   onNotesChange?: (notes: string[], mode: CounterpointMode) => void;
+  abcjsModule?: typeof import('abcjs'); // Optional for testing
 }
 
 export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
@@ -24,6 +25,7 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
   mode,
   onModeChange,
   onNotesChange,
+  abcjsModule,
 }) => {
   const notationRef = useRef<HTMLDivElement | null>(null);
   const abcjsRef = useRef<typeof import('abcjs') | null>(null);
@@ -281,7 +283,8 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
   useEffect(() => {
     const loadAbcjs = async () => {
       try {
-        const abcjs = await preloadABCJS();
+        // Use injected module for testing, or dynamic import for production
+        const abcjs = abcjsModule || (await preloadABCJS());
         abcjsRef.current = abcjs;
 
         if (notationRef.current !== null) {

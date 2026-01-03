@@ -2,33 +2,38 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act } from 'react';
 
 import { CounterpointNotation } from '@/components/counterpoint-components/CounterpointNotation';
 
 let clickListenerCallback: ((abcelem: any) => void) | null = null;
 let lastAbcString: string = '';
 
-// Mock abcjs
-vi.mock('abcjs', () => {
-  const mockRenderAbc = vi.fn((id, abc, options) => {
-    // Capture the clickListener callback and ABC string
-    if (options?.clickListener) {
-      clickListenerCallback = options.clickListener;
-    }
-    lastAbcString = abc;
-    return [
-      {
-        lines: [],
-        staffs: [],
-        voices: [],
-      },
-    ];
-  });
-
-  return {
-    default: {
-      renderAbc: mockRenderAbc,
+// Create mock renderAbc function
+const mockRenderAbc = vi.fn((id, abc, options) => {
+  // Capture the clickListener callback and ABC string
+  if (options?.clickListener) {
+    clickListenerCallback = options.clickListener;
+  }
+  lastAbcString = abc;
+  return [
+    {
+      lines: [],
+      staffs: [],
+      voices: [],
     },
+  ];
+});
+
+// Create mock abcjs module to inject into component
+const mockAbcjsModule = {
+  renderAbc: mockRenderAbc,
+} as unknown as typeof import('abcjs');
+
+// Mock abcjs for dynamic imports (fallback)
+vi.mock('abcjs', () => {
+  return {
+    default: mockAbcjsModule,
     renderAbc: mockRenderAbc,
   };
 });
@@ -50,6 +55,7 @@ describe('CounterpointNotation', () => {
         intervals={[]}
         mode="cantus_firmus"
         onModeChange={mockOnModeChange}
+       abcjsModule={mockAbcjsModule}
       />
     );
 
@@ -67,6 +73,7 @@ describe('CounterpointNotation', () => {
         intervals={[]}
         mode="cantus_firmus"
         onModeChange={mockOnModeChange}
+       abcjsModule={mockAbcjsModule}
       />
     );
 
@@ -82,6 +89,7 @@ describe('CounterpointNotation', () => {
         intervals={[]}
         mode="counterpoint"
         onModeChange={mockOnModeChange}
+       abcjsModule={mockAbcjsModule}
       />
     );
 
@@ -98,6 +106,7 @@ describe('CounterpointNotation', () => {
         intervals={[]}
         mode="cantus_firmus"
         onModeChange={mockOnModeChange}
+       abcjsModule={mockAbcjsModule}
       />
     );
 
@@ -113,6 +122,7 @@ describe('CounterpointNotation', () => {
         intervals={[]}
         mode="cantus_firmus"
         onModeChange={mockOnModeChange}
+       abcjsModule={mockAbcjsModule}
       />
     );
 
@@ -131,6 +141,7 @@ describe('CounterpointNotation', () => {
         intervals={[]}
         mode="cantus_firmus"
         onModeChange={mockOnModeChange}
+       abcjsModule={mockAbcjsModule}
       />
     );
 
@@ -148,8 +159,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -166,8 +178,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -185,8 +198,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       // Note: The actual drag interaction would be triggered by abcjs
       // In a real scenario, we would simulate the drag event
@@ -203,8 +217,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('mode-counterpoint')).toBeInTheDocument();
       expect(screen.getByTestId('mode-cantus-firmus')).toBeInTheDocument();
@@ -220,8 +235,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       // When cantus_firmus mode is active
       expect(screen.getByTestId('mode-cantus-firmus')).toBeInTheDocument();
@@ -234,8 +250,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="counterpoint"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('mode-counterpoint')).toBeInTheDocument();
     });
@@ -250,8 +267,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByText('Edit Score')).toBeInTheDocument();
     });
@@ -270,8 +288,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       // Note: Testing keyboard navigation would require simulating note selection
       // and then firing keyboard events, which depends on internal state
@@ -290,8 +309,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       // Keyboard handling is tested through integration
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
@@ -309,8 +329,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.queryByText('Selected')).not.toBeInTheDocument();
     });
@@ -325,8 +346,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
 
@@ -338,8 +360,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -356,8 +379,9 @@ describe('CounterpointNotation', () => {
           intervals={intervals}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -375,8 +399,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       const cpButton = screen.getByTestId('mode-counterpoint');
       await user.click(cpButton);
@@ -395,8 +420,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="counterpoint"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       const cfButton = screen.getByTestId('mode-cantus-firmus');
       await user.click(cfButton);
@@ -418,8 +444,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={vi.fn()}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -437,8 +464,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -456,8 +484,9 @@ describe('CounterpointNotation', () => {
           mode="counterpoint"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -474,8 +503,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -492,8 +522,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       if (clickListenerCallback) {
         // Simulate clicking without valid startChar
@@ -517,8 +548,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       if (clickListenerCallback) {
         // Simulate clicking on position far beyond actual notes
@@ -543,8 +575,9 @@ describe('CounterpointNotation', () => {
           mode="counterpoint"
           onModeChange={mockOnModeChange}
           onNotesChange={vi.fn()}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -559,8 +592,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -578,8 +612,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={vi.fn()}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -596,8 +631,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -614,8 +650,9 @@ describe('CounterpointNotation', () => {
           mode="counterpoint"
           onModeChange={mockOnModeChange}
           onNotesChange={vi.fn()}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -632,8 +669,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -650,8 +688,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -670,8 +709,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={vi.fn()}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -687,8 +727,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={vi.fn()}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -705,8 +746,9 @@ describe('CounterpointNotation', () => {
           mode="counterpoint"
           onModeChange={mockOnModeChange}
           onNotesChange={vi.fn()}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -725,8 +767,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
       expect(mockOnNotesChange).not.toHaveBeenCalled();
@@ -744,8 +787,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -762,8 +806,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -780,8 +825,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       if (clickListenerCallback) {
         // Try to drag without selecting first
@@ -807,8 +853,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       if (clickListenerCallback) {
         // Select note but trigger without drag property
@@ -840,8 +887,9 @@ describe('CounterpointNotation', () => {
           mode="counterpoint"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -860,8 +908,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -878,8 +927,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -896,8 +946,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -914,8 +965,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -932,8 +984,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -950,8 +1003,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       // Don't select a note, just try to transpose
       const container = screen.getByTestId('notation-container');
@@ -971,8 +1025,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
 
@@ -983,8 +1038,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -997,8 +1053,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
 
@@ -1009,8 +1066,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
@@ -1023,8 +1081,9 @@ describe('CounterpointNotation', () => {
           intervals={[]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
 
@@ -1035,15 +1094,16 @@ describe('CounterpointNotation', () => {
           intervals={[{ interval: 3, cantusFirmus: 'C4', counterpoint: 'E4' }]}
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       expect(screen.getByTestId('notation-container')).toBeInTheDocument();
     });
   });
 
   describe('clickListener with drag operations', () => {
-    it('handles drag operation with valid step and updates notes', () => {
+    it('handles drag operation with valid step and updates notes', async () => {
       const cantusFirmus = ['C4', 'D4', 'E4'];
       const mockOnNotesChange = vi.fn();
 
@@ -1055,35 +1115,44 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
+
+      // Wait for abcjs to be initialized and callback to be set
+      await waitFor(() => {
+        expect(clickListenerCallback).not.toBeNull();
+        expect(lastAbcString).not.toBe('');
+      });
 
       if (clickListenerCallback && lastAbcString) {
         // Find position in CF voice (V:2)
         const v2Index = lastAbcString.indexOf('[V:2]');
         const cfContent = lastAbcString.substring(v2Index);
-        const noteStart = v2Index + cfContent.indexOf('C4');
+        const noteStart = v2Index + cfContent.indexOf('c4'); // ABC notation uses lowercase
 
-        // Simulate first click to select the note
         const mockAbcelem = {
           startChar: noteStart,
           endChar: noteStart + 2,
           elemType: 'note',
         };
-        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
 
-        // Now simulate drag operation with step
-        const mockAbcelemWithDrag = {
-          ...mockAbcelem,
-        };
+        // First select the note (sets dragStateRef)
+        act(() => {
+          clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+        });
+
+        // Then simulate drag with step
         const drag = { step: 1, index: 0 };
-        clickListenerCallback(mockAbcelemWithDrag, 0, '', {}, drag);
+        act(() => {
+          clickListenerCallback(mockAbcelem, 0, '', {}, drag);
+        });
 
         expect(mockOnNotesChange).toHaveBeenCalled();
       }
     });
 
-    it('handles drag operation on counterpoint voice', () => {
+    it('handles drag operation on counterpoint voice', async () => {
       const cantusFirmus = ['C4', 'D4'];
       const counterpoint = ['E4', 'F4'];
       const mockOnNotesChange = vi.fn();
@@ -1096,8 +1165,15 @@ describe('CounterpointNotation', () => {
           mode="counterpoint"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
+
+      // Wait for abcjs to be initialized and callback to be set
+      await waitFor(() => {
+        expect(clickListenerCallback).not.toBeNull();
+        expect(lastAbcString).not.toBe('');
+      });
 
       if (clickListenerCallback && lastAbcString) {
         // Find position in CP voice (V:1)
@@ -1133,8 +1209,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       if (clickListenerCallback && lastAbcString) {
         const v2Index = lastAbcString.indexOf('[V:2]');
@@ -1157,7 +1234,7 @@ describe('CounterpointNotation', () => {
   });
 
   describe('keyboard navigation with drag state', () => {
-    it('transposes note up with ArrowUp when note is selected', () => {
+    it('transposes note up with ArrowUp when note is selected', async () => {
       const cantusFirmus = ['C4', 'D4'];
       const mockOnNotesChange = vi.fn();
 
@@ -1169,20 +1246,30 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
+
+      // Wait for abcjs to be initialized and callback to be set
+      await waitFor(() => {
+        expect(clickListenerCallback).not.toBeNull();
+        expect(lastAbcString).not.toBe('');
+      });
 
       if (clickListenerCallback && lastAbcString) {
         // Select a note first
         const v2Index = lastAbcString.indexOf('[V:2]');
         const cfContent = lastAbcString.substring(v2Index);
-        const noteStart = v2Index + cfContent.indexOf('C4');
+        const noteStart = v2Index + cfContent.indexOf('c4'); // ABC notation uses lowercase
 
         const mockAbcelem = {
           startChar: noteStart,
           elemType: 'note',
         };
-        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        act(() => {
+          clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+        });
 
         // Now fire keyboard event
         const arrowUpEvent = new KeyboardEvent('keydown', {
@@ -1208,8 +1295,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       if (clickListenerCallback && lastAbcString) {
         // Select a note first
@@ -1235,7 +1323,7 @@ describe('CounterpointNotation', () => {
       }
     });
 
-    it('transposes by octave with Shift+ArrowUp', () => {
+    it('transposes by octave with Shift+ArrowUp', async () => {
       const cantusFirmus = ['C4', 'D4'];
       const mockOnNotesChange = vi.fn();
 
@@ -1247,20 +1335,30 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
+
+      // Wait for abcjs to be initialized and callback to be set
+      await waitFor(() => {
+        expect(clickListenerCallback).not.toBeNull();
+        expect(lastAbcString).not.toBe('');
+      });
 
       if (clickListenerCallback && lastAbcString) {
         // Select a note
         const v2Index = lastAbcString.indexOf('[V:2]');
         const cfContent = lastAbcString.substring(v2Index);
-        const noteStart = v2Index + cfContent.indexOf('C4');
+        const noteStart = v2Index + cfContent.indexOf('c4'); // ABC notation uses lowercase
 
         const mockAbcelem = {
           startChar: noteStart,
           elemType: 'note',
         };
-        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+
+        act(() => {
+          clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+        });
 
         // Fire Shift+ArrowUp for octave jump
         const shiftArrowUpEvent = new KeyboardEvent('keydown', {
@@ -1287,8 +1385,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       if (clickListenerCallback && lastAbcString) {
         // Select a note
@@ -1327,8 +1426,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       if (clickListenerCallback && lastAbcString) {
         // Select a note
@@ -1367,8 +1467,9 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
 
       // Fire arrow key without selecting a note
       const arrowUpEvent = new KeyboardEvent('keydown', {
@@ -1383,11 +1484,11 @@ describe('CounterpointNotation', () => {
   });
 
   describe('selected note display', () => {
-    it('shows selected note after click', () => {
+    it('shows selected note after click', async () => {
       const cantusFirmus = ['C4', 'D4'];
       const mockOnNotesChange = vi.fn();
 
-      render(
+      const { rerender } = render(
         <CounterpointNotation
           cantusFirmus={cantusFirmus}
           counterpoint={[]}
@@ -1395,23 +1496,38 @@ describe('CounterpointNotation', () => {
           mode="cantus_firmus"
           onModeChange={mockOnModeChange}
           onNotesChange={mockOnNotesChange}
-        />
-      );
+         abcjsModule={mockAbcjsModule}
+      />
+    );
+
+      // Wait for abcjs to be initialized and callback to be set
+      await waitFor(() => {
+        expect(clickListenerCallback).not.toBeNull();
+        expect(lastAbcString).not.toBe('');
+      });
 
       if (clickListenerCallback && lastAbcString) {
         const v2Index = lastAbcString.indexOf('[V:2]');
         const cfContent = lastAbcString.substring(v2Index);
-        const noteStart = v2Index + cfContent.indexOf('C4');
+        const noteStart = v2Index + cfContent.indexOf('c4'); // ABC notation uses lowercase
 
         const mockAbcelem = {
           startChar: noteStart,
           elemType: 'note',
         };
-        clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
 
-        expect(screen.getByText('Selected')).toBeInTheDocument();
-        expect(screen.getByText('C4')).toBeInTheDocument();
-        expect(screen.getByText('Use ↑↓ arrows')).toBeInTheDocument();
+        // Call the callback to select a note
+        act(() => {
+          clickListenerCallback(mockAbcelem, 0, '', {}, undefined);
+        });
+
+        // The component should show the selected note info
+        await waitFor(() => {
+          expect(screen.queryByText('Selected')).toBeInTheDocument();
+        }, { timeout: 3000 });
+
+        expect(screen.getByText(/C4/)).toBeInTheDocument();
+        expect(screen.getByText(/↑↓/)).toBeInTheDocument();
       }
     });
   });
