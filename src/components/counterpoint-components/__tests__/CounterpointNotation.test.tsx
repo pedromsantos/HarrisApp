@@ -1596,7 +1596,10 @@ describe('CounterpointNotation', () => {
         />
       );
 
-      expect(screen.getByTestId('notation-container')).toBeInTheDocument();
+      // Should show a message instead of notation when empty
+      expect(
+        screen.getByText(/start by selecting a mode/i)
+      ).toBeInTheDocument();
     });
   });
 });
