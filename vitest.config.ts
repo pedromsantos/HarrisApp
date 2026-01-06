@@ -10,8 +10,12 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     testTimeout: 10000,
     hookTimeout: 10000,
-    pool: 'forks',
-    poolMatchGlobs: [['**/*.test.{ts,tsx}', 'forks']],
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: true,
+      },
+    },
     isolate: false,
     include: ['**/__tests__/**/*.{test,spec}.{ts,tsx}', '**/*.{test,spec}.{ts,tsx}'],
     exclude: [
