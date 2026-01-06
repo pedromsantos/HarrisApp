@@ -11,11 +11,8 @@ export default defineConfig({
     testTimeout: 10000,
     hookTimeout: 10000,
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
+    poolMatchGlobs: [['**/*.test.{ts,tsx}', 'forks']],
+    isolate: false,
     include: ['**/__tests__/**/*.{test,spec}.{ts,tsx}', '**/*.{test,spec}.{ts,tsx}'],
     exclude: [
       'node_modules',
