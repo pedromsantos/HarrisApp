@@ -37,7 +37,7 @@ jobs:
         run: npm run test:all
         env:
           CI: true
-          NODE_OPTIONS: '--max-old-space-size=4096'
+          NODE_OPTIONS: "--max-old-space-size=4096"
 
       - name: Run linter
         run: npm run lint
