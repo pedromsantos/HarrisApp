@@ -1,4 +1,4 @@
-/* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable sonarjs/no-duplicate-string, @typescript-eslint/require-await */
 /* eslint-disable react/jsx-no-bind */
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -142,7 +142,6 @@ describe('PianoInput', () => {
   });
 
   it('does not call onOctaveChange when trying to go above max octave', async () => {
-    const user = userEvent.setup();
     const onOctaveChange = vi.fn();
 
     render(<PianoInput {...mockProps} octave={6} onOctaveChange={onOctaveChange} />);
@@ -150,13 +149,12 @@ describe('PianoInput', () => {
     const octaveUpButton = screen.getByTestId('octave-up');
     // Button should be disabled, so this won't actually trigger
     expect(octaveUpButton).toBeDisabled();
-    
+
     // Verify callback was never called
     expect(onOctaveChange).not.toHaveBeenCalled();
   });
 
   it('does not call onOctaveChange when trying to go below min octave', async () => {
-    const user = userEvent.setup();
     const onOctaveChange = vi.fn();
 
     render(<PianoInput {...mockProps} octave={3} onOctaveChange={onOctaveChange} />);
@@ -164,7 +162,7 @@ describe('PianoInput', () => {
     const octaveDownButton = screen.getByTestId('octave-down');
     // Button should be disabled, so this won't actually trigger
     expect(octaveDownButton).toBeDisabled();
-    
+
     // Verify callback was never called
     expect(onOctaveChange).not.toHaveBeenCalled();
   });

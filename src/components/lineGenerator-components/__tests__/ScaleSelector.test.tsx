@@ -1,4 +1,4 @@
-/* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable sonarjs/no-duplicate-string, @typescript-eslint/require-await */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -165,7 +165,9 @@ describe('ScaleSelector', () => {
   it('handles malformed scale string in scale note parsing', async () => {
     const onFromScaleChange = vi.fn();
     // Scale with no note part should use fallback
-    render(<ScaleSelector {...defaultProps} fromScale="Major" onFromScaleChange={onFromScaleChange} />);
+    render(
+      <ScaleSelector {...defaultProps} fromScale="Major" onFromScaleChange={onFromScaleChange} />
+    );
 
     const fromSection = getScaleSection('from scale');
     expect(fromSection).toBeInTheDocument();

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion, sonarjs/no-duplicate-string */
 import { describe, expect, it } from 'vitest';
 
 import { convertToCounterpointABC, getDurationFromRatio, noteToABC } from '../counterpointNotation';
@@ -90,7 +91,7 @@ describe('convertToCounterpointABC', () => {
 
     // Should have bar lines between notes
     expect(result).toContain('|');
-    const cpLine = result.split('[V:1]')[1].split('[V:2]')[0];
+    const cpLine = result.split('[V:1]')[1]!.split('[V:2]')[0];
     expect(cpLine).toContain(' | '); // Bar between notes
   });
 

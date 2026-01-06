@@ -102,7 +102,7 @@ describe('convertToABC', () => {
     ];
     const result = convertToABC(notes);
 
-    const barCount = (result.match(/\|/g) || []).length;
+    const barCount = (result.match(/\|/g) ?? []).length;
     expect(barCount).toBe(2);
   });
 
@@ -119,7 +119,7 @@ describe('convertToABC', () => {
     const result = convertToABC(notes);
 
     // Should have 2 spaces (after C-D and E-F pairs)
-    const spaceCount = (result.split('\n').pop()?.match(/ /g) || []).length;
+    const spaceCount = (result.split('\n').pop()?.match(/ /g) ?? []).length;
     expect(spaceCount).toBeGreaterThanOrEqual(2);
   });
 

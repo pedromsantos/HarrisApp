@@ -1,4 +1,4 @@
-/* eslint-disable react/jsx-no-bind */
+/* eslint-disable react/jsx-no-bind, @typescript-eslint/no-non-null-assertion */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -497,36 +497,42 @@ describe('LineGenerator', () => {
 
       // Add first pattern
       await act(async () => {
-        await userEvent.click(patternItems[0]);
+        await userEvent.click(patternItems[0]!);
       });
 
       // Add second pattern
       await act(async () => {
         const updatedItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
-        await userEvent.click(updatedItems[0]);
+        await userEvent.click(updatedItems[0]!);
       });
 
       // Add third pattern
       await act(async () => {
         const updatedItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
-        await userEvent.click(updatedItems[0]);
+        await userEvent.click(updatedItems[0]!);
       });
 
       const selectedPatternsSection = screen.getByTestId('selected-patterns-section');
-      const firstPatternBefore = within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[0];
+      const firstPatternBefore =
+        within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[0]!;
       const firstPatternTextBefore = firstPatternBefore.textContent;
 
       // Move the first pattern down (should work since it's not last)
       const downButtons = within(selectedPatternsSection)
         .getAllByRole('button')
-        .filter((btn) => btn.getAttribute('aria-label') === 'Move pattern down' && !btn.disabled);
+        .filter(
+          (btn) =>
+            btn.getAttribute('aria-label') === 'Move pattern down' &&
+            !(btn as HTMLButtonElement).disabled
+        );
 
       await act(async () => {
-        await userEvent.click(downButtons[0]);
+        await userEvent.click(downButtons[0]!);
       });
 
       // First pattern should now be second
-      const secondPatternAfter = within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[1];
+      const secondPatternAfter =
+        within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[1]!;
       expect(secondPatternAfter.textContent).toBe(firstPatternTextBefore);
     });
 
@@ -540,35 +546,39 @@ describe('LineGenerator', () => {
       const patternItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
 
       await act(async () => {
-        await userEvent.click(patternItems[0]);
+        await userEvent.click(patternItems[0]!);
       });
 
       await act(async () => {
         const updatedItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
-        await userEvent.click(updatedItems[0]);
+        await userEvent.click(updatedItems[0]!);
       });
 
       await act(async () => {
         const updatedItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
-        await userEvent.click(updatedItems[0]);
+        await userEvent.click(updatedItems[0]!);
       });
 
       const selectedPatternsSection = screen.getByTestId('selected-patterns-section');
       const secondPatternBefore =
-        within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[1];
+        within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[1]!;
       const secondPatternTextBefore = secondPatternBefore.textContent;
 
       // Move the second pattern up (should work since it's not first)
       const upButtons = within(selectedPatternsSection)
         .getAllByRole('button')
-        .filter((btn) => btn.getAttribute('aria-label') === 'Move pattern up' && !btn.disabled);
+        .filter(
+          (btn) =>
+            btn.getAttribute('aria-label') === 'Move pattern up' &&
+            !(btn as HTMLButtonElement).disabled
+        );
 
       await act(async () => {
-        await userEvent.click(upButtons[0]);
+        await userEvent.click(upButtons[0]!);
       });
 
       // Second pattern should now be first
-      const firstPatternAfter = within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[0];
+      const firstPatternAfter = within(selectedPatternsSection).getAllByTestId(/pattern-item-/)[0]!;
       expect(firstPatternAfter.textContent).toBe(secondPatternTextBefore);
     });
 
@@ -583,7 +593,7 @@ describe('LineGenerator', () => {
 
       // Add first pattern
       await act(async () => {
-        await userEvent.click(patternItems[0]);
+        await userEvent.click(patternItems[0]!);
       });
 
       // Add second pattern
@@ -591,7 +601,7 @@ describe('LineGenerator', () => {
         // Get updated pattern items after first was moved
         const updatedPatternItems =
           within(availablePatternsSection).getAllByTestId(/pattern-item-/);
-        await userEvent.click(updatedPatternItems[0]);
+        await userEvent.click(updatedPatternItems[0]!);
       });
 
       // Try to move the last pattern down - last pattern's down button should be disabled
@@ -601,7 +611,7 @@ describe('LineGenerator', () => {
         .filter((btn) => btn.getAttribute('aria-label') === 'Move pattern down');
 
       // The last down button should be disabled (boundary check)
-      expect(downButtons[downButtons.length - 1]).toBeDisabled();
+      expect(downButtons[downButtons.length - 1]!).toBeDisabled();
     });
 
     it('does not move pattern up if it is already first', async () => {
@@ -614,13 +624,13 @@ describe('LineGenerator', () => {
       const patternItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
 
       await act(async () => {
-        await userEvent.click(patternItems[0]);
+        await userEvent.click(patternItems[0]!);
       });
 
       await act(async () => {
         const updatedPatternItems =
           within(availablePatternsSection).getAllByTestId(/pattern-item-/);
-        await userEvent.click(updatedPatternItems[0]);
+        await userEvent.click(updatedPatternItems[0]!);
       });
 
       // Try to move the first pattern up - first pattern's up button should be disabled
@@ -630,7 +640,7 @@ describe('LineGenerator', () => {
         .filter((btn) => btn.getAttribute('aria-label') === 'Move pattern up');
 
       // The first up button should be disabled (boundary check)
-      expect(upButtons[0]).toBeDisabled();
+      expect(upButtons[0]!).toBeDisabled();
     });
   });
 
@@ -644,9 +654,6 @@ describe('LineGenerator', () => {
       const fromScaleTypeSelect = within(fromScaleSection).getByRole('combobox', {
         name: /select scale/i,
       });
-      const fromNoteSelect = within(fromScaleSection).getByRole('combobox', {
-        name: /select note/i,
-      });
 
       // Open the scale type select
       await act(async () => {
@@ -655,7 +662,7 @@ describe('LineGenerator', () => {
 
       // Select major option
       const options = screen.getAllByRole('option');
-      const majorOption = options.find((opt) => opt.textContent?.toLowerCase().includes('major'));
+      const majorOption = options.find((opt) => opt.textContent.toLowerCase().includes('major'));
 
       if (majorOption) {
         await act(async () => {
@@ -684,7 +691,7 @@ describe('LineGenerator', () => {
 
       // Select a note option (D4)
       const options = screen.getAllByRole('option');
-      const noteOption = options.find((opt) => opt.textContent?.includes('D'));
+      const noteOption = options.find((opt) => opt.textContent.includes('D'));
 
       if (noteOption) {
         await act(async () => {
@@ -740,7 +747,7 @@ describe('LineGenerator', () => {
       const patternItems = within(availablePatternsSection).getAllByTestId(/pattern-item-/);
 
       await act(async () => {
-        await userEvent.click(patternItems[0]);
+        await userEvent.click(patternItems[0]!);
       });
 
       // Try to submit - button should be disabled and show "Generating..."

@@ -284,7 +284,7 @@ export const CounterpointNotation: React.FC<CounterpointNotationProps> = ({
     const loadAbcjs = async () => {
       try {
         // Use injected module for testing, or dynamic import for production
-        const abcjs = abcjsModule || (await preloadABCJS());
+        const abcjs = abcjsModule ?? (await preloadABCJS());
         abcjsRef.current = abcjs;
 
         if (notationRef.current !== null) {
