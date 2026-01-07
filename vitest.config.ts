@@ -10,13 +10,7 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     testTimeout: 10000,
     hookTimeout: 10000,
-    pool: 'threads',
-    poolOptions: {
-      threads: {
-        singleThread: true,
-      },
-    },
-    isolate: false,
+    maxConcurrency: 1,
     include: ['**/__tests__/**/*.{test,spec}.{ts,tsx}', '**/*.{test,spec}.{ts,tsx}'],
     exclude: [
       'node_modules',
