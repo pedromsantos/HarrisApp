@@ -10,6 +10,12 @@ export default defineConfig({
     setupFiles: './src/test/setup.ts',
     testTimeout: 30000,
     hookTimeout: 30000,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
     fileParallelism: false,
     include: ['src/**/__tests__/**/*.test.{ts,tsx}', 'src/**/*.test.{ts,tsx}'],
     exclude: ['node_modules', '**/node_modules/**', 'E2E/**', '**/*.perf.test.{ts,tsx}', '**/*.visual.test.{ts,tsx}'],

@@ -10,12 +10,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: --unshallow
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "18.x"
+          node-version: '18.x'
 
       - name: Cache node modules
         uses: actions/cache@v5
@@ -38,8 +38,7 @@ jobs:
         env:
           CI: true
           NODE_ENV: test
-          VITEST_MAX_THREADS: 1
-          NODE_OPTIONS: "--max-old-space-size=4096"
+          NODE_OPTIONS: '--max-old-space-size=4096'
 
       - name: Run linter
         run: npm run lint
