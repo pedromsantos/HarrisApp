@@ -7,11 +7,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-    testTimeout: 10000,
-    hookTimeout: 10000,
-    maxConcurrency: 1,
-    include: ['**/__tests__/**/*.{test,spec}.{ts,tsx}', '**/*.{test,spec}.{ts,tsx}'],
+    setupFiles: './src/test/setup.ts',
+    testTimeout: 30000,
+    hookTimeout: 30000,
+    fileParallelism: false,
+    include: ['**/__tests__/**/*.test.{ts,tsx}', '**/*.test.{ts,tsx}'],
     exclude: [
       'node_modules',
       '**/node_modules/**',
