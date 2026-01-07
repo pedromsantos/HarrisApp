@@ -11,14 +11,8 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 30000,
     fileParallelism: false,
-    include: ['**/__tests__/**/*.test.{ts,tsx}', '**/*.test.{ts,tsx}'],
-    exclude: [
-      'node_modules',
-      '**/node_modules/**',
-      'E2E/**',
-      '**/*.perf.test.{ts,tsx}',
-      '**/*.visual.test.{ts,tsx}',
-    ],
+    include: ['src/**/__tests__/**/*.test.{ts,tsx}', 'src/**/*.test.{ts,tsx}'],
+    exclude: ['node_modules', '**/node_modules/**', 'E2E/**', '**/*.perf.test.{ts,tsx}', '**/*.visual.test.{ts,tsx}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
