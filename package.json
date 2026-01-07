@@ -60,7 +60,7 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json && vite build && npm run lint && npm run test:all",
-    "test:all": "vitest run --reporter=default --no-file-parallelism",
+    "test:all": "vitest run --reporter=verbose --no-file-parallelism",
     "test:coverage": "vitest run --coverage --config vitest.config.ts --exclude \"E2E/**\" --exclude \"**/*.perf.test.{ts,tsx}\" --exclude \"**/*.visual.test.{ts,tsx}\"",
     "test:coverage:html": "vitest run --coverage --config vitest.config.ts --exclude \"E2E/**\" --exclude \"**/*.perf.test.{ts,tsx}\" --exclude \"**/*.visual.test.{ts,tsx}\" --reporter=html",
     "test:coverage:open": "npm run test:coverage:html && npx vite preview --outDir coverage",
