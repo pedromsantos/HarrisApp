@@ -25,10 +25,14 @@ declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean;
 
   namespace Vi {
-    interface Assertion<T = any>
-      extends TestingLibraryMatchers<typeof expect.stringContaining, T> {}
-    interface AsymmetricMatchersContaining
-      extends TestingLibraryMatchers<typeof expect.stringContaining, unknown> {}
+    interface Assertion<T = any> extends TestingLibraryMatchers<
+      typeof expect.stringContaining,
+      T
+    > {}
+    interface AsymmetricMatchersContaining extends TestingLibraryMatchers<
+      typeof expect.stringContaining,
+      unknown
+    > {}
   }
 }
 
