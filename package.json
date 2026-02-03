@@ -85,6 +85,6 @@
   "type": "module",
   "version": "0.0.1",
   "engines": {
-    "node": ">=22.16.0"
+    "node": ">=22.14.0"
   }
 }
