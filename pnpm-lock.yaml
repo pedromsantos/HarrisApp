@@ -21,8 +21,8 @@ importers:
         specifier: ^1.1.10
         version: 1.1.10(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       abcjs:
-        specifier: ^6.6.1
-        version: 6.6.1
+        specifier: ^6.6.2
+        version: 6.6.2
       react:
         specifier: ^19.0.0
         version: 19.2.4
@@ -1576,8 +1576,8 @@ packages:
   '@vitest/utils@4.0.18':
     resolution: {integrity: sha512-msMRKLMVLWygpK3u2Hybgi4MNjcYJvwTb0Ru09+fOyCXIgT5raYP041DRRdiJiI3k/2U6SEbAETB3YtBrUkCFA==}
 
-  abcjs@6.6.1:
-    resolution: {integrity: sha512-DM7nJcUXCJRVESk9HghI1/RdO8kJqWgqOj2f7p+rZ9AMa4XdlkXLPLRCQbwMEj8VwEG0DvhHIs0pd8RMAIqqzg==}
+  abcjs@6.6.2:
+    resolution: {integrity: sha512-YLbp5lYUq0uOywWZx9EuTdm0TcflKZi7hOzz366A/LFl3qoAXSYIjznJQmr/VeHg8NcLxZYoN8dLi7PqCpxKEA==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -4726,7 +4726,7 @@ snapshots:
       '@vitest/pretty-format': 4.0.18
       tinyrainbow: 3.0.3
 
-  abcjs@6.6.1: {}
+  abcjs@6.6.2: {}
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
