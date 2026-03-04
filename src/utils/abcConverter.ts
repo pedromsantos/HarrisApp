@@ -24,9 +24,13 @@ function convertPitchToAbc(pitch: string): string {
   }
 
   const [, letter, accidental = '', octaveStr] = match;
+  if (!letter || !octaveStr) {
+    return 'z';
+  }
+
   const octave = parseInt(octaveStr, 10);
 
-  let abcNote = letter;
+  let abcNote: string = letter;
 
   // ABC uses lowercase for higher octaves
   if (octave >= 5) {

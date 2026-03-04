@@ -103,10 +103,13 @@ describe('DualProgressionDisplay', () => {
 
     // Find first chord and check it has badge-like classes (rounded, padding, background)
     const firstChord = screen.getAllByText('Cm7')[0];
-    expect(firstChord).toHaveClass('rounded');
-    expect(firstChord.className).toMatch(/px-/); // Padding horizontal
-    expect(firstChord.className).toMatch(/py-/); // Padding vertical
-    expect(firstChord.className).toMatch(/bg-/); // Background color
+    expect(firstChord).toBeDefined();
+    if (firstChord) {
+      expect(firstChord).toHaveClass('rounded');
+      expect(firstChord.className).toMatch(/px-/); // Padding horizontal
+      expect(firstChord.className).toMatch(/py-/); // Padding vertical
+      expect(firstChord.className).toMatch(/bg-/); // Background color
+    }
   });
 
   it('positions explanation below progressions', () => {
