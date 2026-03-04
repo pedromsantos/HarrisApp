@@ -13,6 +13,23 @@ app.use(express.json());
 const WES_API_KEY = process.env.WES_API_KEY;
 const WES_API_BASE_URL = process.env.WES_API_BASE_URL || 'https://api.harrisjazzlines.com';
 
+// Authentication middleware for API endpoints
+const requireApiKey = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const apiKey = req.headers['x-api-key'];
+
+  if (!apiKey) {
+    return res.status(401).json({ error: 'Missing or invalid API key' });
+  }
+
+  // In development, accept any non-empty API key
+  // In production, validate against WES_API_KEY
+  if (process.env.NODE_ENV === 'production' && apiKey !== WES_API_KEY) {
+    return res.status(401).json({ error: 'Missing or invalid API key' });
+  }
+
+  next();
+};
+
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -51,7 +68,7 @@ app.post('/api/lines', async (req, res) => {
   }
 });
 
-app.get('/api/jazz-standards', (req, res) => {
+app.get('/api/jazz-standards', requireApiKey, (req, res) => {
   const standards = [
     {
       id: 'autumn-leaves',
@@ -238,7 +255,7 @@ app.get('/api/jazz-standards', (req, res) => {
   res.json(standards);
 });
 
-app.get('/api/jazz-standards/:id', (req, res) => {
+app.get('/api/jazz-standards/:id', requireApiKey, (req, res) => {
   const standards = {
     'autumn-leaves': {
       id: 'autumn-leaves',

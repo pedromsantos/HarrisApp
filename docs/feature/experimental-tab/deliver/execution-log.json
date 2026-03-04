@@ -758,6 +758,41 @@
       "s": "EXECUTED",
       "d": "PASS",
       "t": "2026-03-04T20:14:52Z"
+    },
+    {
+      "sid": "03-07",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-03-04T20:15:02Z"
+    },
+    {
+      "sid": "03-07",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: E2E scenario test with no unit tests required - library load failure tested via E2E only",
+      "t": "2026-03-04T20:15:36Z"
+    },
+    {
+      "sid": "03-08",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-03-04T20:17:48Z"
+    },
+    {
+      "sid": "03-08",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-03-04T20:23:26Z"
+    },
+    {
+      "sid": "03-08",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-03-04T20:41:18Z"
     }
   ]
 }

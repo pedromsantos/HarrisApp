@@ -7,10 +7,11 @@ import { ShapeSelector } from '@/components/experimental/ShapeSelector';
 import { useBarryHarrisInstructions } from '@/hooks/useBarryHarrisInstructions';
 import { useStandardDetail } from '@/hooks/useStandardDetail';
 import type { BarryLineInstructionDto, CAGEDShape } from '@/types/barryHarrisInstructions';
+import { NotFoundPage } from './NotFoundPage';
 
 export function StandardDetailPage(): React.ReactElement {
   const { id } = useParams<{ id: string }>();
-  const { standard, error: standardError, isLoading: standardLoading } = useStandardDetail(id ?? '');
+  const { standard, error: standardError, isLoading: standardLoading, isNotFound } = useStandardDetail(id ?? '');
 
   const {
     materializedLines,
@@ -67,6 +68,10 @@ export function StandardDetailPage(): React.ReactElement {
         <p className="text-lg text-gray-600">Loading standard...</p>
       </div>
     );
+  }
+
+  if (isNotFound) {
+    return <NotFoundPage />;
   }
 
   if (standardError) {
