@@ -18,15 +18,13 @@ export function useStandards(): UseStandardsReturn {
   const handleError = useCallback((err: unknown) => {
     if (err instanceof Error) {
       if (err.message.includes('Failed to fetch')) {
-        const errorMessage =
-          'Unable to connect to the server. Please check your internet connection and try again. ' +
-          'If the problem persists, the service might be temporarily unavailable.';
+        const errorMessage = 'Unable to load standards library';
         setError(errorMessage);
       } else {
         setError(err.message);
       }
     } else {
-      const errorMessage = 'An unexpected error occurred. Please try again later.';
+      const errorMessage = 'Unable to load standards library';
       setError(errorMessage);
     }
   }, []);
