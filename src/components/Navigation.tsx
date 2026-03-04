@@ -52,6 +52,16 @@ const Navigation: React.FC = () => {
           >
             Counterpoint
           </Link>
+          <Link
+            to="/experimental"
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              isActive('/experimental')
+                ? 'bg-primary text-primary-foreground'
+                : 'text-card-foreground hover:bg-accent hover:text-accent-foreground'
+            }`}
+          >
+            Experimental
+          </Link>
         </nav>
       </div>
     </header>

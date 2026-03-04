@@ -8,6 +8,8 @@ import { ThemeProvider } from './components/ThemeProvider';
 import Counterpoint from './pages/Counterpoint';
 // import InstructionsExplorer from './pages/InstructionsExplorer';
 import LineGenerator from './pages/LineGenerator';
+import { StandardsLibraryPage } from './pages/experimental/StandardsLibraryPage';
+import { StandardDetailPage } from './pages/experimental/StandardDetailPage';
 
 const AppContent: React.FC = () => {
   return (
@@ -21,6 +23,8 @@ const AppContent: React.FC = () => {
                 <Route path="/" element={<LineGenerator />} />
                 {/* <Route path="/instructions-explorer" element={<InstructionsExplorer />} /> */}
                 <Route path="/counterpoint" element={<Counterpoint />} />
+                <Route path="/experimental" element={<StandardsLibraryPage />} />
+                <Route path="/experimental/standards/:id" element={<StandardDetailPage />} />
               </Routes>
             </div>
           </div>
