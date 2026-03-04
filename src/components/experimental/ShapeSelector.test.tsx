@@ -85,26 +85,18 @@ describe('ShapeSelector', () => {
     expect(screen.getByRole('button', { name: 'A' })).toHaveFocus();
   });
 
-  it('is keyboard accessible with Space key activation', async () => {
+  it.each([
+    ['Space', 'E', ' '],
+    ['Enter', 'D', '{Enter}'],
+  ] as const)('is keyboard accessible with %s key activation', async (keyName, shape, keyInput) => {
     const { user, onShapeChangeMock } = setup();
     render(<ShapeSelector activeShape="C" onShapeChange={onShapeChangeMock} isLoading={false} />);
 
-    const buttonE = screen.getByRole('button', { name: 'E' });
-    buttonE.focus();
-    await user.keyboard(' ');
+    const button = screen.getByRole('button', { name: shape });
+    button.focus();
+    await user.keyboard(keyInput);
 
-    expect(onShapeChangeMock).toHaveBeenCalledWith('E');
-  });
-
-  it('is keyboard accessible with Enter key activation', async () => {
-    const { user, onShapeChangeMock } = setup();
-    render(<ShapeSelector activeShape="C" onShapeChange={onShapeChangeMock} isLoading={false} />);
-
-    const buttonD = screen.getByRole('button', { name: 'D' });
-    buttonD.focus();
-    await user.keyboard('{Enter}');
-
-    expect(onShapeChangeMock).toHaveBeenCalledWith('D');
+    expect(onShapeChangeMock).toHaveBeenCalledWith(shape);
   });
 
   it('sets aria-pressed="true" for active shape button', () => {

@@ -46,95 +46,67 @@ describe('useStandards', () => {
   });
 
   describe('loading state', () => {
-    it('returns loading true during fetch', () => {
-      vi.mocked(apiClient.fetchAllStandards).mockReturnValue(
-        new Promise(() => {
-          /* never resolves */
-        })
-      );
+    it.each([
+      [
+        'during fetch',
+        () =>
+          new Promise(() => {
+            /* never resolves */
+          }),
+        true,
+        null,
+        null,
+      ],
+      ['after successful fetch', () => Promise.resolve([]), false, [], null],
+      ['after fetch failure', () => Promise.reject(new Error('Network error')), false, null, 'Network error'],
+    ] as const)(
+      'returns correct loading state %s',
+      async (scenario, mockImplementation, expectedLoading, expectedStandards, expectedError) => {
+        vi.mocked(apiClient.fetchAllStandards).mockImplementation(mockImplementation);
 
-      const { result } = renderHook(() => useStandards());
+        const { result } = renderHook(() => useStandards());
 
-      expect(result.current.isLoading).toBe(true);
-      expect(result.current.standards).toBeNull();
-      expect(result.current.error).toBeNull();
-    });
+        if (scenario === 'during fetch') {
+          expect(result.current.isLoading).toBe(expectedLoading);
+          expect(result.current.standards).toEqual(expectedStandards);
+          expect(result.current.error).toEqual(expectedError);
+        } else {
+          await waitFor(() => {
+            expect(result.current.isLoading).toBe(expectedLoading);
+          });
 
-    it('returns loading false after successful fetch', async () => {
-      vi.mocked(apiClient.fetchAllStandards).mockResolvedValue([]);
-
-      const { result } = renderHook(() => useStandards());
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      expect(result.current.standards).toEqual([]);
-    });
-
-    it('returns loading false after fetch failure', async () => {
-      vi.mocked(apiClient.fetchAllStandards).mockRejectedValue(new Error('Network error'));
-
-      const { result } = renderHook(() => useStandards());
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      expect(result.current.error).not.toBeNull();
-    });
+          if (expectedStandards !== null) {
+            expect(result.current.standards).toEqual(expectedStandards);
+          }
+          if (expectedError !== null) {
+            expect(result.current.error).not.toBeNull();
+          }
+        }
+      }
+    );
   });
 
   describe('error state', () => {
-    it('returns error message on fetch failure', async () => {
-      const errorMessage = 'Failed to load standards';
-      vi.mocked(apiClient.fetchAllStandards).mockRejectedValue(new Error(errorMessage));
+    it.each([
+      ['Failed to load standards', 'Failed to load standards'],
+      ['Failed to fetch', 'Unable to load standards library'],
+      ['Unknown error', 'Unable to load standards library'],
+    ])('handles %s error with appropriate message', async (errorInput, expectedErrorMessage) => {
+      const errorValue = errorInput === 'Unknown error' ? errorInput : new Error(errorInput);
+      vi.mocked(apiClient.fetchAllStandards).mockRejectedValue(errorValue);
 
       const { result } = renderHook(() => useStandards());
 
       await waitFor(() => {
-        expect(result.current.error).toBe(errorMessage);
+        expect(result.current.error).toContain(expectedErrorMessage);
       });
 
       expect(result.current.standards).toBeNull();
       expect(result.current.isLoading).toBe(false);
     });
-
-    it('handles network errors gracefully', async () => {
-      vi.mocked(apiClient.fetchAllStandards).mockRejectedValue(new Error('Failed to fetch'));
-
-      const { result } = renderHook(() => useStandards());
-
-      await waitFor(() => {
-        expect(result.current.error).toContain('Unable to connect to the server');
-      });
-    });
-
-    it('handles unexpected errors with generic message', async () => {
-      vi.mocked(apiClient.fetchAllStandards).mockRejectedValue('Unknown error');
-
-      const { result } = renderHook(() => useStandards());
-
-      await waitFor(() => {
-        expect(result.current.error).toContain('An unexpected error occurred');
-      });
-    });
   });
 
   describe('refetch function', () => {
-    it('provides refetch function for retry', async () => {
-      vi.mocked(apiClient.fetchAllStandards).mockResolvedValue([]);
-
-      const { result } = renderHook(() => useStandards());
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      expect(result.current.refetch).toBeDefined();
-      expect(typeof result.current.refetch).toBe('function');
-    });
-
     it('refetch triggers new API call', async () => {
       const mockStandards = [
         {

@@ -8,7 +8,7 @@ describe('DualProgressionDisplay', () => {
   const mockImprovisationChords = ['Cm7', 'F7', 'BbMaj7'];
   const mockExplanation = 'The Barry Harris approach simplifies the progression by removing the EbMaj7.';
 
-  it('displays original progression label', () => {
+  it.each([['Original Progression'], ['Improvisation Progression']])('displays %s label', (labelText) => {
     render(
       <DualProgressionDisplay
         originalChords={mockOriginalChords}
@@ -17,10 +17,13 @@ describe('DualProgressionDisplay', () => {
       />
     );
 
-    expect(screen.getByText('Original Progression')).toBeInTheDocument();
+    expect(screen.getByText(labelText)).toBeInTheDocument();
   });
 
-  it('displays improvisation progression label', () => {
+  it.each([
+    ['original', mockOriginalChords],
+    ['improvisation', mockImprovisationChords],
+  ] as const)('displays all %s chords as separate elements', (progressionType, chords) => {
     render(
       <DualProgressionDisplay
         originalChords={mockOriginalChords}
@@ -29,34 +32,7 @@ describe('DualProgressionDisplay', () => {
       />
     );
 
-    expect(screen.getByText('Improvisation Progression')).toBeInTheDocument();
-  });
-
-  it('displays all original chords as separate elements', () => {
-    render(
-      <DualProgressionDisplay
-        originalChords={mockOriginalChords}
-        improvisationChords={mockImprovisationChords}
-        explanation={mockExplanation}
-      />
-    );
-
-    mockOriginalChords.forEach((chord) => {
-      const chordElements = screen.getAllByText(chord);
-      expect(chordElements.length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  it('displays all improvisation chords as separate elements', () => {
-    render(
-      <DualProgressionDisplay
-        originalChords={mockOriginalChords}
-        improvisationChords={mockImprovisationChords}
-        explanation={mockExplanation}
-      />
-    );
-
-    mockImprovisationChords.forEach((chord) => {
+    chords.forEach((chord) => {
       const chordElements = screen.getAllByText(chord);
       expect(chordElements.length).toBeGreaterThanOrEqual(1);
     });

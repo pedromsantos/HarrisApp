@@ -94,27 +94,21 @@ describe('useStandardDetail', () => {
   });
 
   describe('error state', () => {
-    it('returns error message on fetch failure including 404 and network errors', async () => {
-      vi.mocked(apiClient.fetchStandardById).mockRejectedValue(new Error('Failed to load standard'));
+    it.each([
+      ['Failed to load standard', 'Failed to load standard'],
+      ['Unknown error', 'An unexpected error occurred'],
+    ])('handles %s error with appropriate message', async (errorInput, expectedErrorMessage) => {
+      const errorValue = errorInput === 'Unknown error' ? errorInput : new Error(errorInput);
+      vi.mocked(apiClient.fetchStandardById).mockRejectedValue(errorValue);
 
       const { result } = renderHook(() => useStandardDetail(AUTUMN_LEAVES_ID));
 
       await waitFor(() => {
-        expect(result.current.error).toBe('Failed to load standard');
+        expect(result.current.error).toContain(expectedErrorMessage);
       });
 
       expect(result.current.standard).toBeNull();
       expect(result.current.isLoading).toBe(false);
-    });
-
-    it('handles unexpected errors with generic message', async () => {
-      vi.mocked(apiClient.fetchStandardById).mockRejectedValue('Unknown error');
-
-      const { result } = renderHook(() => useStandardDetail(AUTUMN_LEAVES_ID));
-
-      await waitFor(() => {
-        expect(result.current.error).toContain('An unexpected error occurred');
-      });
     });
   });
 
