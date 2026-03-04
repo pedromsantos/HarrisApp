@@ -1,0 +1,42 @@
+{
+  "schema_version": "3.0",
+  "project_id": "experimental-tab",
+  "feature_id": "experimental-tab",
+  "events": [
+    {
+      "sid": "01-01",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-03-04T13:17:42Z"
+    },
+    {
+      "sid": "01-01",
+      "p": "RED_ACCEPTANCE",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: data models have no behavior to test",
+      "t": "2026-03-04T13:17:46Z"
+    },
+    {
+      "sid": "01-01",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: data models have no behavior to test",
+      "t": "2026-03-04T13:17:48Z"
+    },
+    {
+      "sid": "01-01",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-03-04T13:24:09Z"
+    },
+    {
+      "sid": "01-01",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-03-04T13:25:45Z"
+    }
+  ]
+}
