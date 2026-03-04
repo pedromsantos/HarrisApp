@@ -32,16 +32,6 @@ const Navigation: React.FC = () => {
           >
             Line Generator
           </Link>
-          {/* <Link
-            to="/instructions-explorer"
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              isActive('/instructions-explorer')
-                ? 'bg-primary text-primary-foreground'
-                : 'text-card-foreground hover:bg-accent hover:text-accent-foreground'
-            }`}
-          >
-            Instructions Explorer
-          </Link> */}
           <Link
             to="/counterpoint"
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${

@@ -2,14 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { LineGeneratorRequest, LineGeneratorResponse } from '@/types/lineGenerator';
 
-// Use proxy server in development, Cloudflare Worker in production
 const API_BASE_URL = import.meta.env.DEV
   ? '/api'
   : ((import.meta.env['VITE_API_URL'] as string | undefined) ??
     'https://harrisapp-backend.your-worker-subdomain.workers.dev');
 
-const HEALTH_CHECK_INTERVAL = 60 * 1000;
-const TIMEOUT_THRESHOLD = 5000; // Show timeout message after 5 seconds
+const MILLISECONDS_PER_SECOND = 1000;
+const HEALTH_CHECK_INTERVAL_MS = 60 * MILLISECONDS_PER_SECOND;
+const TIMEOUT_THRESHOLD_MS = 5 * MILLISECONDS_PER_SECOND;
 
 type UseLineGeneratorReturn = {
   result: LineGeneratorResponse | null;
@@ -49,7 +49,7 @@ export function useLineGenerator(): UseLineGeneratorReturn {
   useEffect(() => {
     const intervalId = setInterval(() => {
       void checkServerHealth();
-    }, HEALTH_CHECK_INTERVAL);
+    }, HEALTH_CHECK_INTERVAL_MS);
 
     return () => {
       clearInterval(intervalId);
@@ -119,10 +119,9 @@ export function useLineGenerator(): UseLineGeneratorReturn {
       setIsTimedOut(false);
       setLastRequest(formData);
 
-      // Set timeout flag after TIMEOUT_THRESHOLD
       const timeoutId = setTimeout(() => {
         setIsTimedOut(true);
-      }, TIMEOUT_THRESHOLD);
+      }, TIMEOUT_THRESHOLD_MS);
 
       try {
         const data = await makeApiRequest(formData);

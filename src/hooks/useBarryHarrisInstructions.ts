@@ -7,13 +7,14 @@ import {
   MaterializeInstructionsRequest,
 } from '@/types/barryHarrisInstructions';
 
-// Use proxy server in development, Cloudflare Worker in production
 const API_BASE_URL = import.meta.env.DEV
   ? '/api'
   : ((import.meta.env['VITE_API_URL'] as string | undefined) ??
     'https://harrisapp-backend.your-worker-subdomain.workers.dev');
 
-const TIMEOUT_THRESHOLD = 5000; // Show timeout message after 5 seconds
+const TIMEOUT_THRESHOLD_MS = 5000;
+const RATE_LIMIT_DEFAULT_RETRY_SECONDS = 60;
+const MILLISECONDS_PER_SECOND = 1000;
 
 type UseBarryHarrisInstructionsReturn = {
   instructions: InstructionsResponse | null;
@@ -51,7 +52,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
 
     const updateCountdown = () => {
       const now = Date.now();
-      const secondsLeft = Math.ceil((rateLimitExpiryTime - now) / 1000);
+      const secondsLeft = Math.ceil((rateLimitExpiryTime - now) / MILLISECONDS_PER_SECOND);
 
       if (secondsLeft <= 0) {
         setIsRateLimited(false);
@@ -64,7 +65,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
     };
 
     updateCountdown();
-    const intervalId = setInterval(updateCountdown, 1000);
+    const intervalId = setInterval(updateCountdown, MILLISECONDS_PER_SECOND);
 
     return () => clearInterval(intervalId);
   }, [rateLimitExpiryTime]);
@@ -117,10 +118,9 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
       setRateLimitSecondsRemaining(null);
       setLastGenerateRequest(request);
 
-      // Set timeout flag after TIMEOUT_THRESHOLD
       const timeoutId = setTimeout(() => {
         setIsTimedOut(true);
-      }, TIMEOUT_THRESHOLD);
+      }, TIMEOUT_THRESHOLD_MS);
 
       try {
         const endpoint = import.meta.env.DEV
@@ -139,11 +139,10 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
         let data = (await response.json()) as unknown;
 
         if (!response.ok) {
-          // Handle rate limiting (429 status)
           if (response.status === 429) {
             const rateLimitData = data as { error?: string; message?: string; retry_after?: number };
-            const retryAfter = rateLimitData.retry_after ?? 60;
-            const expiryTime = Date.now() + retryAfter * 1000;
+            const retryAfter = rateLimitData.retry_after ?? RATE_LIMIT_DEFAULT_RETRY_SECONDS;
+            const expiryTime = Date.now() + retryAfter * MILLISECONDS_PER_SECOND;
 
             setIsRateLimited(true);
             setRateLimitExpiryTime(expiryTime);
@@ -190,10 +189,9 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
       setRateLimitSecondsRemaining(null);
       setLastMaterializeRequest(request);
 
-      // Set timeout flag after TIMEOUT_THRESHOLD
       const timeoutId = setTimeout(() => {
         setIsTimedOut(true);
-      }, TIMEOUT_THRESHOLD);
+      }, TIMEOUT_THRESHOLD_MS);
 
       try {
         const endpoint = import.meta.env.DEV
@@ -212,11 +210,10 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
         let data = (await response.json()) as unknown;
 
         if (!response.ok) {
-          // Handle rate limiting (429 status)
           if (response.status === 429) {
             const rateLimitData = data as { error?: string; message?: string; retry_after?: number };
-            const retryAfter = rateLimitData.retry_after ?? 60;
-            const expiryTime = Date.now() + retryAfter * 1000;
+            const retryAfter = rateLimitData.retry_after ?? RATE_LIMIT_DEFAULT_RETRY_SECONDS;
+            const expiryTime = Date.now() + retryAfter * MILLISECONDS_PER_SECOND;
 
             setIsRateLimited(true);
             setRateLimitExpiryTime(expiryTime);
