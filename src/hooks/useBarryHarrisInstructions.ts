@@ -70,6 +70,36 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
     return () => clearInterval(intervalId);
   }, [rateLimitExpiryTime]);
 
+  const resetRequestState = useCallback(() => {
+    setError(null);
+    setIsLoading(true);
+    setIsTimedOut(false);
+    setIsRateLimited(false);
+    setRateLimitExpiryTime(null);
+    setRateLimitSecondsRemaining(null);
+  }, []);
+
+  const handleRateLimitResponse = useCallback((data: unknown) => {
+    const rateLimitData = data as { error?: string; message?: string; retry_after?: number };
+    const retryAfter = rateLimitData.retry_after ?? RATE_LIMIT_DEFAULT_RETRY_SECONDS;
+    const expiryTime = Date.now() + retryAfter * MILLISECONDS_PER_SECOND;
+
+    setIsRateLimited(true);
+    setRateLimitExpiryTime(expiryTime);
+    setRateLimitSecondsRemaining(retryAfter);
+    setError(`You're exploring shapes too quickly. Please wait ${retryAfter} seconds`);
+  }, []);
+
+  const unwrapMessageField = useCallback((data: unknown): unknown => {
+    if (typeof data === 'object' && data !== null && 'message' in data) {
+      const wrapped = data as { message: string };
+      if (typeof wrapped.message === 'string') {
+        return JSON.parse(wrapped.message) as unknown;
+      }
+    }
+    return data;
+  }, []);
+
   const handleError = useCallback((err: unknown) => {
     if (err instanceof Error) {
       if (err.message.includes('Failed to fetch')) {
@@ -110,12 +140,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
 
   const generateInstructions = useCallback(
     async (request: GenerateInstructionsRequest) => {
-      setError(null);
-      setIsLoading(true);
-      setIsTimedOut(false);
-      setIsRateLimited(false);
-      setRateLimitExpiryTime(null);
-      setRateLimitSecondsRemaining(null);
+      resetRequestState();
       setLastGenerateRequest(request);
 
       const timeoutId = setTimeout(() => {
@@ -140,14 +165,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
 
         if (!response.ok) {
           if (response.status === 429) {
-            const rateLimitData = data as { error?: string; message?: string; retry_after?: number };
-            const retryAfter = rateLimitData.retry_after ?? RATE_LIMIT_DEFAULT_RETRY_SECONDS;
-            const expiryTime = Date.now() + retryAfter * MILLISECONDS_PER_SECOND;
-
-            setIsRateLimited(true);
-            setRateLimitExpiryTime(expiryTime);
-            setRateLimitSecondsRemaining(retryAfter);
-            setError(`You're exploring shapes too quickly. Please wait ${retryAfter} seconds`);
+            handleRateLimitResponse(data);
             return null;
           }
 
@@ -155,14 +173,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
           throw new Error(errorData.message ?? errorData.error ?? 'Failed to generate instructions');
         }
 
-        // Unwrap message field if present (API returns stringified JSON in message field)
-        if (typeof data === 'object' && data !== null && 'message' in data) {
-          const wrapped = data as { message: string };
-          if (typeof wrapped.message === 'string') {
-            data = JSON.parse(wrapped.message) as unknown;
-          }
-        }
-
+        data = unwrapMessageField(data);
         validateInstructionsResponse(data);
 
         setInstructions(data as InstructionsResponse);
@@ -176,17 +187,12 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
         setIsLoading(false);
       }
     },
-    [validateInstructionsResponse, handleError]
+    [resetRequestState, handleRateLimitResponse, unwrapMessageField, validateInstructionsResponse, handleError]
   );
 
   const materializeInstructions = useCallback(
     async (request: MaterializeInstructionsRequest) => {
-      setError(null);
-      setIsLoading(true);
-      setIsTimedOut(false);
-      setIsRateLimited(false);
-      setRateLimitExpiryTime(null);
-      setRateLimitSecondsRemaining(null);
+      resetRequestState();
       setLastMaterializeRequest(request);
 
       const timeoutId = setTimeout(() => {
@@ -211,14 +217,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
 
         if (!response.ok) {
           if (response.status === 429) {
-            const rateLimitData = data as { error?: string; message?: string; retry_after?: number };
-            const retryAfter = rateLimitData.retry_after ?? RATE_LIMIT_DEFAULT_RETRY_SECONDS;
-            const expiryTime = Date.now() + retryAfter * MILLISECONDS_PER_SECOND;
-
-            setIsRateLimited(true);
-            setRateLimitExpiryTime(expiryTime);
-            setRateLimitSecondsRemaining(retryAfter);
-            setError(`You're exploring shapes too quickly. Please wait ${retryAfter} seconds`);
+            handleRateLimitResponse(data);
             return null;
           }
 
@@ -226,14 +225,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
           throw new Error(errorData.message ?? errorData.error ?? 'Failed to materialize instructions');
         }
 
-        // Unwrap message field if present (API returns stringified JSON in message field)
-        if (typeof data === 'object' && data !== null && 'message' in data) {
-          const wrapped = data as { message: string };
-          if (typeof wrapped.message === 'string') {
-            data = JSON.parse(wrapped.message) as unknown;
-          }
-        }
-
+        data = unwrapMessageField(data);
         validateMaterializedResponse(data);
 
         setMaterializedLines(data as MaterializedLinesResponse);
@@ -247,7 +239,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
         setIsLoading(false);
       }
     },
-    [validateMaterializedResponse, handleError]
+    [resetRequestState, handleRateLimitResponse, unwrapMessageField, validateMaterializedResponse, handleError]
   );
 
   const retry = useCallback(async () => {
