@@ -414,6 +414,38 @@ npx tsc --noEmit  # Check for type errors
 # In VS Code: Cmd/Ctrl + Shift + P -> "TypeScript: Restart TS Server"
 ```
 
+## Development Paradigm
+
+This project uses **Object-Oriented Programming (OOP) + Functional React Hooks**:
+
+**Frontend**:
+
+- Functional React components (not class-based)
+- Custom hooks for data fetching and state management
+- Component composition with props
+- Object-oriented TypeScript types (interfaces, classes where appropriate)
+- Uses `@nw-software-crafter` agent for TDD implementation
+
+**Backend**:
+
+- Rust with struct-based design
+- Domain objects with rich behavior
+- Service layer orchestration
+- Trait implementations for polymorphism
+- Traditional OOP patterns (builder, strategy)
+
+See [ADR-001](/Users/pedro/src/HarrisApp/docs/feature/experimental-tab/design/adrs/ADR-001-development-paradigm-selection.md) for detailed rationale.
+
+## Mutation Testing Strategy
+
+This project uses **per-feature** mutation testing:
+
+- Mutation testing runs after each feature delivery
+- Minimum kill rate: ≥80% (gate blocks delivery if below threshold)
+- Scope: All production code modified during the feature
+- Tool: Stryker (TypeScript/React frontend), cargo-mutants (Rust backend)
+- See `/nw:mutation-test` command for execution details
+
 ## Important Notes
 
 - Node.js version: >= 22.16.0 (specified in engines field)

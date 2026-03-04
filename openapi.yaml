@@ -571,6 +571,78 @@ paths:
         "400":
           $ref: "#/components/responses/BadRequest"
 
+  /progression/lines:
+    post:
+      summary: Generate Barry Harris jazz lines for chord progression
+      description: |
+        Generates jazz lines for a chord progression using Barry Harris theory.
+        Analyzes the progression, simplifies to scale outlines (detects ii-V patterns),
+        and generates melodic lines with optional CAGED shape filtering.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProgressionLinesRequest"
+      responses:
+        "200":
+          description: Generated progression lines with scale transitions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgressionLinesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "unauthorized"
+                  message:
+                    type: string
+                    example: "Missing API key"
+
+  /progression/midi:
+    post:
+      summary: Export progression lines as MIDI file
+      description: |
+        Generates Barry Harris jazz lines for a chord progression and exports as MIDI file.
+        Returns binary MIDI data that can be saved as .mid file.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProgressionMidiRequest"
+      responses:
+        "200":
+          description: MIDI file data
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "unauthorized"
+                  message:
+                    type: string
+                    example: "Missing API key"
+
   /counterpoint/evaluate:
     post:
       summary: Evaluate counterpoint
@@ -747,6 +819,7 @@ components:
         - from_scale
         - to_scale
         - patterns
+        - position
       properties:
         from_scale:
           type: string
@@ -764,7 +837,9 @@ components:
           example: ["chord_up", "scale_down"]
         position:
           type: integer
-          description: The position on the instrument
+          minimum: 0
+          maximum: 9
+          description: Guitar position index for tablature generation (0-9)
           example: 1
 
     TransposeRequest:
@@ -1108,3 +1183,162 @@ components:
           nullable: true
           description: An optional suggestion for fixing the violation
           example: "Replace with a consonant interval (unison, third, fifth, sixth, or octave)"
+
+    ProgressionLinesRequest:
+      type: object
+      required:
+        - chords
+      properties:
+        chords:
+          type: array
+          items:
+            type: string
+          description: Array of chord names for the progression (minimum 2 chords)
+          example: ["Dm7", "G7", "CMaj7"]
+          minItems: 2
+        caged_shape:
+          type: string
+          nullable: true
+          description: |
+            Optional CAGED shape filter for guitar fretboard positions.
+            - "C", "A", "G", "E", "D": Generate lines for specific shape
+            - "all": Generate lines for all CAGED shapes
+            - null/omitted: Default behavior (shape-agnostic generation)
+          example: "E"
+          enum: ["C", "A", "G", "E", "D", "all"]
+
+    ProgressionMidiRequest:
+      type: object
+      required:
+        - chords
+      properties:
+        chords:
+          type: array
+          items:
+            type: string
+          description: Array of chord names for the progression (minimum 2 chords)
+          example: ["Dm7", "G7", "CMaj7"]
+          minItems: 2
+        caged_shape:
+          type: string
+          nullable: true
+          description: Optional CAGED shape filter (same as ProgressionLinesRequest)
+          example: "E"
+          enum: ["C", "A", "G", "E", "D", "all"]
+
+    ProgressionLinesResponse:
+      type: object
+      required:
+        - transitions
+      properties:
+        transitions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScaleTransitionDto"
+          description: Array of scale transitions with generated lines
+
+    ScaleTransitionDto:
+      type: object
+      required:
+        - from_chords
+        - to_chords
+        - from_scale
+        - to_scale
+        - resolution
+        - rule_applied
+      properties:
+        from_chords:
+          type: array
+          items:
+            type: string
+          description: Chord names covered by the source scale
+          example: ["Dm7", "G7"]
+        to_chords:
+          type: array
+          items:
+            type: string
+          description: Chord names covered by the target scale
+          example: ["CMaj7"]
+        from_scale:
+          type: string
+          description: Source Barry Harris scale name
+          example: "G Dominant"
+        to_scale:
+          type: string
+          description: Target Barry Harris scale name
+          example: "C Major"
+        resolution:
+          type: string
+          description: Scale resolution strategy used
+          example: "direct"
+          enum: ["direct", "to_the_third", "to_the_sixth"]
+        rule_applied:
+          type: string
+          description: Human-readable description of the Barry Harris rule applied
+          example: "ii-V: play dominant over both"
+        lines:
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/GeneratedLineDto"
+          description: Generated lines for this transition (present when caged_shape is NOT "all")
+        shapes:
+          type: object
+          nullable: true
+          additionalProperties:
+            $ref: "#/components/schemas/ShapeLinesDto"
+          description: Generated lines grouped by CAGED shape (present when caged_shape is "all")
+          example:
+            "C":
+              lines: [...]
+            "A":
+              lines: [...]
+
+    GeneratedLineDto:
+      type: object
+      required:
+        - pitches
+        - patterns
+        - source_degree
+        - target_degree
+        - tab
+      properties:
+        pitches:
+          type: array
+          items:
+            type: string
+          description: Array of pitch names in the generated line
+          example: ["D4", "F4", "A4", "C5", "B4", "G4"]
+        patterns:
+          type: array
+          items:
+            type: string
+          description: Barry Harris patterns used to generate this line
+          example: ["ChordUp", "ScaleDown"]
+        source_degree:
+          type: integer
+          description: Starting scale degree (1-8)
+          example: 1
+          minimum: 1
+          maximum: 8
+        target_degree:
+          type: integer
+          description: Target scale degree (1-8)
+          example: 3
+          minimum: 1
+          maximum: 8
+        tab:
+          type: string
+          description: Guitar tablature notation
+          example: "e|---5---7---9---|\nB|---6---8---10--|\n..."
+
+    ShapeLinesDto:
+      type: object
+      required:
+        - lines
+      properties:
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/GeneratedLineDto"
+          description: Lines generated for this CAGED shape

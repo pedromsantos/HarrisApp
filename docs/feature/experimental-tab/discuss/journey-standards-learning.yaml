@@ -1,0 +1,614 @@
+journey_id: standards-learning-mvp
+name: Standards-Based Barry Harris Learning
+description: |
+  User journey for learning jazz improvisation using Barry Harris method through
+  familiar jazz standards. Covers standards library browsing, dual progression viewing,
+  line generation, and CAGED shape exploration.
+feature_id: experimental-tab
+wave: DISCUSS
+version: 1.0
+date: 2026-03-04
+
+# Jobs-to-be-Done mapping
+jobs:
+  primary:
+    - id: standards-based-learning
+      opportunity_score: 18
+      description: Learn jazz improvisation using Barry Harris method via familiar standards
+  secondary:
+    - id: shape-exploration
+      opportunity_score: 13
+      description: Explore different CAGED shapes to find comfortable fretboard positions
+
+# Critical Success Factors
+critical_success_factors:
+  - id: frictionless-entry
+    name: Frictionless Entry
+    target: <30 seconds from app open to generation
+    description: Standards library immediately visible, one-click selection
+  - id: fast-generation
+    name: Fast Generation
+    target: <3 seconds API response
+    description: No perceived lag during line generation or shape switching
+  - id: dual-progression-clarity
+    name: Dual Progression Clarity
+    description: Both original and improvisation progressions clearly labeled with pedagogical explanation
+  - id: quality-output
+    name: Quality Musical Output
+    description: Generated lines must sound musical and appropriate for difficulty level
+  - id: effortless-shape-exploration
+    name: Effortless Shape Exploration
+    description: Shape selector obvious and accessible, switching feels instant
+
+# Main Journey Steps
+steps:
+  - step_id: "01"
+    name: Practice Session Begins - Seeking Direction
+    emotional_state:
+      valence: positive
+      emoji: 😊
+      label: Motivated & Slightly Uncertain
+    mental_model:
+      current_thought: What should I practice today?
+      user_question: How can I apply Barry Harris method to real music?
+      confidence_level: medium
+    user_actions:
+      - Opens HarrisApp
+      - Navigates to Experimental Tab
+      - Sees "Standards Library" option
+    system_response:
+      - Displays experimental tab with clear navigation
+      - Standards library prominently featured
+    artifacts:
+      created:
+        - name: practice_intention
+          type: user_goal
+          value: Apply Barry Harris to familiar standards
+          persistence: session
+      used: []
+    timing:
+      target: <5 seconds
+      description: Immediate app open to tab discovery
+    success_criteria:
+      - Experimental tab is visible and accessible
+      - Standards library option clearly labeled
+      - User understands this is for learning (not API debugging)
+    error_paths:
+      - condition: Tab not found
+        user_thought: Where are the practice features?
+        recovery: Clear navigation menu with "Experimental" label
+
+  - step_id: "02"
+    name: Discover Standards Library
+    emotional_state:
+      valence: positive
+      emoji: 😊
+      label: Discovery & Relief
+    mental_model:
+      current_thought: Aha! This is exactly what I was looking for
+      user_question: Which standards are available?
+      confidence_level: high
+    user_actions:
+      - Clicks "Standards Library"
+      - Sees list of 15 familiar jazz standards
+      - Recognizes tunes (Autumn Leaves, All The Things You Are, etc.)
+    system_response:
+      - Displays standards list with metadata
+      - Shows difficulty levels, tempos, composers
+      - Organizes by difficulty or alphabetically
+    artifacts:
+      created: []
+      used:
+        - name: practice_intention
+          source: step_01
+      loaded_from_database:
+        - name: standards_catalog
+          type: json_data
+          file: data/jazz-standards.json
+          count: 15 standards
+    timing:
+      target: <2 seconds
+      description: Standards library loads instantly
+    success_criteria:
+      - All 15 standards visible
+      - Metadata (difficulty, tempo, key) displayed
+      - Recognizable standard names
+      - Search/filter optional but helpful
+    error_paths:
+      - condition: Standards not loading
+        user_thought: Is the API down?
+        recovery: Loading indicator, retry mechanism
+
+  - step_id: "03"
+    name: Browse and Select Standard
+    emotional_state:
+      valence: positive
+      emoji: 😊
+      label: Engaged & Confident
+    mental_model:
+      current_thought: I know this tune, let me see the Barry Harris approach
+      user_question: What will the simplified progression look like?
+      confidence_level: high
+    user_actions:
+      - Browses standards list
+      - Sees "Autumn Leaves" (beginner difficulty)
+      - Clicks on "Autumn Leaves"
+    system_response:
+      - Highlights selected standard
+      - Transitions to standard detail view
+      - Shows standard metadata prominently
+    artifacts:
+      created:
+        - name: selected_standard
+          type: user_selection
+          value: autumn-leaves
+          persistence: session, url_param
+      used:
+        - name: standards_catalog
+          source: step_02
+    timing:
+      target: <1 second
+      description: Instant selection and transition
+    success_criteria:
+      - Selection is obvious (highlighted, checked)
+      - Transition feels smooth
+      - Can change selection easily
+      - URL updates with standard ID (shareable link)
+    error_paths:
+      - condition: Selection doesn't register
+        user_thought: Did I click it?
+        recovery: Clear visual feedback on click
+
+  - step_id: "04"
+    name: View Dual Progressions
+    emotional_state:
+      valence: positive
+      emoji: 😊
+      label: Understanding & Appreciation
+    mental_model:
+      current_thought: Ah! Barry Harris simplifies the progression for improvisation
+      user_question: Why is the improvisation version different?
+      confidence_level: high
+      learning_moment: true
+    user_actions:
+      - Views "Autumn Leaves" detail page
+      - Sees "Original Progression" section
+      - Sees "Improvisation Progression" section
+      - Reads explanation of simplification
+    system_response:
+      - Displays both progressions clearly labeled
+      - Shows original: [Cm7, F7, BbMaj7, EbMaj7, Am7b5, D7, Gm7, Gm7]
+      - Shows improvisation: [Cm7, F7, BbMaj7, Am7b5, D7, Gm7]
+      - Explains: "Barry Harris simplification removes EbMaj7 passing chord for clearer ii-V patterns"
+    artifacts:
+      created: []
+      used:
+        - name: selected_standard
+          source: step_03
+      loaded_from_database:
+        - name: chords_original
+          type: chord_progression
+          source: jazz-standards.json
+          value: ["Cm7", "F7", "BbMaj7", "EbMaj7", "Am7b5", "D7", "Gm7", "Gm7"]
+        - name: chords_improvisation
+          type: chord_progression
+          source: jazz-standards.json
+          value: ["Cm7", "F7", "BbMaj7", "Am7b5", "D7", "Gm7"]
+        - name: simplification_explanation
+          type: pedagogical_text
+          source: jazz-standards.json
+          value: "Simplified version removes EbMaj7 passing chord."
+    timing:
+      target: Immediate
+      description: Data already loaded from step 3
+    success_criteria:
+      - Both progressions displayed side-by-side or stacked clearly
+      - Labels: "Original Progression (Melody/Comping)" and "Improvisation Progression (Barry Harris)"
+      - Explanation text visible and understandable
+      - User has "aha moment" understanding Barry Harris approach
+    error_paths:
+      - condition: Progressions look identical (no simplification)
+        user_thought: What's the difference?
+        recovery: Explanation text must be clear
+
+  - step_id: "05"
+    name: Generate Barry Harris Lines (Default Shape)
+    emotional_state:
+      valence: neutral_positive
+      emoji: 😐
+      label: Anticipation & Slight Tension
+    mental_model:
+      current_thought: Let's see what the Barry Harris method produces
+      user_question: Will these lines sound good?
+      confidence_level: medium
+      anxiety_present: true
+      anxiety_type: quality_concern
+    user_actions:
+      - Clicks "Generate Lines" button
+      - Sees loading indicator (2-3 seconds)
+      - Waits for API response
+    system_response:
+      - Shows loading indicator
+      - Calls API: POST /barry-harris/generate-instructions
+      - Payload: {chords: chords_improvisation, caged_shape: "E", guitar_position: "E"}
+      - Receives generated lines
+    artifacts:
+      created:
+        - name: generation_request
+          type: api_request
+          payload:
+            chords: ${chords_improvisation}
+            caged_shape: E
+            guitar_position: E
+        - name: default_shape
+          type: system_default
+          value: E
+          rationale: E shape is most common for jazz standards
+      used:
+        - name: chords_improvisation
+          source: step_04
+    timing:
+      target: <3 seconds
+      description: API must respond quickly to maintain engagement
+    success_criteria:
+      - Loading indicator appears immediately
+      - API responds in <3 seconds
+      - No perceived lag
+      - Loading state is clear (not frozen)
+    error_paths:
+      - condition: API timeout (>5 seconds)
+        user_thought: Is it stuck? Did it fail?
+        recovery: Timeout message, retry button
+      - condition: API error (500)
+        user_thought: Something went wrong
+        recovery: Error message with explanation, retry button
+
+  - step_id: "06"
+    name: View Generated Lines (ABC Notation)
+    emotional_state:
+      valence: positive
+      emoji: 😊
+      label: Satisfaction & Validation
+    mental_model:
+      current_thought: It worked! I have lines to practice
+      user_question: Do these lines sound musical?
+      confidence_level: high
+      anxiety_resolved: true
+    user_actions:
+      - Views generated ABC notation
+      - Sees melodic lines rendered
+      - Scans lines visually
+      - Optional: Plays audio preview (if available)
+    system_response:
+      - Renders ABC notation using abcjs library
+      - Displays lines clearly with chord symbols
+      - Shows which patterns were used (if pattern labels enabled)
+    artifacts:
+      created:
+        - name: generated_lines_E
+          type: abc_notation
+          source: api_response
+          persistence: ui_display
+      used:
+        - name: generation_request
+          source: step_05
+    timing:
+      target: <1 second
+      description: Rendering happens client-side, should be instant
+    success_criteria:
+      - ABC notation renders correctly
+      - Lines are readable and musical
+      - Chord symbols aligned
+      - User can visually confirm quality
+      - Optional: Audio playback available
+    error_paths:
+      - condition: ABC rendering fails
+        user_thought: Why can't I see the notation?
+        recovery: Fallback to text representation, error message
+
+  - step_id: "07"
+    name: Curiosity About Other Shapes
+    emotional_state:
+      valence: positive
+      emoji: 😊
+      label: Curiosity & Exploration
+    mental_model:
+      current_thought: How would this sound in a different position?
+      user_question: What if I try the A shape instead?
+      confidence_level: high
+    user_actions:
+      - Notices shape selector (C, A, G, E, D buttons)
+      - E shape is highlighted (current)
+      - Clicks "A" button
+    system_response:
+      - Highlights A button
+      - Shows loading indicator
+      - Regenerates lines with A shape
+    artifacts:
+      created:
+        - name: shape_selection_A
+          type: user_choice
+          value: A
+          persistence: session
+      used:
+        - name: generated_lines_E
+          source: step_06
+        - name: chords_improvisation
+          source: step_04
+    timing:
+      target: <3 seconds
+      description: Same as step 5 - fast regeneration
+    success_criteria:
+      - Shape selector is visible and obvious
+      - Current shape clearly indicated
+      - Shape switching feels instant
+      - User understands they're exploring different fretboard positions
+    error_paths:
+      - condition: Shape selector not visible
+        user_thought: How do I try other shapes?
+        recovery: Clear UI placement, tooltip/help text
+
+  - step_id: "08"
+    name: Compare Shapes & Make Decision
+    emotional_state:
+      valence: positive
+      emoji: 😊
+      label: Confidence & Empowerment
+    mental_model:
+      current_thought: I'll start with A shape today, it feels more comfortable
+      user_question: Which shape should I practice?
+      confidence_level: very_high
+      decision_made: true
+    user_actions:
+      - Views A shape lines
+      - Compares mentally with E shape (from memory or side-by-side if implemented)
+      - Decides A shape is more comfortable
+      - Prepares to practice
+    system_response:
+      - Displays A shape lines
+      - A shape button remains highlighted
+      - Lines ready for practice
+    artifacts:
+      created:
+        - name: generated_lines_A
+          type: abc_notation
+          source: api_response
+          persistence: ui_display
+        - name: shape_decision
+          type: user_decision
+          value: A
+          rationale: More comfortable fretboard position
+          persistence: session
+      used:
+        - name: shape_selection_A
+          source: step_07
+        - name: generated_lines_E
+          source: step_06
+    timing:
+      target: N/A
+      description: User decision-making time (no system constraint)
+    success_criteria:
+      - User can easily compare shapes (mental or side-by-side)
+      - Shape decision feels informed (not random)
+      - User has confidence in chosen shape
+      - Optional: Side-by-side comparison view (V2 enhancement)
+    error_paths:
+      - condition: Too many shapes overwhelm user
+        user_thought: Which one is correct?
+        recovery: Default shape recommendation, "Start with E" guidance
+
+  - step_id: "09"
+    name: Move to Guitar Practice
+    emotional_state:
+      valence: positive
+      emoji: 😊
+      label: Motivated & Empowered
+    mental_model:
+      current_thought: From question to practicing in <5 minutes
+      user_question: Ready to practice on guitar
+      confidence_level: very_high
+      flow_state: true
+    user_actions:
+      - Takes guitar
+      - Plays generated lines from ABC notation
+      - Practices Barry Harris vocabulary on "Autumn Leaves"
+      - Applies learned patterns
+    system_response:
+      - N/A (user has left app to practice)
+      - Optional: App remains open for reference
+    artifacts:
+      created:
+        - name: practice_session
+          type: real_world_activity
+          standard: autumn-leaves
+          shape: A
+          duration: user_determined
+      used:
+        - name: generated_lines_A
+          source: step_08
+        - name: shape_decision
+          source: step_08
+    timing:
+      target: <5 minutes total
+      description: From step 1 (app open) to step 9 (practicing)
+    success_criteria:
+      - Total journey time <5 minutes (target: <2 minutes)
+      - User feels prepared and motivated
+      - Lines are playable and musical
+      - User applies Barry Harris method successfully
+      - Frictionless transition from digital to physical practice
+    error_paths:
+      - condition: Lines are too difficult to play
+        user_thought: This is beyond my skill level
+        recovery: Difficulty filtering in standards library (beginner/intermediate/advanced)
+
+  - step_id: "10"
+    name: (Optional) Return to Explore More Standards
+    emotional_state:
+      valence: positive
+      emoji: 😊
+      label: Flow State & Mastery Building
+    mental_model:
+      current_thought: Let me try a different standard with different harmonic context
+      user_question: What other standards can I explore?
+      confidence_level: very_high
+      flow_state: true
+    user_actions:
+      - Returns to app
+      - Navigates back to Standards Library
+      - Selects "Blue Bossa" (different harmonic context)
+      - Repeats journey steps 4-9
+    system_response:
+      - Returns to standards list
+      - Previous selection remembered (optional)
+      - "Blue Bossa" loads with dual progressions
+    artifacts:
+      created:
+        - name: selected_standard_2
+          type: user_selection
+          value: blue-bossa
+          persistence: session
+      used:
+        - name: practice_session
+          source: step_09
+        - name: standards_catalog
+          source: step_02
+    timing:
+      target: <30 seconds
+      description: Quick return and new selection
+    success_criteria:
+      - Easy navigation back to library
+      - Previous work not lost (can return to Autumn Leaves)
+      - Seamless iteration across multiple standards
+      - User builds repertoire over time
+    error_paths:
+      - condition: Cannot find way back to library
+        user_thought: How do I pick another standard?
+        recovery: Clear breadcrumb navigation, back button
+
+# Journey Variations
+variations:
+  - variation_id: beginner-first-time
+    description: Beginner user encountering standards library for first time
+    differences:
+      - step_02:
+          mental_model_override: Which standard should I start with?
+          anxiety: Choosing wrong difficulty level
+      - step_04:
+          additional_need: Explanation of chord symbols
+      - step_08:
+          decision_uncertainty: Needs guidance on shape selection
+
+  - variation_id: advanced-complex-standard
+    description: Advanced user selecting complex standard (e.g., Stella By Starlight)
+    differences:
+      - step_03:
+          selected_standard: stella-by-starlight
+          confidence_level: very_high
+      - step_05:
+          expectation: More complex lines with advanced patterns
+      - step_06:
+          evaluation: Scrutinizes pattern quality and voice leading
+
+  - variation_id: direct-practice-mode
+    description: User who knows exactly what they want (returning user)
+    differences:
+      - step_02:
+          skip: true
+          reason: User bookmarked direct link to standard
+      - step_03:
+          speed: <5 seconds
+          direct_selection: URL parameter loads standard immediately
+
+# Anti-patterns to Avoid
+anti_patterns:
+  - id: hidden-library
+    description: Standards library buried in menu or unclear navigation
+    impact: User never discovers feature
+    fix: Prominent placement in Experimental tab
+
+  - id: single-progression
+    description: Only showing improvisation progression without original
+    impact: User doesn't understand Barry Harris pedagogical approach
+    fix: Always display both progressions with clear labels
+
+  - id: no-loading-indicator
+    description: No feedback during API call
+    impact: User thinks app is frozen
+    fix: Clear loading state with spinner/progress indicator
+
+  - id: shape-selector-hidden
+    description: Shape selector not visible or unclear
+    impact: User never explores different shapes (misses P2 value)
+    fix: Prominent shape selector with clear labels
+
+  - id: poor-error-messages
+    description: Generic "Error occurred" without explanation
+    impact: User loses trust, abandons feature
+    fix: Specific error messages with recovery actions
+
+  - id: slow-api
+    description: API response >5 seconds
+    impact: User loses engagement, perceives as broken
+    fix: Optimize API, add timeout with retry
+
+  - id: unplayable-lines
+    description: Generated lines too complex or unmusical
+    impact: User questions quality, stops using feature
+    fix: Quality validation, difficulty-appropriate pattern selection
+
+# Metrics and Success Tracking
+metrics:
+  engagement:
+    - metric: standards_browsed_per_session
+      target: "2-3 standards"
+      description: Average number of standards explored per session
+    - metric: shapes_tried_per_standard
+      target: ">2 shapes"
+      description: Indicates shape exploration happening
+    - metric: time_to_first_generation
+      target: "<30 seconds"
+      description: From app open to first line generation
+    - metric: total_journey_time
+      target: "<5 minutes"
+      description: From app open to guitar practice (step 1-9)
+
+  satisfaction:
+    - metric: return_rate
+      target: ">60%"
+      description: Users who return to library after first use
+    - metric: post_practice_survey
+      question: "Did this help your Barry Harris learning?"
+      target: ">4/5 rating"
+    - metric: feature_discovery_rate
+      target: ">80%"
+      description: Users who find standards library within first session
+
+  technical:
+    - metric: api_response_time_p95
+      target: "<3 seconds"
+      description: 95th percentile API response time
+    - metric: api_error_rate
+      target: "<1%"
+      description: API errors per request
+    - metric: abc_rendering_time
+      target: "<500ms"
+      description: Client-side notation rendering
+
+# Next Artifacts
+next_steps:
+  - artifact: journey-standards-learning.feature
+    description: Gherkin BDD scenarios for acceptance testing
+    phase: DISCUSS
+  - artifact: shared-artifacts-registry.md
+    description: Consolidated artifact tracking across journey
+    phase: DISCUSS
+  - artifact: user-stories.md
+    description: LeanUX user stories derived from journey
+    phase: DISCUSS
+  - artifact: acceptance-criteria.md
+    description: Testable requirements per user story
+    phase: DISCUSS
+  - artifact: architecture-diagram.md
+    description: System architecture for MVP (P1+P2)
+    phase: DESIGN

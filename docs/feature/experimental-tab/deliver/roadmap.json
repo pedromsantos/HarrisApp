@@ -1,0 +1,608 @@
+{
+  "roadmap": {
+    "project_id": "experimental-tab",
+    "created_at": "2026-03-04T13:07:09Z",
+    "total_steps": 27,
+    "phases": 3
+  },
+  "phases": [
+    {
+      "id": "01",
+      "name": "Backend API - Jazz Standards Endpoints",
+      "description": "Implement GET endpoints for standards library with TDD. Load standards from JSON file at compile time. Zero database changes.",
+      "steps": [
+        {
+          "id": "01-01",
+          "name": "Jazz Standards Data Models",
+          "description": "Create Rust domain models for jazz standards (JazzStandard struct with id, name, composer, key, dual progressions, metadata). Add Difficulty enum.",
+          "criteria": [
+            "Backend models deserialize all 15 standards from JSON with metadata",
+            "Difficulty values restricted to beginner, intermediate, or advanced",
+            "Models support JSON serialization and deserialization",
+            "Models compile without warnings"
+          ],
+          "time_estimate": "2 hours",
+          "dependencies": [],
+          "implementation_scope": {
+            "source": ["src/infrastructure/driving/http/models/jazz_standards_models.rs"],
+            "tests": []
+          }
+        },
+        {
+          "id": "01-02",
+          "name": "Jazz Standards Service (TDD)",
+          "description": "Create service layer loading standards from JSON via include_str! macro. Implements get_all_standards and get_standard_by_id methods.",
+          "criteria": [
+            "Service loads all 15 standards from jazz-standards.json",
+            "get_all_standards returns all 15 standards",
+            "get_standard_by_id returns Some(standard) for valid ID",
+            "get_standard_by_id returns None for invalid ID",
+            "Standards loaded at compile time with zero runtime file I/O overhead"
+          ],
+          "time_estimate": "4 hours",
+          "dependencies": ["01-01"],
+          "implementation_scope": {
+            "source": ["src/services/jazz_standards_service.rs"],
+            "tests": ["src/services/jazz_standards_service.rs"]
+          }
+        },
+        {
+          "id": "01-03",
+          "name": "GET /jazz-standards Endpoint (RED-GREEN-REFACTOR)",
+          "description": "HTTP handler for listing all standards. Write acceptance test first (RED), implement handler (GREEN), refactor.",
+          "criteria": [
+            "GET /jazz-standards returns 200 with array of 15 standards",
+            "Response includes all metadata (name, composer, key, difficulty, tempo, form)",
+            "Endpoint requires valid X-API-Key header",
+            "Returns 401 without valid API key",
+            "Response time <500ms (static data)"
+          ],
+          "time_estimate": "4 hours",
+          "dependencies": ["01-02"],
+          "implementation_scope": {
+            "source": ["src/infrastructure/driving/http/jazz_standards_handlers.rs", "src/lib.rs"],
+            "tests": ["test/standards-endpoints.e2e.test.ts"]
+          }
+        },
+        {
+          "id": "01-04",
+          "name": "GET /jazz-standards/{id} Endpoint (RED-GREEN-REFACTOR)",
+          "description": "HTTP handler for single standard by ID. Write acceptance test first (RED), implement handler (GREEN), refactor.",
+          "criteria": [
+            "GET /jazz-standards/autumn-leaves returns 200 with single standard",
+            "Response includes dual progressions (chords_original, chords_improvisation)",
+            "Returns 404 for invalid standard ID",
+            "Returns 401 without valid API key",
+            "ID parameter uses kebab-case (autumn-leaves, blue-bossa)"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["01-02"],
+          "implementation_scope": {
+            "source": ["src/infrastructure/driving/http/jazz_standards_handlers.rs", "src/lib.rs"],
+            "tests": ["test/standards-endpoints.e2e.test.ts"]
+          }
+        },
+        {
+          "id": "01-05",
+          "name": "Backend Error Handling & Integration Tests",
+          "description": "Implement error scenarios (500, 401, 404). Write integration tests covering error paths and authentication.",
+          "criteria": [
+            "401 error returns message: Missing or invalid API key",
+            "404 error returns message: Standard not found",
+            "500 error returns message: Failed to load standards",
+            "Error responses use consistent JSON format",
+            "All backend E2E tests pass (GET /jazz-standards, GET /jazz-standards/{id}, error scenarios)"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["01-03", "01-04"],
+          "implementation_scope": {
+            "source": ["src/infrastructure/driving/http/jazz_standards_handlers.rs", "src/domain/errors.rs"],
+            "tests": ["test/standards-endpoints.e2e.test.ts"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "name": "Frontend - React Components and Hooks",
+      "description": "Implement React components with Outside-In TDD. Create custom hooks for API calls, stateless components for UI. Follow existing patterns.",
+      "steps": [
+        {
+          "id": "02-01",
+          "name": "Frontend TypeScript Types",
+          "description": "Create TypeScript interfaces for jazz standards, CAGED shapes, API requests/responses. Match backend models exactly.",
+          "criteria": [
+            "JazzStandard interface matches backend model",
+            "Shape values restricted to exactly five CAGED shapes: C, A, G, E, D",
+            "Line interface includes pitches, patterns, tab",
+            "GenerateLinesRequest/Response types match existing API contract",
+            "Types compile without errors"
+          ],
+          "time_estimate": "1 hour",
+          "dependencies": ["01-05"],
+          "implementation_scope": {
+            "source": ["src/types/jazzStandards.ts"],
+            "tests": []
+          }
+        },
+        {
+          "id": "02-02",
+          "name": "useStandards Hook (TDD with Mocks)",
+          "description": "Custom hook for fetching all standards. Write unit test with mocked API client first (RED), implement hook (GREEN), refactor.",
+          "criteria": [
+            "Hook fetches standards on mount",
+            "Returns loading state during fetch",
+            "Returns error state on fetch failure",
+            "Provides refetch function for retry",
+            "Unit test uses mocked API client (fast execution)"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["02-01"],
+          "implementation_scope": {
+            "source": ["src/hooks/useStandards.ts", "src/api/client.ts"],
+            "tests": ["src/hooks/useStandards.test.ts", "test/fixtures/api-client.mock.ts"]
+          }
+        },
+        {
+          "id": "02-03",
+          "name": "useStandardDetail Hook (TDD with Mocks)",
+          "description": "Custom hook for fetching single standard by ID. Write unit test with mocked API client first (RED), implement hook (GREEN).",
+          "criteria": [
+            "Hook fetches standard by ID on mount or ID change",
+            "Returns loading state during fetch",
+            "Returns error state on fetch failure (including 404)",
+            "Provides refetch function for retry",
+            "Unit test uses mocked API client"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["02-01"],
+          "implementation_scope": {
+            "source": ["src/hooks/useStandardDetail.ts", "src/api/client.ts"],
+            "tests": ["src/hooks/useStandardDetail.test.ts", "test/fixtures/api-client.mock.ts"]
+          }
+        },
+        {
+          "id": "02-04",
+          "name": "StandardCard Component (TDD with RTL)",
+          "description": "Display individual standard with metadata. Write component test with React Testing Library first (RED), implement (GREEN).",
+          "criteria": [
+            "Displays standard name, composer, key, difficulty, tempo, form",
+            "Difficulty badge color-coded (green=beginner, yellow=intermediate, red=advanced)",
+            "Hover effect indicates clickability",
+            "Fires onClick callback with standard ID",
+            "Accessible with keyboard navigation and ARIA labels"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["02-01"],
+          "implementation_scope": {
+            "source": ["src/components/experimental/StandardCard.tsx"],
+            "tests": ["src/components/experimental/StandardCard.test.tsx"]
+          }
+        },
+        {
+          "id": "02-05",
+          "name": "DualProgressionDisplay Component (TDD with RTL)",
+          "description": "Show original and Barry Harris simplified progressions with explanation. Write component test first (RED), implement (GREEN).",
+          "criteria": [
+            "Both progressions labeled clearly (Original Progression, Improvisation Progression)",
+            "Explanation text visible below progressions",
+            "Responsive layout (side-by-side desktop, stacked mobile)",
+            "Chords displayed as badges or inline text",
+            "No visual bugs at mobile viewport (320px)"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["02-01"],
+          "implementation_scope": {
+            "source": ["src/components/experimental/DualProgressionDisplay.tsx"],
+            "tests": ["src/components/experimental/DualProgressionDisplay.test.tsx"]
+          }
+        },
+        {
+          "id": "02-06",
+          "name": "ShapeSelector Component (TDD with RTL)",
+          "description": "CAGED shape buttons with active state. Write component test first (RED), implement controlled component (GREEN).",
+          "criteria": [
+            "Five buttons labeled C, A, G, E, D",
+            "Active shape visually distinct with primary color",
+            "Disabled during loading (no double-clicks)",
+            "Fires onShapeChange callback with selected shape",
+            "Accessible with keyboard navigation and ARIA pressed states"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["02-01"],
+          "implementation_scope": {
+            "source": ["src/components/experimental/ShapeSelector.tsx"],
+            "tests": ["src/components/experimental/ShapeSelector.test.tsx"]
+          }
+        },
+        {
+          "id": "02-07",
+          "name": "LineDisplay Component (TDD with abcjs)",
+          "description": "Render ABC notation via abcjs library. Write component test first (RED), implement rendering logic (GREEN).",
+          "criteria": [
+            "ABC notation renders within 1 second",
+            "Chord symbols aligned with notation",
+            "Tablature visible below notation (optional)",
+            "Responsive width scales to container",
+            "Display refreshes when generated lines change"
+          ],
+          "time_estimate": "4 hours",
+          "dependencies": ["02-01"],
+          "implementation_scope": {
+            "source": ["src/components/experimental/LineDisplay.tsx", "src/utils/abcConverter.ts"],
+            "tests": ["src/components/experimental/LineDisplay.test.tsx"]
+          }
+        },
+        {
+          "id": "02-08",
+          "name": "StandardsLibraryPage Component (TDD Orchestration)",
+          "description": "Page component orchestrating standards list. Write component test first (RED), implement with useStandards hook (GREEN).",
+          "criteria": [
+            "Displays 15 standards in grid (3 cols desktop, 1 col mobile)",
+            "Loading indicator shown during fetch",
+            "Error message with Retry button on failure",
+            "Navigates to detail page on standard card click",
+            "Grid layout responsive at mobile viewport"
+          ],
+          "time_estimate": "4 hours",
+          "dependencies": ["02-02", "02-04"],
+          "implementation_scope": {
+            "source": ["src/pages/experimental/StandardsLibraryPage.tsx"],
+            "tests": ["src/pages/experimental/StandardsLibraryPage.test.tsx"]
+          }
+        },
+        {
+          "id": "02-09",
+          "name": "StandardDetailPage Component (TDD Orchestration)",
+          "description": "Page component orchestrating detail view. Write component test first (RED), implement with hooks (GREEN).",
+          "criteria": [
+            "Loads standard by ID from URL param",
+            "Displays dual progressions immediately",
+            "Generate Lines button triggers API call with default E shape",
+            "Shape selector appears after first generation",
+            "Shape switch triggers regeneration with new shape",
+            "Back to Library link navigates to standards list"
+          ],
+          "time_estimate": "5 hours",
+          "dependencies": ["02-03", "02-05", "02-06", "02-07"],
+          "implementation_scope": {
+            "source": ["src/pages/experimental/StandardDetailPage.tsx"],
+            "tests": ["src/pages/experimental/StandardDetailPage.test.tsx"]
+          }
+        },
+        {
+          "id": "02-10",
+          "name": "Navigation and Routing Updates",
+          "description": "Add Experimental tab to navigation. Update router with new routes for standards library and detail pages.",
+          "criteria": [
+            "Experimental tab visible in main navigation",
+            "Route /experimental renders StandardsLibraryPage",
+            "Route /experimental/standards/:id renders StandardDetailPage",
+            "URL params persist on page refresh",
+            "Navigation accessible with keyboard (Tab key)"
+          ],
+          "time_estimate": "2 hours",
+          "dependencies": ["02-08", "02-09"],
+          "implementation_scope": {
+            "source": ["src/components/Navigation.tsx", "src/App.tsx", "src/routes.tsx"],
+            "tests": ["src/components/Navigation.test.tsx"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "name": "Integration, E2E Tests, and Performance Validation",
+      "description": "Connect frontend to backend with E2E tests. Implement walking skeletons one at a time. Validate all CSF targets with benchmarks.",
+      "steps": [
+        {
+          "id": "03-01",
+          "name": "Playwright Setup and Configuration",
+          "description": "Install Playwright, create config, setup test fixtures. Prepare for E2E test implementation.",
+          "criteria": [
+            "Playwright installed: npm install -D @playwright/test",
+            "Chromium browser installed: npx playwright install chromium",
+            "playwright.config.ts created with baseURL and webServer config",
+            "Test fixtures directory created with mock data",
+            "Sample test runs successfully (health check)"
+          ],
+          "time_estimate": "2 hours",
+          "dependencies": ["02-10"],
+          "implementation_scope": {
+            "source": [],
+            "tests": ["playwright.config.ts", "test/e2e/fixtures.ts"]
+          }
+        },
+        {
+          "id": "03-02",
+          "name": "Walking Skeleton 1: First-Time User Journey (RED-GREEN)",
+          "description": "E2E test for complete user journey from app open to guitar practice. Enable ONLY this test (mark others @skip). Implement until green.",
+          "criteria": [
+            "User opens app and clicks Experimental tab within 10 seconds",
+            "Standards library loads 15 standards within 2 seconds",
+            "User selects Autumn Leaves and views dual progressions",
+            "User generates lines with default E shape within 3 seconds",
+            "User switches to A shape and sees new lines within 3 seconds",
+            "Total journey time <30 seconds (CSF 1)"
+          ],
+          "time_estimate": "6 hours",
+          "dependencies": ["03-01"],
+          "implementation_scope": {
+            "source": ["src/api/client.ts"],
+            "tests": ["test/e2e/standards-library/complete-user-journey.test.ts"]
+          }
+        },
+        {
+          "id": "03-03",
+          "name": "Walking Skeleton 2: Returning User URL Access (RED-GREEN)",
+          "description": "E2E test for direct URL access. Enable this test. Implement until green. Commit on green.",
+          "criteria": [
+            "User opens URL with standard ID (e.g., /experimental/standards/blue-bossa)",
+            "Lands directly on detail page without seeing library list first",
+            "Dual progressions visible immediately",
+            "Generates lines with default E shape within 3 seconds",
+            "Switches to G shape and sees new lines within 3 seconds",
+            "Total URL-to-practice time <20 seconds"
+          ],
+          "time_estimate": "4 hours",
+          "dependencies": ["03-02"],
+          "implementation_scope": {
+            "source": [],
+            "tests": ["test/e2e/standards-library/returning-user-url.test.ts"]
+          }
+        },
+        {
+          "id": "03-04",
+          "name": "Shape Exploration Scenario (RED-GREEN)",
+          "description": "E2E test for exploring multiple shapes across two standards. Enable this test. Implement until green.",
+          "criteria": [
+            "User explores all 5 shapes (C, A, G, E, D) for Autumn Leaves",
+            "Each shape switch completes within 3 seconds",
+            "User completes 5 shape switches in <20 seconds total",
+            "User returns to library and selects Solar",
+            "User explores A and G shapes for Solar",
+            "Total time for 2 standards with multiple shapes <2 minutes"
+          ],
+          "time_estimate": "4 hours",
+          "dependencies": ["03-03"],
+          "implementation_scope": {
+            "source": [],
+            "tests": ["test/e2e/standards-library/shape-exploration.test.ts"]
+          }
+        },
+        {
+          "id": "03-05",
+          "name": "API Timeout Recovery Scenario (RED-GREEN)",
+          "description": "E2E test for timeout handling. Enable this test. Implement error handling until green.",
+          "criteria": [
+            "User generates lines for Stella By Starlight",
+            "API experiences high latency (>5 seconds)",
+            "Timeout message appears: Generation is taking longer than expected",
+            "Retry button displayed with loading indicator still visible",
+            "User clicks Retry and API responds successfully within 3 seconds",
+            "Context preserved (standard and shape not lost)"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["03-04"],
+          "implementation_scope": {
+            "source": ["src/hooks/useLineGenerator.ts", "src/api/client.ts"],
+            "tests": ["test/e2e/standards-library/api-timeout-recovery.test.ts"]
+          }
+        },
+        {
+          "id": "03-06",
+          "name": "Rate Limit Handling Scenario (RED-GREEN)",
+          "description": "E2E test for rate limiting. Enable this test. Implement rate limit detection until green.",
+          "criteria": [
+            "User explores shapes rapidly (25 requests in 1 minute)",
+            "First 20 requests succeed with 200 OK",
+            "21st request returns 429 Too Many Requests",
+            "Error message: You're exploring shapes too quickly. Please wait 60 seconds",
+            "Countdown timer shows seconds remaining",
+            "After 60 seconds, user can continue exploring shapes"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["03-04"],
+          "implementation_scope": {
+            "source": ["src/hooks/useLineGenerator.ts", "src/api/client.ts"],
+            "tests": ["test/e2e/standards-library/rate-limit-handling.test.ts"]
+          }
+        },
+        {
+          "id": "03-07",
+          "name": "Standards Library Load Failure Scenario (RED-GREEN)",
+          "description": "E2E test for library load error. Enable this test. Implement error handling until green.",
+          "criteria": [
+            "User clicks Experimental tab",
+            "Standards library API is temporarily unavailable",
+            "Loading indicator shown then error message: Unable to load standards library",
+            "Retry button displayed without broken UI or stack trace",
+            "API becomes available and user clicks Retry",
+            "Standards load successfully within 2 seconds"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["03-04"],
+          "implementation_scope": {
+            "source": ["src/hooks/useStandards.ts", "src/pages/experimental/StandardsLibraryPage.tsx"],
+            "tests": ["test/e2e/standards-library/library-load-failure.test.ts"]
+          }
+        },
+        {
+          "id": "03-08",
+          "name": "Boundary Scenarios: Invalid ID and Missing API Key",
+          "description": "E2E tests for 404 and 401 error handling. Enable tests. Implement error UI until green.",
+          "criteria": [
+            "User navigates to /experimental/standards/invalid-standard-name",
+            "404 error message: Standard not found with Return to Library link",
+            "No broken UI or stack trace visible",
+            "Unauthenticated API request returns 401 with message: Missing or invalid API key",
+            "Authentication enforced consistently across all endpoints"
+          ],
+          "time_estimate": "2 hours",
+          "dependencies": ["03-04"],
+          "implementation_scope": {
+            "source": ["src/pages/experimental/NotFoundPage.tsx", "src/api/client.ts"],
+            "tests": ["test/e2e/standards-library/boundary-scenarios.test.ts"]
+          }
+        },
+        {
+          "id": "03-09",
+          "name": "Accessibility: Keyboard Navigation Scenario",
+          "description": "E2E test for keyboard-only navigation. Enable this test. Implement accessibility until green.",
+          "criteria": [
+            "Keyboard-only user can Tab through standards cards",
+            "Focus indicators visible on all interactive elements",
+            "Enter key on focused standard navigates to detail page",
+            "Tab to Generate Lines button and Enter triggers generation",
+            "Tab to shape buttons and Enter triggers shape regeneration",
+            "All interactive elements have ARIA labels"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["03-04"],
+          "implementation_scope": {
+            "source": [
+              "src/components/experimental/StandardCard.tsx",
+              "src/components/experimental/ShapeSelector.tsx",
+              "src/pages/experimental/StandardDetailPage.tsx"
+            ],
+            "tests": ["test/e2e/accessibility/keyboard-navigation.test.ts"]
+          }
+        },
+        {
+          "id": "03-10",
+          "name": "Performance Benchmarks: CSF Validation",
+          "description": "Implement performance tests validating all 3 CSF targets. Measure and optimize if needed.",
+          "criteria": [
+            "CSF 1 (Frictionless Entry): <30 seconds from app open to generation measured",
+            "CSF 2 (Fast Generation): <3 seconds API response p95 validated with 100 requests",
+            "CSF 5 (Shape Exploration): <3 seconds per shape switch validated",
+            "Performance tests run in CI pipeline",
+            "All CSF targets met in >95% of test runs"
+          ],
+          "time_estimate": "4 hours",
+          "dependencies": ["03-04"],
+          "implementation_scope": {
+            "source": [],
+            "tests": [
+              "test/e2e/performance/frictionless-entry.test.ts",
+              "test/e2e/performance/fast-generation.test.ts",
+              "test/e2e/performance/shape-switch-latency.test.ts"
+            ]
+          }
+        },
+        {
+          "id": "03-11",
+          "name": "Smoke Tests for CI/CD",
+          "description": "Create fast smoke tests for post-deployment validation. Target execution time <2 minutes total.",
+          "criteria": [
+            "9 critical smoke tests (backend health, endpoints, auth, frontend)",
+            "4 important smoke tests (caching, rate limiting, error handling)",
+            "All tests execute in <2 minutes total",
+            "Smoke tests integrated into deploy.yml and deploy-frontend.yml",
+            "Smoke tests run automatically after deployment"
+          ],
+          "time_estimate": "3 hours",
+          "dependencies": ["03-08"],
+          "implementation_scope": {
+            "source": [],
+            "tests": ["test/smoke.e2e.test.ts"]
+          }
+        },
+        {
+          "id": "03-12",
+          "name": "Documentation and Handoff Preparation",
+          "description": "Update README, create deployment guide, document E2E test execution. Prepare for production deployment.",
+          "criteria": [
+            "README updated with Experimental tab feature description",
+            "Test execution commands documented (Playwright, Vitest)",
+            "Deployment guide includes wrangler commands and environment variables",
+            "All acceptance criteria validated and documented",
+            "Feature demo video recorded for stakeholders (optional)"
+          ],
+          "time_estimate": "2 hours",
+          "dependencies": ["03-11"],
+          "implementation_scope": {
+            "source": ["README.md", "docs/feature/experimental-tab/deliver/DEPLOYMENT.md"],
+            "tests": []
+          }
+        }
+      ]
+    }
+  ],
+  "implementation_scope": {
+    "source_directories": [
+      "src/infrastructure/driving/http/",
+      "src/infrastructure/driven/",
+      "src/services/",
+      "src/domain/",
+      "src/api/",
+      "src/hooks/",
+      "src/components/experimental/",
+      "src/pages/experimental/",
+      "src/types/",
+      "src/utils/"
+    ],
+    "test_directories": [
+      "test/",
+      "test/e2e/",
+      "test/e2e/standards-library/",
+      "test/e2e/performance/",
+      "test/e2e/accessibility/",
+      "test/fixtures/",
+      "src/hooks/",
+      "src/components/experimental/",
+      "src/pages/experimental/"
+    ],
+    "excluded_patterns": [
+      "__init__.py",
+      "__pycache__/**",
+      "node_modules/**",
+      ".next/**",
+      "dist/**",
+      "build/**",
+      "coverage/**",
+      ".turbo/**"
+    ]
+  },
+  "validation": {
+    "status": "approved",
+    "reviewer": "solution-architect-reviewer",
+    "approved_at": "2026-03-04T16:45:00Z",
+    "review_date": "2026-03-04",
+    "iteration": 2,
+    "approval_conditions": [],
+    "critical_issues_count": 0,
+    "high_issues_count": 0,
+    "medium_issues_count": 0,
+    "strengths": [
+      "Clear external validity with system entry point wiring (Steps 01-03, 02-10, 03-02)",
+      "Excellent step decomposition ratio (1.59, well below 2.0 threshold)",
+      "Walking Skeleton pattern enforces incremental integration (Steps 03-02 through 03-04)",
+      "Zero implementation code in roadmap — maintains WHAT vs. HOW separation",
+      "Concise acceptance criteria within word count thresholds",
+      "E2E tests correctly placed at system boundary (Phase 3)"
+    ],
+    "recommendations": [],
+    "review_metadata": {
+      "architecture_docs_reviewed": [
+        "docs/feature/experimental-tab/design/architecture.md",
+        "docs/feature/experimental-tab/design/adrs/ADR-001-development-paradigm-selection.md",
+        "docs/feature/experimental-tab/design/adrs/ADR-002-no-repository-layer.md"
+      ],
+      "files_analyzed": {
+        "backend_files": 100,
+        "frontend_files": 75,
+        "unique_production_files_in_scope": 17,
+        "total_implementation_steps": 27,
+        "decomposition_ratio": 1.59
+      },
+      "external_validity_check": "PASSED",
+      "ac_coupling_check": "PASSED",
+      "step_decomposition_check": "PASSED (1.59 < 2.0)",
+      "implementation_code_check": "PASSED",
+      "concision_check": "PASSED",
+      "test_boundary_check": "PASSED"
+    },
+    "notes": "Roadmap ready for TDD implementation. Follow Outside-In approach: enable ONE acceptance test at a time (mark others @skip), implement until green, commit, repeat. Backend uses real implementations (no mocks). Frontend component unit tests use React Testing Library with user-centric queries (getByRole, getByLabelText) — no shallow rendering or prop assertions. Frontend hooks unit tests use mocked API client. E2E tests use real backend. Estimated delivery: 2-3 weeks (80-100 hours)."
+  }
+}
