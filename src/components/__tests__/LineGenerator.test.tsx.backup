@@ -35,8 +35,6 @@ describe('LineGenerator', () => {
     error: null,
     isLoading: false,
     isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
     generateLines: mockGenerateLines,
     checkServerHealth: mockCheckServerHealth,
   };
@@ -54,8 +52,6 @@ describe('LineGenerator', () => {
       error: null,
       isLoading: false,
       isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
       generateLines: vi.fn(),
       checkServerHealth: vi.fn(),
     });
@@ -104,8 +100,6 @@ describe('LineGenerator', () => {
         ...defaultHookReturn,
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: localMockGenerateLines,
       });
 
@@ -153,8 +147,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: vi.fn(),
         checkServerHealth: vi.fn(),
       });
@@ -174,8 +166,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         checkServerHealth: vi.fn(),
         generateLines: vi.fn(),
       });
@@ -230,8 +220,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         checkServerHealth: vi.fn(),
         generateLines: localMockGenerateLines,
       });
@@ -249,8 +237,6 @@ describe('LineGenerator', () => {
         error: 'Failed to generate lines',
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: localMockGenerateLines,
         checkServerHealth: vi.fn(),
       });
@@ -263,8 +249,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: localMockGenerateLines,
         checkServerHealth: vi.fn(),
       });
@@ -280,8 +264,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: vi.fn(),
         checkServerHealth: vi.fn(),
       });
@@ -305,8 +287,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: true,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: vi.fn(),
         checkServerHealth: vi.fn(),
       });
@@ -321,8 +301,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: true,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: vi.fn(),
         checkServerHealth: vi.fn(),
       });
@@ -354,8 +332,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: false,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: vi.fn(),
         checkServerHealth: vi.fn(),
       });
@@ -372,8 +348,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: false,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: vi.fn(),
         checkServerHealth: vi.fn(),
       });
@@ -401,8 +375,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: false,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: vi.fn(),
         checkServerHealth: localMockCheckServerHealth,
       });
@@ -429,8 +401,6 @@ describe('LineGenerator', () => {
         error: 'Failed to generate lines',
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: vi.fn(),
         checkServerHealth: vi.fn(),
       });
@@ -446,8 +416,6 @@ describe('LineGenerator', () => {
         error: 'Failed to generate lines',
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: localMockGenerateLines,
         checkServerHealth: vi.fn(),
       });
@@ -460,8 +428,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: localMockGenerateLines,
         checkServerHealth: vi.fn(),
       });
@@ -486,8 +452,6 @@ describe('LineGenerator', () => {
         error: null,
         isLoading: false,
         isServerHealthy: true,
-        isTimedOut: false,
-        retry: vi.fn(),
         generateLines: vi.fn(),
         checkServerHealth: vi.fn(),
       });

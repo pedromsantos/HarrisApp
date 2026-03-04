@@ -16,8 +16,10 @@ export function StandardDetailPage(): React.ReactElement {
     materializedLines,
     error: barryError,
     isLoading: barryLoading,
+    isTimedOut: barryTimedOut,
     generateInstructions,
     materializeInstructions,
+    retry: barryRetry,
   } = useBarryHarrisInstructions();
 
   const [selectedShape, setSelectedShape] = useState<CAGEDShape>('E');
@@ -126,6 +128,25 @@ export function StandardDetailPage(): React.ReactElement {
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Select CAGED Shape</h3>
             <ShapeSelector activeShape={selectedShape} onShapeChange={handleShapeChange} isLoading={barryLoading} />
+          </div>
+        )}
+
+        {/* Timeout Message */}
+        {barryTimedOut && barryLoading && (
+          <div className="rounded-lg border border-yellow-300 bg-yellow-50 p-4 mb-6">
+            <p className="text-sm text-yellow-800 mb-2">Generation is taking longer than expected</p>
+            <div className="flex items-center gap-4">
+              <div data-testid="loading-indicator" className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-800"></div>
+                <span className="text-sm text-yellow-700">Still loading...</span>
+              </div>
+              <button
+                onClick={() => void barryRetry()}
+                className="rounded-md bg-yellow-600 px-4 py-1.5 text-sm text-white font-medium hover:bg-yellow-700"
+              >
+                Retry
+              </button>
+            </div>
           </div>
         )}
 

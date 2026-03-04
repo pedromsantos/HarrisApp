@@ -21,7 +21,7 @@ export function ShapeSelector({ activeShape, onShapeChange, isLoading }: ShapeSe
   );
 
   return (
-    <div className="flex gap-2" role="group" aria-label="CAGED shape selector">
+    <div className="flex gap-2" role="group" aria-label="CAGED shape selector" data-testid="shape-selector">
       {ALL_SHAPES.map((shape) => {
         const isActive = shape === activeShape;
         return (

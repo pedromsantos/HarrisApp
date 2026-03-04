@@ -13,28 +13,29 @@ const API_BASE_URL = import.meta.env.DEV
   : ((import.meta.env['VITE_API_URL'] as string | undefined) ??
     'https://harrisapp-backend.your-worker-subdomain.workers.dev');
 
+const TIMEOUT_THRESHOLD = 5000; // Show timeout message after 5 seconds
+
 type UseBarryHarrisInstructionsReturn = {
   instructions: InstructionsResponse | null;
   materializedLines: MaterializedLinesResponse | null;
   error: string | null;
   isLoading: boolean;
-  generateInstructions: (
-    request: GenerateInstructionsRequest
-  ) => Promise<InstructionsResponse | null>;
-  materializeInstructions: (
-    request: MaterializeInstructionsRequest
-  ) => Promise<MaterializedLinesResponse | null>;
+  isTimedOut: boolean;
+  generateInstructions: (request: GenerateInstructionsRequest) => Promise<InstructionsResponse | null>;
+  materializeInstructions: (request: MaterializeInstructionsRequest) => Promise<MaterializedLinesResponse | null>;
+  retry: () => Promise<void>;
   clearError: () => void;
   clearResults: () => void;
 };
 
 export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
   const [instructions, setInstructions] = useState<InstructionsResponse | null>(null);
-  const [materializedLines, setMaterializedLines] = useState<MaterializedLinesResponse | null>(
-    null
-  );
+  const [materializedLines, setMaterializedLines] = useState<MaterializedLinesResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTimedOut, setIsTimedOut] = useState(false);
+  const [lastGenerateRequest, setLastGenerateRequest] = useState<GenerateInstructionsRequest | null>(null);
+  const [lastMaterializeRequest, setLastMaterializeRequest] = useState<MaterializeInstructionsRequest | null>(null);
 
   const handleError = useCallback((err: unknown) => {
     if (err instanceof Error) {
@@ -52,42 +53,39 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
     }
   }, []);
 
-  const validateInstructionsResponse = useCallback(
-    (data: unknown): data is InstructionsResponse => {
-      if (typeof data !== 'object' || data === null) {
-        throw new Error('Invalid response format: not an object');
-      }
-      const response = data as { transitions?: unknown; metadata?: unknown };
-      if (
-        response.transitions === undefined ||
-        !Array.isArray(response.transitions) ||
-        response.metadata === undefined
-      ) {
-        throw new Error('Invalid response format: missing transitions or metadata');
-      }
-      return true;
-    },
-    []
-  );
+  const validateInstructionsResponse = useCallback((data: unknown): data is InstructionsResponse => {
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('Invalid response format: not an object');
+    }
+    const response = data as { transitions?: unknown; metadata?: unknown };
+    if (response.transitions === undefined || !Array.isArray(response.transitions) || response.metadata === undefined) {
+      throw new Error('Invalid response format: missing transitions or metadata');
+    }
+    return true;
+  }, []);
 
-  const validateMaterializedResponse = useCallback(
-    (data: unknown): data is MaterializedLinesResponse => {
-      if (typeof data !== 'object' || data === null) {
-        throw new Error('Invalid response format: not an object');
-      }
-      const response = data as { lines?: unknown };
-      if (response.lines === undefined || !Array.isArray(response.lines)) {
-        throw new Error('Invalid response format: missing lines');
-      }
-      return true;
-    },
-    []
-  );
+  const validateMaterializedResponse = useCallback((data: unknown): data is MaterializedLinesResponse => {
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('Invalid response format: not an object');
+    }
+    const response = data as { lines?: unknown };
+    if (response.lines === undefined || !Array.isArray(response.lines)) {
+      throw new Error('Invalid response format: missing lines');
+    }
+    return true;
+  }, []);
 
   const generateInstructions = useCallback(
     async (request: GenerateInstructionsRequest) => {
       setError(null);
       setIsLoading(true);
+      setIsTimedOut(false);
+      setLastGenerateRequest(request);
+
+      // Set timeout flag after TIMEOUT_THRESHOLD
+      const timeoutId = setTimeout(() => {
+        setIsTimedOut(true);
+      }, TIMEOUT_THRESHOLD);
 
       try {
         const endpoint = import.meta.env.DEV
@@ -121,11 +119,13 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
         validateInstructionsResponse(data);
 
         setInstructions(data as InstructionsResponse);
+        setIsTimedOut(false);
         return data as InstructionsResponse;
       } catch (err) {
         handleError(err);
         return null;
       } finally {
+        clearTimeout(timeoutId);
         setIsLoading(false);
       }
     },
@@ -136,6 +136,13 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
     async (request: MaterializeInstructionsRequest) => {
       setError(null);
       setIsLoading(true);
+      setIsTimedOut(false);
+      setLastMaterializeRequest(request);
+
+      // Set timeout flag after TIMEOUT_THRESHOLD
+      const timeoutId = setTimeout(() => {
+        setIsTimedOut(true);
+      }, TIMEOUT_THRESHOLD);
 
       try {
         const endpoint = import.meta.env.DEV
@@ -155,9 +162,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
 
         if (!response.ok) {
           const errorData = data as { error?: string; message?: string };
-          throw new Error(
-            errorData.message ?? errorData.error ?? 'Failed to materialize instructions'
-          );
+          throw new Error(errorData.message ?? errorData.error ?? 'Failed to materialize instructions');
         }
 
         // Unwrap message field if present (API returns stringified JSON in message field)
@@ -171,16 +176,31 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
         validateMaterializedResponse(data);
 
         setMaterializedLines(data as MaterializedLinesResponse);
+        setIsTimedOut(false);
         return data as MaterializedLinesResponse;
       } catch (err) {
         handleError(err);
         return null;
       } finally {
+        clearTimeout(timeoutId);
         setIsLoading(false);
       }
     },
     [validateMaterializedResponse, handleError]
   );
+
+  const retry = useCallback(async () => {
+    if (lastGenerateRequest && lastMaterializeRequest) {
+      const instructionsResult = await generateInstructions(lastGenerateRequest);
+      if (instructionsResult) {
+        await materializeInstructions(lastMaterializeRequest);
+      }
+    } else if (lastGenerateRequest) {
+      await generateInstructions(lastGenerateRequest);
+    } else if (lastMaterializeRequest) {
+      await materializeInstructions(lastMaterializeRequest);
+    }
+  }, [lastGenerateRequest, lastMaterializeRequest, generateInstructions, materializeInstructions]);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -197,8 +217,10 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
     materializedLines,
     error,
     isLoading,
+    isTimedOut,
     generateInstructions,
     materializeInstructions,
+    retry,
     clearError,
     clearResults,
   };

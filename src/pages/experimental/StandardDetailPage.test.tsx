@@ -114,6 +114,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: vi.fn(),
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     render(<StandardDetailPage />);
@@ -142,6 +144,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: vi.fn(),
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     render(<StandardDetailPage />);
@@ -175,6 +179,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: mockMaterializeInstructions,
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     render(<StandardDetailPage />);
@@ -214,6 +220,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: mockMaterializeInstructions,
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     render(<StandardDetailPage />);
@@ -231,6 +239,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: mockMaterializeInstructions,
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     // Click generate button to trigger hasGenerated state change
@@ -267,6 +277,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: mockMaterializeInstructions,
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     render(<StandardDetailPage />);
@@ -281,6 +293,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: mockMaterializeInstructions,
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     // First, generate lines to show shape selector
@@ -327,6 +341,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: vi.fn(),
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     render(<StandardDetailPage />);
@@ -355,6 +371,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: vi.fn(),
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     render(<StandardDetailPage />);
@@ -381,6 +399,8 @@ describe('StandardDetailPage', () => {
       materializeInstructions: vi.fn(),
       clearError: vi.fn(),
       clearResults: vi.fn(),
+      isTimedOut: false,
+      retry: vi.fn(),
     });
 
     render(<StandardDetailPage />);

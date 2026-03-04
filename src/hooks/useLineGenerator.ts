@@ -9,21 +9,26 @@ const API_BASE_URL = import.meta.env.DEV
     'https://harrisapp-backend.your-worker-subdomain.workers.dev');
 
 const HEALTH_CHECK_INTERVAL = 60 * 1000;
+const TIMEOUT_THRESHOLD = 5000; // Show timeout message after 5 seconds
 
 type UseLineGeneratorReturn = {
   result: LineGeneratorResponse | null;
   error: string | null;
   isLoading: boolean;
+  isTimedOut: boolean;
   isServerHealthy: boolean | null;
   checkServerHealth: () => Promise<void>;
   generateLines: (formData: LineGeneratorRequest) => Promise<LineGeneratorResponse | null>;
+  retry: () => Promise<void>;
 };
 
 export function useLineGenerator(): UseLineGeneratorReturn {
   const [result, setResult] = useState<LineGeneratorResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTimedOut, setIsTimedOut] = useState(false);
   const [isServerHealthy, setIsServerHealthy] = useState<boolean | null>(null);
+  const [lastRequest, setLastRequest] = useState<LineGeneratorRequest | null>(null);
 
   const checkServerHealth = useCallback(async () => {
     try {
@@ -63,12 +68,9 @@ export function useLineGenerator(): UseLineGeneratorReturn {
     return true;
   }, []);
 
-  const normalizeResponseData = useCallback(
-    (data: LineGeneratorResponse): LineGeneratorResponse => {
-      return data;
-    },
-    []
-  );
+  const normalizeResponseData = useCallback((data: LineGeneratorResponse): LineGeneratorResponse => {
+    return data;
+  }, []);
 
   const makeApiRequest = useCallback(async (formData: LineGeneratorRequest) => {
     // Use proxy endpoint in development, Cloudflare Worker in production
@@ -114,6 +116,13 @@ export function useLineGenerator(): UseLineGeneratorReturn {
     async (formData: LineGeneratorRequest) => {
       setError(null);
       setIsLoading(true);
+      setIsTimedOut(false);
+      setLastRequest(formData);
+
+      // Set timeout flag after TIMEOUT_THRESHOLD
+      const timeoutId = setTimeout(() => {
+        setIsTimedOut(true);
+      }, TIMEOUT_THRESHOLD);
 
       try {
         const data = await makeApiRequest(formData);
@@ -123,23 +132,33 @@ export function useLineGenerator(): UseLineGeneratorReturn {
         const normalizedData = normalizeResponseData(data);
 
         setResult(normalizedData);
+        setIsTimedOut(false);
         return normalizedData;
       } catch (err) {
         handleError(err);
         return null;
       } finally {
+        clearTimeout(timeoutId);
         setIsLoading(false);
       }
     },
     [makeApiRequest, validateResponse, normalizeResponseData, handleError]
   );
 
+  const retry = useCallback(async () => {
+    if (lastRequest) {
+      await generateLines(lastRequest);
+    }
+  }, [lastRequest, generateLines]);
+
   return {
     result,
     error,
     isLoading,
+    isTimedOut,
     isServerHealthy,
     checkServerHealth,
     generateLines,
+    retry,
   };
 }
