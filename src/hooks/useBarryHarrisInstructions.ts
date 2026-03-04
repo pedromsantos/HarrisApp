@@ -1,20 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { API_BASE_URL, RATE_LIMIT, TIME, TIMEOUT_MS } from '@/config/api';
 import {
   GenerateInstructionsRequest,
   InstructionsResponse,
   MaterializedLinesResponse,
   MaterializeInstructionsRequest,
 } from '@/types/barryHarrisInstructions';
-
-const API_BASE_URL = import.meta.env.DEV
-  ? '/api'
-  : ((import.meta.env['VITE_API_URL'] as string | undefined) ??
-    'https://harrisapp-backend.your-worker-subdomain.workers.dev');
-
-const TIMEOUT_THRESHOLD_MS = 5000;
-const RATE_LIMIT_DEFAULT_RETRY_SECONDS = 60;
-const MILLISECONDS_PER_SECOND = 1000;
 
 type UseBarryHarrisInstructionsReturn = {
   instructions: InstructionsResponse | null;
@@ -52,7 +44,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
 
     const updateCountdown = () => {
       const now = Date.now();
-      const secondsLeft = Math.ceil((rateLimitExpiryTime - now) / MILLISECONDS_PER_SECOND);
+      const secondsLeft = Math.ceil((rateLimitExpiryTime - now) / TIME.MILLISECONDS_PER_SECOND);
 
       if (secondsLeft <= 0) {
         setIsRateLimited(false);
@@ -65,7 +57,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
     };
 
     updateCountdown();
-    const intervalId = setInterval(updateCountdown, MILLISECONDS_PER_SECOND);
+    const intervalId = setInterval(updateCountdown, TIME.MILLISECONDS_PER_SECOND);
 
     return () => clearInterval(intervalId);
   }, [rateLimitExpiryTime]);
@@ -81,8 +73,8 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
 
   const handleRateLimitResponse = useCallback((data: unknown) => {
     const rateLimitData = data as { error?: string; message?: string; retry_after?: number };
-    const retryAfter = rateLimitData.retry_after ?? RATE_LIMIT_DEFAULT_RETRY_SECONDS;
-    const expiryTime = Date.now() + retryAfter * MILLISECONDS_PER_SECOND;
+    const retryAfter = rateLimitData.retry_after ?? RATE_LIMIT.DEFAULT_RETRY_SECONDS;
+    const expiryTime = Date.now() + retryAfter * TIME.MILLISECONDS_PER_SECOND;
 
     setIsRateLimited(true);
     setRateLimitExpiryTime(expiryTime);
@@ -145,7 +137,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
 
       const timeoutId = setTimeout(() => {
         setIsTimedOut(true);
-      }, TIMEOUT_THRESHOLD_MS);
+      }, TIMEOUT_MS.DEFAULT);
 
       try {
         const endpoint = import.meta.env.DEV
@@ -197,7 +189,7 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
 
       const timeoutId = setTimeout(() => {
         setIsTimedOut(true);
-      }, TIMEOUT_THRESHOLD_MS);
+      }, TIMEOUT_MS.DEFAULT);
 
       try {
         const endpoint = import.meta.env.DEV

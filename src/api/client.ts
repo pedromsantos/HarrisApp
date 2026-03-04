@@ -1,9 +1,5 @@
+import { API_BASE_URL } from '@/config/api';
 import { JazzStandard } from '@/types/jazzStandards';
-
-const API_BASE_URL = import.meta.env.DEV
-  ? '/api'
-  : ((import.meta.env['VITE_API_URL'] as string | undefined) ??
-    'https://harrisapp-backend.your-worker-subdomain.workers.dev');
 
 const API_KEY = (import.meta.env['VITE_API_KEY'] as string | undefined) ?? 'dev-api-key';
 
