@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   GenerateInstructionsRequest,
@@ -21,6 +21,8 @@ type UseBarryHarrisInstructionsReturn = {
   error: string | null;
   isLoading: boolean;
   isTimedOut: boolean;
+  isRateLimited: boolean;
+  rateLimitSecondsRemaining: number | null;
   generateInstructions: (request: GenerateInstructionsRequest) => Promise<InstructionsResponse | null>;
   materializeInstructions: (request: MaterializeInstructionsRequest) => Promise<MaterializedLinesResponse | null>;
   retry: () => Promise<void>;
@@ -34,8 +36,38 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isTimedOut, setIsTimedOut] = useState(false);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [rateLimitExpiryTime, setRateLimitExpiryTime] = useState<number | null>(null);
+  const [rateLimitSecondsRemaining, setRateLimitSecondsRemaining] = useState<number | null>(null);
   const [lastGenerateRequest, setLastGenerateRequest] = useState<GenerateInstructionsRequest | null>(null);
   const [lastMaterializeRequest, setLastMaterializeRequest] = useState<MaterializeInstructionsRequest | null>(null);
+
+  // Countdown timer for rate limit
+  useEffect(() => {
+    if (!rateLimitExpiryTime) {
+      setRateLimitSecondsRemaining(null);
+      return;
+    }
+
+    const updateCountdown = () => {
+      const now = Date.now();
+      const secondsLeft = Math.ceil((rateLimitExpiryTime - now) / 1000);
+
+      if (secondsLeft <= 0) {
+        setIsRateLimited(false);
+        setRateLimitExpiryTime(null);
+        setRateLimitSecondsRemaining(null);
+        setError(null);
+      } else {
+        setRateLimitSecondsRemaining(secondsLeft);
+      }
+    };
+
+    updateCountdown();
+    const intervalId = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [rateLimitExpiryTime]);
 
   const handleError = useCallback((err: unknown) => {
     if (err instanceof Error) {
@@ -80,6 +112,9 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
       setError(null);
       setIsLoading(true);
       setIsTimedOut(false);
+      setIsRateLimited(false);
+      setRateLimitExpiryTime(null);
+      setRateLimitSecondsRemaining(null);
       setLastGenerateRequest(request);
 
       // Set timeout flag after TIMEOUT_THRESHOLD
@@ -104,6 +139,19 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
         let data = (await response.json()) as unknown;
 
         if (!response.ok) {
+          // Handle rate limiting (429 status)
+          if (response.status === 429) {
+            const rateLimitData = data as { error?: string; message?: string; retry_after?: number };
+            const retryAfter = rateLimitData.retry_after ?? 60;
+            const expiryTime = Date.now() + retryAfter * 1000;
+
+            setIsRateLimited(true);
+            setRateLimitExpiryTime(expiryTime);
+            setRateLimitSecondsRemaining(retryAfter);
+            setError(`You're exploring shapes too quickly. Please wait ${retryAfter} seconds`);
+            return null;
+          }
+
           const errorData = data as { error?: string; message?: string };
           throw new Error(errorData.message ?? errorData.error ?? 'Failed to generate instructions');
         }
@@ -137,6 +185,9 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
       setError(null);
       setIsLoading(true);
       setIsTimedOut(false);
+      setIsRateLimited(false);
+      setRateLimitExpiryTime(null);
+      setRateLimitSecondsRemaining(null);
       setLastMaterializeRequest(request);
 
       // Set timeout flag after TIMEOUT_THRESHOLD
@@ -161,6 +212,19 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
         let data = (await response.json()) as unknown;
 
         if (!response.ok) {
+          // Handle rate limiting (429 status)
+          if (response.status === 429) {
+            const rateLimitData = data as { error?: string; message?: string; retry_after?: number };
+            const retryAfter = rateLimitData.retry_after ?? 60;
+            const expiryTime = Date.now() + retryAfter * 1000;
+
+            setIsRateLimited(true);
+            setRateLimitExpiryTime(expiryTime);
+            setRateLimitSecondsRemaining(retryAfter);
+            setError(`You're exploring shapes too quickly. Please wait ${retryAfter} seconds`);
+            return null;
+          }
+
           const errorData = data as { error?: string; message?: string };
           throw new Error(errorData.message ?? errorData.error ?? 'Failed to materialize instructions');
         }
@@ -218,6 +282,8 @@ export function useBarryHarrisInstructions(): UseBarryHarrisInstructionsReturn {
     error,
     isLoading,
     isTimedOut,
+    isRateLimited,
+    rateLimitSecondsRemaining,
     generateInstructions,
     materializeInstructions,
     retry,

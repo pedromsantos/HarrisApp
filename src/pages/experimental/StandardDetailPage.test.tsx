@@ -115,6 +115,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 
@@ -145,6 +147,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 
@@ -180,6 +184,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 
@@ -221,6 +227,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 
@@ -240,6 +248,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 
@@ -278,6 +288,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 
@@ -294,6 +306,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 
@@ -342,6 +356,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 
@@ -372,6 +388,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 
@@ -400,6 +418,8 @@ describe('StandardDetailPage', () => {
       clearError: vi.fn(),
       clearResults: vi.fn(),
       isTimedOut: false,
+      isRateLimited: false,
+      rateLimitSecondsRemaining: null,
       retry: vi.fn(),
     });
 

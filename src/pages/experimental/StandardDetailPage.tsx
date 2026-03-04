@@ -17,6 +17,8 @@ export function StandardDetailPage(): React.ReactElement {
     error: barryError,
     isLoading: barryLoading,
     isTimedOut: barryTimedOut,
+    isRateLimited: barryRateLimited,
+    rateLimitSecondsRemaining: barryRateLimitSeconds,
     generateInstructions,
     materializeInstructions,
     retry: barryRetry,
@@ -131,8 +133,24 @@ export function StandardDetailPage(): React.ReactElement {
           </div>
         )}
 
+        {/* Rate Limit Message */}
+        {barryRateLimited && barryError && (
+          <div className="rounded-lg border border-orange-300 bg-orange-50 p-4 mb-6">
+            <p className="text-sm text-orange-800 mb-2">{barryError}</p>
+            {barryRateLimitSeconds !== null && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-orange-700">Time remaining:</span>
+                <span data-testid="rate-limit-countdown" className="text-sm font-semibold text-orange-900">
+                  {barryRateLimitSeconds}
+                </span>
+                <span className="text-sm text-orange-700">seconds</span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Timeout Message */}
-        {barryTimedOut && barryLoading && (
+        {barryTimedOut && barryLoading && !barryRateLimited && (
           <div className="rounded-lg border border-yellow-300 bg-yellow-50 p-4 mb-6">
             <p className="text-sm text-yellow-800 mb-2">Generation is taking longer than expected</p>
             <div className="flex items-center gap-4">
@@ -151,7 +169,7 @@ export function StandardDetailPage(): React.ReactElement {
         )}
 
         {/* Error Display */}
-        {barryError && (
+        {barryError && !barryRateLimited && (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 mb-6">
             <p className="text-sm text-red-700">{barryError}</p>
           </div>
